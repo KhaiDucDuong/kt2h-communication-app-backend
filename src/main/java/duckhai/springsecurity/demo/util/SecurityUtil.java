@@ -25,6 +25,8 @@ public class SecurityUtil {
     private String jwtKey;
     @Value("${jwt.expiration-in-seconds}")
     private long jwtExpiration;
+    @Value("${jwt.claim-name}")
+    private String claimName;
 
     private final JwtEncoder jwtEncoder;
 
@@ -33,12 +35,11 @@ public class SecurityUtil {
         Instant validity;
 
         validity = now.plus(this.jwtExpiration, ChronoUnit.SECONDS);
-        // @formatter:off
         JwtClaimsSet claims = JwtClaimsSet.builder()
                 .issuedAt(now)
                 .expiresAt(validity)
                 .subject(authentication.getName())
-                .claim("khaiduong", authentication)
+                .claim(claimName, authentication)
                 .build();
 
         JwsHeader jwsHeader = JwsHeader.with(JWT_ALGORITHM).build();

@@ -19,8 +19,9 @@ api:
   prefix: /api
 
 jwt:
-  expiration-in-seconds: 86400 #1 day = 24 * 60 * 60
+  expiration-in-seconds: 86400 #1 day (86400s) = 24 * 60 * 60
   base64-secret: zNmgOnudAdPIQPXlnzsTaTxC8bOCGaF/PGHSxOlJXCnYDRMj3fC5qil7+NtMK6+e liTNyZwj3D0sVgGCfB/pxg==
+  claim-name: khaiduong
 
 logging:
   level:
