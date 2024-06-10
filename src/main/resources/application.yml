@@ -10,15 +10,19 @@ spring:
   jpa:
     show-sql: true
     hibernate:
-      ddl-auto: create-drop
+      ddl-auto: update
     properties:
       hibernate:
         dialect: org.hibernate.dialect.MySQLDialect
 
-  api:
-    prefix: /api
+api:
+  prefix: /api
 
-  logging:
-    level:
-      org.hibernate.SQL: debug
-      org.hibernate.type.descriptor.sql.BasicBinder: trace
+jwt:
+  expiration-in-seconds: 86400 #1 day = 24 * 60 * 60
+  base64-secret: zNmgOnudAdPIQPXlnzsTaTxC8bOCGaF/PGHSxOlJXCnYDRMj3fC5qil7+NtMK6+e liTNyZwj3D0sVgGCfB/pxg==
+
+logging:
+  level:
+    org.hibernate.SQL: debug
+    org.hibernate.type.descriptor.sql.BasicBinder: trace

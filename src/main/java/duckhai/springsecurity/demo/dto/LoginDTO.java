@@ -1,20 +1,17 @@
 package duckhai.springsecurity.demo.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import jakarta.persistence.Column;
-import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 
 @Getter
 @Setter
-public class UserDTO {
-    @JsonProperty("full_name")
-    private String fullName;
+public class LoginDTO {
+    @NotBlank(message = "Username cannot be blank")
+    @JsonProperty("username")
+    private String username;
 
-    @JsonProperty("email")
-    private String email;
-
+    @NotBlank(message = "Password cannot be blank")
     @JsonProperty("password")
     private String password;
 }

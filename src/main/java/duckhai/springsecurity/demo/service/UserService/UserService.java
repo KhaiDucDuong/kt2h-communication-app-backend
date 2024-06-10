@@ -5,4 +5,5 @@ import duckhai.springsecurity.demo.dto.UserDTO;
 
 public interface UserService {
     User createUser(UserDTO userDTO);
+    User findUserByUsername(String username);
 }

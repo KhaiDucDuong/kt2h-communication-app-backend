@@ -5,9 +5,9 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
 
 //disable security
-@SpringBootApplication(exclude = { SecurityAutoConfiguration.class })
+//@SpringBootApplication(exclude = { SecurityAutoConfiguration.class })
 
-//@SpringBootApplication
+@SpringBootApplication
 public class SpringSecurityDemoApplication {
 
 	public static void main(String[] args) {

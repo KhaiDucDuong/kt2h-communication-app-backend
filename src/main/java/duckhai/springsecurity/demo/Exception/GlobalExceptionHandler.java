@@ -30,7 +30,7 @@ public class GlobalExceptionHandler {
         RestResponse<Object> res = new RestResponse<Object>();
         res.setStatusCode(HttpStatus.BAD_REQUEST.value());
         res.setError(messages);
-        res.setMessage("Client side exception");
+        res.setMessage("Constraint Violation Exception");
 
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(res);
     }
