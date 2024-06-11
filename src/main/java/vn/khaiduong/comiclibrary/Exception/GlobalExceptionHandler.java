@@ -1,8 +1,8 @@
 package vn.khaiduong.comiclibrary.Exception;
 
-import org.springframework.security.authentication.InsufficientAuthenticationException;
+import org.springframework.data.mapping.PropertyReferenceException;
 import vn.khaiduong.comiclibrary.constant.ExceptionMessage;
-import vn.khaiduong.comiclibrary.util.RestResponse;
+import vn.khaiduong.comiclibrary.Response.RestResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
@@ -57,5 +57,16 @@ public class GlobalExceptionHandler {
         res.setMessage(ex.getMessage());
 
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(res);
+    }
+
+
+    @ExceptionHandler(value = {PropertyReferenceException.class})
+    protected ResponseEntity<?> handlePropertyReferenceException(Exception ex) {
+        RestResponse<Object> res = new RestResponse<Object>();
+        res.setStatusCode(HttpStatus.BAD_REQUEST.value());
+        res.setError(HttpStatus.BAD_REQUEST);
+        res.setMessage(ex.getMessage());
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(res);
     }
 }

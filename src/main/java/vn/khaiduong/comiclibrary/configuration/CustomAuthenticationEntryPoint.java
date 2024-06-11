@@ -3,7 +3,7 @@ package vn.khaiduong.comiclibrary.configuration;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.security.authentication.InsufficientAuthenticationException;
 import vn.khaiduong.comiclibrary.constant.ExceptionMessage;
-import vn.khaiduong.comiclibrary.util.RestResponse;
+import vn.khaiduong.comiclibrary.Response.RestResponse;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -20,7 +20,7 @@ public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint 
     private final AuthenticationEntryPoint delegate = new BearerTokenAuthenticationEntryPoint();
     private final ObjectMapper mapper;
 
-    public CustomAuthenticationEntryPoint(ObjectMapper mapper){
+    public CustomAuthenticationEntryPoint(ObjectMapper mapper) {
         this.mapper = mapper;
     }
 
@@ -35,11 +35,8 @@ public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint 
         res.setStatusCode(HttpStatus.UNAUTHORIZED.value());
         res.setError(authException.getMessage());
 
-        if(authException instanceof InsufficientAuthenticationException){
-            res.setMessage(ExceptionMessage.MISSING_TOKEN);
-        } else {
-            res.setMessage(ExceptionMessage.INVALID_TOKEN);
-        }
+        res.setMessage(authException instanceof InsufficientAuthenticationException ?
+                ExceptionMessage.MISSING_TOKEN : ExceptionMessage.INVALID_TOKEN);
 
         mapper.writeValue(response.getWriter(), res);
     }

@@ -20,15 +20,9 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class ComicController {
     private final ComicService comicService;
-    private final int DEFAULT_PAGE_SIZE = 20;
 
     @GetMapping("")
-    public ResponseEntity<?> getAllComics(@RequestParam("current") Optional<String> currentOptional,
-                                          @RequestParam("pageSize") Optional<String> pageSizeOptional) {
-        String sCurrent = currentOptional.orElse("1");
-        String sPageSize = pageSizeOptional.orElse(String.valueOf(DEFAULT_PAGE_SIZE));
-        Pageable pageable = PageRequest.of(Integer.parseInt(sCurrent) - 1, Integer.parseInt(sPageSize));
-
+    public ResponseEntity<?> getAllComics(Pageable pageable) {
         ResultPaginationResponse resultPaginationResponse = comicService.getAllComics(pageable);
         return ResponseEntity.ok().body(resultPaginationResponse);
     }

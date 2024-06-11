@@ -1,4 +1,4 @@
-package vn.khaiduong.comiclibrary.util;
+package vn.khaiduong.comiclibrary.Response;
 
 import lombok.Getter;
 import lombok.Setter;
