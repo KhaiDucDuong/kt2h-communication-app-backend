@@ -11,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import vn.khaiduong.comiclibrary.util.annotation.ApiMessage;
 
 import java.util.List;
 import java.util.Optional;
@@ -22,12 +23,14 @@ public class ComicController {
     private final ComicService comicService;
 
     @GetMapping("")
+    @ApiMessage("Fetched all comics")
     public ResponseEntity<?> getAllComics(Pageable pageable) {
         ResultPaginationResponse resultPaginationResponse = comicService.getAllComics(pageable);
         return ResponseEntity.ok().body(resultPaginationResponse);
     }
 
     @PostMapping("")
+    @ApiMessage("Created comic")
     public ResponseEntity<?> createComic(@Valid @RequestBody ComicDTO comicDTO) {
         Comic newComic = comicService.createComic(comicDTO);
         return ResponseEntity.status(HttpStatus.CREATED).body(newComic);

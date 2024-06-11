@@ -9,6 +9,7 @@ import org.springframework.http.server.ServletServerHttpResponse;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyAdvice;
 import vn.khaiduong.comiclibrary.Response.RestResponse;
+import vn.khaiduong.comiclibrary.util.annotation.ApiMessage;
 
 @ControllerAdvice
 public class FormatRestResponse implements ResponseBodyAdvice<Object> {
@@ -18,24 +19,29 @@ public class FormatRestResponse implements ResponseBodyAdvice<Object> {
     }
 
     @Override
-    public Object beforeBodyWrite(Object body, MethodParameter returnType, MediaType selectedContentType, Class selectedConverterType, ServerHttpRequest request, ServerHttpResponse response) {
+    public Object beforeBodyWrite(Object body, MethodParameter returnType,
+                                  MediaType selectedContentType,
+                                  Class selectedConverterType,
+                                  ServerHttpRequest request,
+                                  ServerHttpResponse response) {
         HttpServletResponse servletResponse = ((ServletServerHttpResponse) response).getServletResponse();
         int status = servletResponse.getStatus();
 
         RestResponse<Object> res = new RestResponse<Object>();
         res.setStatusCode(status);
 
-        if(body instanceof String) {
+        if (body instanceof String) {
             return body;
         }
 
-        if(status >= 400){
+        if (status >= 400) {
             //case error
-                return body;
+            return body;
         } else {
             //case success
             res.setData(body);
-            res.setMessage("CALL API SUCCESS");
+            ApiMessage message = returnType.getMethodAnnotation(ApiMessage.class);
+            res.setMessage(message != null ? message.value() : "Call API successfully");
         }
 
         return res;

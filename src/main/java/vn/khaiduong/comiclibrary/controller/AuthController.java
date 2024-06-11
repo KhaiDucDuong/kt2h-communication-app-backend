@@ -17,6 +17,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
+import vn.khaiduong.comiclibrary.util.annotation.ApiMessage;
 
 @RestController
 @RequiredArgsConstructor
@@ -25,6 +26,7 @@ public class AuthController {
     private final SecurityUtil securityUtil;
     private final UserService userService;
     @PostMapping("/login")
+    @ApiMessage("Login successfully")
     public ResponseEntity<Object> login(@Valid @RequestBody LoginDTO loginDTO) {
         UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
                 loginDTO.getUsername(),
@@ -44,6 +46,7 @@ public class AuthController {
     }
 
     @PostMapping("/register")
+    @ApiMessage("Created account successfully")
     public ResponseEntity<?> createUser(@Valid @RequestBody UserDTO userDTO) throws IllegalArgumentException {
         User newUser = userService.createUser(userDTO);
         return ResponseEntity.status(HttpStatus.CREATED).body(newUser);
