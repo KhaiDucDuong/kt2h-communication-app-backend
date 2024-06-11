@@ -1,5 +1,6 @@
 package vn.khaiduong.comiclibrary.Exception;
 
+import org.springframework.security.authentication.InsufficientAuthenticationException;
 import vn.khaiduong.comiclibrary.constant.ExceptionMessage;
 import vn.khaiduong.comiclibrary.util.RestResponse;
 import jakarta.servlet.http.HttpServletRequest;
@@ -41,11 +42,11 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(value = {UsernameNotFoundException.class, BadCredentialsException.class})
     protected ResponseEntity<?> handleConstraintViolationException(Exception ex) {
         RestResponse<Object> res = new RestResponse<Object>();
-        res.setStatusCode(HttpStatus.BAD_REQUEST.value());
+        res.setStatusCode(HttpStatus.UNAUTHORIZED.value());
         res.setError(ex.getMessage());
         res.setMessage(ExceptionMessage.LOGIN_FAILED);
 
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(res);
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(res);
     }
 
     @ExceptionHandler(value = {HttpRequestMethodNotSupportedException.class})

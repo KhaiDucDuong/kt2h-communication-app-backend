@@ -1,6 +1,7 @@
 package vn.khaiduong.comiclibrary.configuration;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.security.authentication.InsufficientAuthenticationException;
 import vn.khaiduong.comiclibrary.constant.ExceptionMessage;
 import vn.khaiduong.comiclibrary.util.RestResponse;
 import jakarta.servlet.ServletException;
@@ -27,12 +28,19 @@ public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint 
     public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException) throws IOException, ServletException {
         this.delegate.commence(request, response, authException);
 
+        System.out.println(">>> Processing access token error: " + authException.getMessage());
         response.setContentType("application/json; charset=UTF-8");
         RestResponse<Object> res = new RestResponse<Object>();
 
         res.setStatusCode(HttpStatus.UNAUTHORIZED.value());
-        res.setError(authException.getCause().getMessage());
-        res.setMessage(ExceptionMessage.INVALID_TOKEN);
+        res.setError(authException.getMessage());
+
+        if(authException instanceof InsufficientAuthenticationException){
+            res.setMessage(ExceptionMessage.MISSING_TOKEN);
+        } else {
+            res.setMessage(ExceptionMessage.INVALID_TOKEN);
+        }
+
         mapper.writeValue(response.getWriter(), res);
     }
 }

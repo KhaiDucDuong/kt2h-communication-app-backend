@@ -51,7 +51,7 @@ public class SecurityConfiguration {
                         .authenticationEntryPoint(customAuthenticationEntryPoint)
                 )
                 .exceptionHandling(exceptions -> exceptions
-                        .authenticationEntryPoint(new BearerTokenAuthenticationEntryPoint()) //401
+                        .authenticationEntryPoint(customAuthenticationEntryPoint) //401
                         .accessDeniedHandler(new BearerTokenAccessDeniedHandler())) //403
                 .formLogin(AbstractHttpConfigurer::disable)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
