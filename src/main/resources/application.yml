@@ -3,7 +3,7 @@ server:
 spring:
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://localhost:3306/springsecuritydemo
+    url: jdbc:mysql://localhost:3306/comic_library
     username: root
     password: Khai_1211
 
@@ -20,8 +20,7 @@ api:
 
 jwt:
   expiration-in-seconds: 86400 #1 day (86400s) = 24 * 60 * 60
-  base64-secret: zNmgOnudAdPIQPXlnzsTaTxC8bOCGaF/PGHSxOlJXCnYDRMj3fC5qil7+NtMK6+e liTNyZwj3D0sVgGCfB/pxg==
-  claim-name: khaiduong
+  base64-secret: xqWM9YRbhgqWNY9REd4RW47o/kZRkOkQrzg1qdMBVfiXErOHpT6UTVwoUnNIZLIDaFiatwVbNgyjx/iMYbNkKQ==
 
 logging:
   level:

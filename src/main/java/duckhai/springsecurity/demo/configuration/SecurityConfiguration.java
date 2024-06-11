@@ -31,8 +31,6 @@ import javax.crypto.spec.SecretKeySpec;
 public class SecurityConfiguration {
     @Value("${jwt.base64-secret}")
     private String jwtKey;
-    @Value("${jwt.claim-name}")
-    private String claimName;
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -64,7 +62,7 @@ public class SecurityConfiguration {
     public JwtAuthenticationConverter jwtAuthenticationConverter(){
         JwtGrantedAuthoritiesConverter grantedAuthoritiesConverter = new JwtGrantedAuthoritiesConverter();
         grantedAuthoritiesConverter.setAuthorityPrefix("");
-        grantedAuthoritiesConverter.setAuthoritiesClaimName(claimName);
+        grantedAuthoritiesConverter.setAuthoritiesClaimName("KhaiDuong");
 
         JwtAuthenticationConverter jwtAuthenticationConverter = new JwtAuthenticationConverter();
         jwtAuthenticationConverter.setJwtGrantedAuthoritiesConverter(grantedAuthoritiesConverter);
