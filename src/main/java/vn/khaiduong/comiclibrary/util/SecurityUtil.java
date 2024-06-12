@@ -29,7 +29,7 @@ public final class SecurityUtil {
 
     private final JwtEncoder jwtEncoder;
 
-    public String createAccessToken(Authentication authentication) {
+    public String createAccessToken(Authentication authentication, LoginResponse.UserLogin userLogin) {
         Instant now = Instant.now();
         Instant validity;
 
@@ -38,7 +38,7 @@ public final class SecurityUtil {
                 .issuedAt(now)
                 .expiresAt(validity)
                 .subject(authentication.getName())
-                .claim("KhaiDuong", authentication)
+                .claim("user", userLogin)
                 .build();
 
         JwsHeader jwsHeader = JwsHeader.with(JWT_ALGORITHM).build();

@@ -3,6 +3,7 @@ package vn.khaiduong.comiclibrary.controller;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
+import org.springframework.web.bind.annotation.*;
 import vn.khaiduong.comiclibrary.Response.LoginResponse;
 import vn.khaiduong.comiclibrary.domain.User;
 import vn.khaiduong.comiclibrary.dto.LoginDTO;
@@ -17,12 +18,10 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
 import vn.khaiduong.comiclibrary.util.annotation.ApiMessage;
 
 @RestController
+@RequestMapping("/api/auth")
 @RequiredArgsConstructor
 public class AuthController {
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
@@ -40,9 +39,6 @@ public class AuthController {
         );
 
         Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
-
-        //create access token
-        String accessToken = securityUtil.createAccessToken(authentication);
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
         User userLogin = userService.findUserByUsername(loginDTO.getUsername());
@@ -51,6 +47,9 @@ public class AuthController {
                 .email(userLogin.getEmail())
                 .fullName(userLogin.getFullName())
                 .build();
+
+        //create access token
+        String accessToken = securityUtil.createAccessToken(authentication, userLoginData);
 
         //create & update refresh token in user
         String refreshToken = this.securityUtil.createRefreshToken(loginDTO.getUsername(), userLoginData);
@@ -81,5 +80,22 @@ public class AuthController {
     public ResponseEntity<?> createUser(@Valid @RequestBody UserDTO userDTO) throws IllegalArgumentException {
         User newUser = userService.createUser(userDTO);
         return ResponseEntity.status(HttpStatus.CREATED).body(newUser);
+    }
+
+    @GetMapping("/getAccount")
+    @ApiMessage("Fetched account successfully")
+    public ResponseEntity<?> getAccount() {
+        String username = SecurityUtil.getCurrentUserLogin().isPresent() ? SecurityUtil.getCurrentUserLogin().get() : "";
+        User userLogin = userService.findUserByUsername(username);
+        if(userLogin != null){
+            LoginResponse.UserLogin userLoginData = LoginResponse.UserLogin.builder()
+                    .userId(String.valueOf(userLogin.getId()))
+                    .email(userLogin.getEmail())
+                    .fullName(userLogin.getFullName())
+                    .build();
+            return ResponseEntity.ok().body(userLoginData);
+        }
+
+        return ResponseEntity.internalServerError().body(HttpStatus.INTERNAL_SERVER_ERROR.toString());
     }
 }
