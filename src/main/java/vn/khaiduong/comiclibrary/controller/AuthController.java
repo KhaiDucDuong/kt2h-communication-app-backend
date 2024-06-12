@@ -39,8 +39,16 @@ public class AuthController {
         String access_token = securityUtil.createToken(authentication);
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
+        User userLogin = userService.findUserByUsername(loginDTO.getUsername());
+        LoginResponse.UserLogin userLoginData = LoginResponse.UserLogin.builder()
+                .userId(String.valueOf(userLogin.getId()))
+                .email(userLogin.getEmail())
+                .fullName(userLogin.getFullName())
+                .build();
+
         LoginResponse loginResponse = LoginResponse.builder()
                 .access_token(access_token)
+                .user(userLoginData)
                 .build();
         return ResponseEntity.ok().body(loginResponse);
     }

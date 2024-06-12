@@ -8,6 +8,5 @@ import java.util.List;
 public interface UserService {
     User createUser(UserDTO userDTO) throws IllegalArgumentException;
     User findUserByUsername(String username);
-
     List<User> getAllUsers();
 }
