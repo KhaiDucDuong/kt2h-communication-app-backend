@@ -1,6 +1,5 @@
 package vn.khaiduong.comiclibrary.util;
 
-import com.nimbusds.jose.util.Base64;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
@@ -10,9 +9,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.oauth2.jose.jws.MacAlgorithm;
 import org.springframework.security.oauth2.jwt.*;
 import org.springframework.stereotype.Service;
+import vn.khaiduong.comiclibrary.Response.LoginResponse;
 
-import javax.crypto.SecretKey;
-import javax.crypto.spec.SecretKeySpec;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Optional;
@@ -24,21 +22,39 @@ public final class SecurityUtil {
 
     @Value("${jwt.base64-secret}")
     private String jwtKey;
-    @Value("${jwt.expiration-in-seconds}")
-    private long jwtExpiration;
+    @Value("${jwt.access-token-expiration-in-seconds}")
+    private long jwtAccessTokenExpiration;
+    @Value("${jwt.refresh-token-expiration-in-seconds}")
+    private long jwtRefreshTokenExpiration;
 
     private final JwtEncoder jwtEncoder;
 
-    public String createToken(Authentication authentication) {
+    public String createAccessToken(Authentication authentication) {
         Instant now = Instant.now();
         Instant validity;
 
-        validity = now.plus(this.jwtExpiration, ChronoUnit.SECONDS);
+        validity = now.plus(this.jwtAccessTokenExpiration, ChronoUnit.SECONDS);
         JwtClaimsSet claims = JwtClaimsSet.builder()
                 .issuedAt(now)
                 .expiresAt(validity)
                 .subject(authentication.getName())
                 .claim("KhaiDuong", authentication)
+                .build();
+
+        JwsHeader jwsHeader = JwsHeader.with(JWT_ALGORITHM).build();
+        return this.jwtEncoder.encode(JwtEncoderParameters.from(jwsHeader, claims)).getTokenValue();
+    }
+
+    public String createRefreshToken(String email, LoginResponse.UserLogin userLogin) {
+        Instant now = Instant.now();
+        Instant validity;
+
+        validity = now.plus(this.jwtRefreshTokenExpiration, ChronoUnit.SECONDS);
+        JwtClaimsSet claims = JwtClaimsSet.builder()
+                .issuedAt(now)
+                .expiresAt(validity)
+                .subject(email)
+                .claim("user", userLogin)
                 .build();
 
         JwsHeader jwsHeader = JwsHeader.with(JWT_ALGORITHM).build();

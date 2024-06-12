@@ -32,6 +32,9 @@ public class User {
     @Column(name="password")
     private String password;
 
+    @Column(name="refresh_token", columnDefinition = "MEDIUMTEXT")
+    private String refreshToken;
+
 //    @Column(name="created_at")
 //    private Instant createdAt;
 //

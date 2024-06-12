@@ -1,5 +1,8 @@
 package vn.khaiduong.comiclibrary.controller;
 
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseCookie;
 import vn.khaiduong.comiclibrary.Response.LoginResponse;
 import vn.khaiduong.comiclibrary.domain.User;
 import vn.khaiduong.comiclibrary.dto.LoginDTO;
@@ -25,6 +28,9 @@ public class AuthController {
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
     private final SecurityUtil securityUtil;
     private final UserService userService;
+
+    @Value("${jwt.refresh-token-expiration-in-seconds}")
+    private long jwtRefreshTokenExpiration;
     @PostMapping("/login")
     @ApiMessage("Login successfully")
     public ResponseEntity<Object> login(@Valid @RequestBody LoginDTO loginDTO) {
@@ -35,8 +41,8 @@ public class AuthController {
 
         Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
 
-        //create token
-        String access_token = securityUtil.createToken(authentication);
+        //create access token
+        String accessToken = securityUtil.createAccessToken(authentication);
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
         User userLogin = userService.findUserByUsername(loginDTO.getUsername());
@@ -46,11 +52,28 @@ public class AuthController {
                 .fullName(userLogin.getFullName())
                 .build();
 
+        //create & update refresh token in user
+        String refreshToken = this.securityUtil.createRefreshToken(loginDTO.getUsername(), userLoginData);
+        userService.updateUserRefreshToken(loginDTO.getUsername(), refreshToken);
+
         LoginResponse loginResponse = LoginResponse.builder()
-                .access_token(access_token)
+                .access_token(accessToken)
                 .user(userLoginData)
                 .build();
-        return ResponseEntity.ok().body(loginResponse);
+
+        //set refresh token in response cookie
+        ResponseCookie responseCookie = ResponseCookie
+                .from("refresh_token", refreshToken)
+                .httpOnly(true)
+                .secure(true)
+                .path("/")
+                .maxAge(jwtRefreshTokenExpiration)
+                //.domain()
+                .build();
+
+        return ResponseEntity.ok()
+                .header(HttpHeaders.SET_COOKIE, responseCookie.toString())
+                .body(loginResponse);
     }
 
     @PostMapping("/register")

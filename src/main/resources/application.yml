@@ -26,7 +26,8 @@ api:
   prefix: /api
 
 jwt:
-  expiration-in-seconds: 86400 #1 day (86400s) = 24 * 60 * 60
+  access-token-expiration-in-seconds: 600 #10 minutes (600s) = 6 * 60
+  refresh-token-expiration-in-seconds: 7776000 #90 days (7776000s) = 90 * 24 * 60 * 60
   base64-secret: xqWM9YRbhgqWNY9REd4RW47o/kZRkOkQrzg1qdMBVfiXErOHpT6UTVwoUnNIZLIDaFiatwVbNgyjx/iMYbNkKQ==
 
 logging:
