@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import vn.khaiduong.comiclibrary.Response.LoginResponse;
 import vn.khaiduong.comiclibrary.domain.User;
 import vn.khaiduong.comiclibrary.dto.LoginDTO;
-import vn.khaiduong.comiclibrary.dto.UserDTO;
+import vn.khaiduong.comiclibrary.dto.RegisterUserDTO;
 import vn.khaiduong.comiclibrary.service.UserService.UserService;
 import vn.khaiduong.comiclibrary.util.SecurityUtil;
 import jakarta.validation.Valid;
@@ -36,7 +36,7 @@ public class AuthController {
     @PostMapping("/login")
     @ApiMessage("Login successfully")
     public ResponseEntity<Object> login(@Valid @RequestBody LoginDTO loginDTO) {
-        log.info("REST request to login with username : {}", loginDTO.getUsername());
+        log.debug("REST request to login with username : {}", loginDTO.getUsername());
         UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
                 loginDTO.getUsername(),
                 loginDTO.getPassword()
@@ -74,6 +74,7 @@ public class AuthController {
                 //.domain()
                 .build();
 
+        log.debug("REST request to login with username {} successfully", loginDTO.getUsername());
         return ResponseEntity.ok()
                 .header(HttpHeaders.SET_COOKIE, responseCookie.toString())
                 .body(loginResponse);
@@ -81,15 +82,17 @@ public class AuthController {
 
     @PostMapping("/register")
     @ApiMessage("Created account successfully")
-    public ResponseEntity<?> createUser(@Valid @RequestBody UserDTO userDTO) throws IllegalArgumentException {
-        log.info("REST request to register account with username : {}", userDTO.getEmail());
-        User newUser = userService.createUser(userDTO);
+    public ResponseEntity<?> createUser(@Valid @RequestBody RegisterUserDTO registerUserDTO) throws IllegalArgumentException {
+        log.debug("REST request to register account with username : {}", registerUserDTO.getEmail());
+
+        User newUser = userService.createUser(registerUserDTO);
         return ResponseEntity.status(HttpStatus.CREATED).body(newUser);
     }
 
     @GetMapping("/getAccount")
     @ApiMessage("Fetched account successfully")
     public ResponseEntity<?> getAccount() {
+        log.debug("REST request to get current account");
         String username = SecurityUtil.getCurrentUserLogin().isPresent() ? SecurityUtil.getCurrentUserLogin().get() : "";
         User userLogin = userService.findUserByUsername(username);
         if(userLogin != null){

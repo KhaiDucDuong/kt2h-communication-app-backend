@@ -1,6 +1,8 @@
 package vn.khaiduong.comiclibrary.configuration;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.InsufficientAuthenticationException;
 import vn.khaiduong.comiclibrary.constant.ExceptionMessage;
 import vn.khaiduong.comiclibrary.Response.RestResponse;
@@ -12,12 +14,15 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.oauth2.server.resource.web.BearerTokenAuthenticationEntryPoint;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.stereotype.Component;
+import vn.khaiduong.comiclibrary.controller.AuthController;
 
 import java.io.IOException;
 
 @Component
 public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint {
     private final AuthenticationEntryPoint delegate = new BearerTokenAuthenticationEntryPoint();
+
+    private final Logger log = LoggerFactory.getLogger(CustomAuthenticationEntryPoint.class);
     private final ObjectMapper mapper;
 
     public CustomAuthenticationEntryPoint(ObjectMapper mapper) {
@@ -28,7 +33,7 @@ public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint 
     public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException) throws IOException, ServletException {
         this.delegate.commence(request, response, authException);
 
-        System.out.println(">>> Processing access token error: " + authException.getMessage());
+        log.error(">>> Processing access token error {} from request method {} at {}", authException.getMessage(), request.getMethod(), request.getRequestURL());
         response.setContentType("application/json; charset=UTF-8");
         RestResponse<Object> res = new RestResponse<Object>();
 

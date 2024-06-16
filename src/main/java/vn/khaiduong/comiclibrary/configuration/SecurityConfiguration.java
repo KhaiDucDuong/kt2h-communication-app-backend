@@ -2,6 +2,9 @@ package vn.khaiduong.comiclibrary.configuration;
 
 import com.nimbusds.jose.jwk.source.ImmutableSecret;
 import com.nimbusds.jose.util.Base64;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import vn.khaiduong.comiclibrary.controller.AuthController;
 import vn.khaiduong.comiclibrary.util.SecurityUtil;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -31,6 +34,7 @@ import javax.crypto.spec.SecretKeySpec;
 public class SecurityConfiguration {
     @Value("${jwt.base64-secret}")
     private String jwtKey;
+    private final Logger log = LoggerFactory.getLogger(SecurityConfiguration.class);
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -50,9 +54,9 @@ public class SecurityConfiguration {
                 .oauth2ResourceServer((oauth2) -> oauth2.jwt(Customizer.withDefaults())
                         .authenticationEntryPoint(customAuthenticationEntryPoint)
                 )
-                .exceptionHandling(exceptions -> exceptions
-                        .authenticationEntryPoint(customAuthenticationEntryPoint) //401
-                        .accessDeniedHandler(new BearerTokenAccessDeniedHandler())) //403
+//                .exceptionHandling(exceptions -> exceptions
+//                        .authenticationEntryPoint(customAuthenticationEntryPoint) //401
+//                        .accessDeniedHandler(new BearerTokenAccessDeniedHandler())) //403
                 .formLogin(AbstractHttpConfigurer::disable)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
         return http.build();
@@ -76,7 +80,7 @@ public class SecurityConfiguration {
             try {
                 return jwtDecoder.decode(token);
             } catch (Exception e) {
-                System.out.println(">>> JWT Error: " + e.getMessage());
+                log.warn(">>> JWT Error: " + e.getMessage());
                 throw e;
             }
         };

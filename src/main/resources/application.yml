@@ -33,3 +33,6 @@ jwt:
 logging:
   level:
     root: INFO
+    vn.khaiduong.comiclibrary: TRACE
+  file:
+    name: log/dev.log

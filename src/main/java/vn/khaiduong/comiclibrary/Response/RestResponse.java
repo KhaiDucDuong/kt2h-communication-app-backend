@@ -1,5 +1,6 @@
 package vn.khaiduong.comiclibrary.Response;
 
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 

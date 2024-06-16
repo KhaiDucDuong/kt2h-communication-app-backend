@@ -1,6 +1,11 @@
 package vn.khaiduong.comiclibrary.Exception;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.mapping.PropertyReferenceException;
+import org.springframework.validation.ObjectError;
+import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.context.request.NativeWebRequest;
 import vn.khaiduong.comiclibrary.constant.ExceptionMessage;
 import vn.khaiduong.comiclibrary.Response.RestResponse;
 import jakarta.servlet.http.HttpServletRequest;
@@ -13,13 +18,42 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import vn.khaiduong.comiclibrary.controller.AuthController;
 
 import java.util.List;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
-    @ExceptionHandler(value = {IllegalArgumentException.class})
-    public ResponseEntity<Object> handleIllegalArgumentExceptions(Exception ex) {
+    private final Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class);
+
+    @ExceptionHandler
+    public ResponseEntity<Object> handleAnyException(Exception ex, HttpServletRequest request){
+        log.error("Exception type {} occurred with message {} from request method {} at {}", ex.getClass(), ex.getMessage(),
+                request.getMethod(), request.getRequestURL());
+        if(ex instanceof IllegalArgumentException){
+            return handleIllegalArgumentExceptions(ex);
+        } else if (ex instanceof ConstraintViolationException){
+            return handleConstraintViolationException((ConstraintViolationException) ex, request);
+        } else if (ex instanceof MethodArgumentNotValidException){
+            return handleMethodArgumentNotValidException((MethodArgumentNotValidException) ex, request);
+        } else if (ex instanceof UsernameNotFoundException || ex instanceof BadCredentialsException){
+            return handleConstraintViolationException(ex);
+        } else if (ex instanceof HttpRequestMethodNotSupportedException){
+            return handleHttpRequestMethodNotSupportedException(ex);
+        } else if (ex instanceof PropertyReferenceException){
+            return handlePropertyReferenceException(ex);
+        }
+
+
+        RestResponse<Object> res = new RestResponse<Object>();
+        res.setStatusCode(HttpStatus.INTERNAL_SERVER_ERROR.value());
+        res.setError(ex.getMessage());
+        res.setMessage(HttpStatus.INTERNAL_SERVER_ERROR);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(res);
+    }
+
+
+    private ResponseEntity<Object> handleIllegalArgumentExceptions(Exception ex) {
         RestResponse<Object> res = new RestResponse<Object>();
         res.setStatusCode(HttpStatus.BAD_REQUEST.value());
         res.setError(ex.getMessage());
@@ -28,8 +62,7 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(res);
     }
 
-    @ExceptionHandler(ConstraintViolationException.class)
-    protected ResponseEntity<?> handleConstraintViolationException(ConstraintViolationException ex, HttpServletRequest request) {
+    private ResponseEntity<Object> handleConstraintViolationException(ConstraintViolationException ex, HttpServletRequest request) {
         List<String> messages = ex.getConstraintViolations().stream().map(ConstraintViolation::getMessage).toList();
         RestResponse<Object> res = new RestResponse<Object>();
         res.setStatusCode(HttpStatus.BAD_REQUEST.value());
@@ -39,8 +72,17 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(res);
     }
 
-    @ExceptionHandler(value = {UsernameNotFoundException.class, BadCredentialsException.class})
-    protected ResponseEntity<?> handleConstraintViolationException(Exception ex) {
+    private ResponseEntity<Object> handleMethodArgumentNotValidException(MethodArgumentNotValidException ex, HttpServletRequest request) {
+        List<String> message = ex.getAllErrors().stream().map(ObjectError::getDefaultMessage).toList();
+        RestResponse<Object> res = new RestResponse<Object>();
+        res.setStatusCode(HttpStatus.BAD_REQUEST.value());
+        res.setError(message);
+        res.setMessage("Method Argument Not Valid Exception");
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(res);
+    }
+
+    private ResponseEntity<Object> handleConstraintViolationException(Exception ex) {
         RestResponse<Object> res = new RestResponse<Object>();
         res.setStatusCode(HttpStatus.UNAUTHORIZED.value());
         res.setError(ex.getMessage());
@@ -49,8 +91,7 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(res);
     }
 
-    @ExceptionHandler(value = {HttpRequestMethodNotSupportedException.class})
-    protected ResponseEntity<?> handleHttpRequestMethodNotSupportedException(Exception ex) {
+    private ResponseEntity<Object> handleHttpRequestMethodNotSupportedException(Exception ex) {
         RestResponse<Object> res = new RestResponse<Object>();
         res.setStatusCode(HttpStatus.NOT_FOUND.value());
         res.setError(HttpStatus.NOT_FOUND);
@@ -59,9 +100,7 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(res);
     }
 
-
-    @ExceptionHandler(value = {PropertyReferenceException.class})
-    protected ResponseEntity<?> handlePropertyReferenceException(Exception ex) {
+    private ResponseEntity<Object> handlePropertyReferenceException(Exception ex) {
         RestResponse<Object> res = new RestResponse<Object>();
         res.setStatusCode(HttpStatus.BAD_REQUEST.value());
         res.setError(HttpStatus.BAD_REQUEST);

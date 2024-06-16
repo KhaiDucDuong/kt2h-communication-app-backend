@@ -3,7 +3,7 @@ package vn.khaiduong.comiclibrary.service.UserService;
 import org.apache.commons.lang3.StringUtils;
 import vn.khaiduong.comiclibrary.constant.ExceptionMessage;
 import vn.khaiduong.comiclibrary.domain.User;
-import vn.khaiduong.comiclibrary.dto.UserDTO;
+import vn.khaiduong.comiclibrary.dto.RegisterUserDTO;
 import vn.khaiduong.comiclibrary.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -17,15 +17,15 @@ public class UserServiceImpl implements UserService{
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
 
-    public User createUser(UserDTO userDTO) throws IllegalArgumentException {
-        if(userRepository.existsUserByEmail(userDTO.getEmail())){
+    public User createUser(RegisterUserDTO registerUserDTO) throws IllegalArgumentException {
+        if(userRepository.existsUserByEmail(registerUserDTO.getEmail())){
             throw new IllegalArgumentException(ExceptionMessage.EMAIL_IS_TAKEN);
         }
 
-        String harshPassword = passwordEncoder.encode(userDTO.getPassword());
+        String harshPassword = passwordEncoder.encode(registerUserDTO.getPassword());
         User newUser = User.builder()
-                .fullName(userDTO.getFullName())
-                .email(userDTO.getEmail())
+                .fullName(registerUserDTO.getFullName())
+                .email(registerUserDTO.getEmail())
                 .password(harshPassword)
                 .build();
         return userRepository.save(newUser);
