@@ -14,7 +14,7 @@ import java.time.Instant;
 @AllArgsConstructor
 @Builder
 @Table(name ="users")
-public class User {
+public class User extends AbstractAuditingEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name="id")

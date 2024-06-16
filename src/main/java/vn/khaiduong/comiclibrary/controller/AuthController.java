@@ -1,5 +1,7 @@
 package vn.khaiduong.comiclibrary.controller;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
@@ -24,6 +26,7 @@ import vn.khaiduong.comiclibrary.util.annotation.ApiMessage;
 @RequestMapping("/api/auth")
 @RequiredArgsConstructor
 public class AuthController {
+    private final Logger log = LoggerFactory.getLogger(AuthController.class);
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
     private final SecurityUtil securityUtil;
     private final UserService userService;
@@ -33,6 +36,7 @@ public class AuthController {
     @PostMapping("/login")
     @ApiMessage("Login successfully")
     public ResponseEntity<Object> login(@Valid @RequestBody LoginDTO loginDTO) {
+        log.debug("REST request to login with username : {}", loginDTO.getUsername());
         UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
                 loginDTO.getUsername(),
                 loginDTO.getPassword()
@@ -78,6 +82,7 @@ public class AuthController {
     @PostMapping("/register")
     @ApiMessage("Created account successfully")
     public ResponseEntity<?> createUser(@Valid @RequestBody UserDTO userDTO) throws IllegalArgumentException {
+        log.debug("REST request to register account with username : {}", userDTO.getEmail());
         User newUser = userService.createUser(userDTO);
         return ResponseEntity.status(HttpStatus.CREATED).body(newUser);
     }
