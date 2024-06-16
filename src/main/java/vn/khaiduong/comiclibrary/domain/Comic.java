@@ -2,6 +2,7 @@ package vn.khaiduong.comiclibrary.domain;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import lombok.*;
 
 @Getter
@@ -17,7 +18,7 @@ public class Comic extends AbstractAuditingEntity{
     @Column(name="id")
     private long id;
 
-    @NotBlank(message = "Comic name cannot be blank")
-    @Column(name="name")
+    @Size(max = 100)
+    @Column(name="name", nullable = false)
     private String name;
 }

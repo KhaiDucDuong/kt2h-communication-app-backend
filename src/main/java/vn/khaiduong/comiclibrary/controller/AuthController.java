@@ -5,11 +5,15 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 import vn.khaiduong.comiclibrary.Response.LoginResponse;
+import vn.khaiduong.comiclibrary.configuration.SecurityConfiguration;
+import vn.khaiduong.comiclibrary.domain.RefreshToken;
 import vn.khaiduong.comiclibrary.domain.User;
 import vn.khaiduong.comiclibrary.dto.LoginDTO;
 import vn.khaiduong.comiclibrary.dto.RegisterUserDTO;
+import vn.khaiduong.comiclibrary.service.RefreshToken.RefreshTokenService;
 import vn.khaiduong.comiclibrary.service.UserService.UserService;
 import vn.khaiduong.comiclibrary.util.SecurityUtil;
 import jakarta.validation.Valid;
@@ -30,6 +34,7 @@ public class AuthController {
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
     private final SecurityUtil securityUtil;
     private final UserService userService;
+    private final RefreshTokenService refreshTokenService;
 
     @Value("${jwt.refresh-token-expiration-in-seconds}")
     private long jwtRefreshTokenExpiration;
@@ -55,9 +60,9 @@ public class AuthController {
         //create access token
         String accessToken = securityUtil.createAccessToken(authentication, userLoginData);
 
-        //create & update refresh token in user
-        String refreshToken = this.securityUtil.createRefreshToken(loginDTO.getUsername(), userLoginData);
-        userService.updateUserRefreshToken(loginDTO.getUsername(), refreshToken);
+        //create refresh token for user
+        RefreshToken refreshToken = this.refreshTokenService.createRefreshToken(userLogin, false); //isMobile is default to false for now
+        String refreshTokenValue = refreshToken.getToken();
 
         LoginResponse loginResponse = LoginResponse.builder()
                 .access_token(accessToken)
@@ -66,7 +71,7 @@ public class AuthController {
 
         //set refresh token in response cookie
         ResponseCookie responseCookie = ResponseCookie
-                .from("refresh_token", refreshToken)
+                .from("refresh_token", refreshTokenValue)
                 .httpOnly(true)
                 .secure(true)
                 .path("/")
@@ -95,6 +100,7 @@ public class AuthController {
         log.debug("REST request to get current account");
         String username = SecurityUtil.getCurrentUserLogin().isPresent() ? SecurityUtil.getCurrentUserLogin().get() : "";
         User userLogin = userService.findUserByUsername(username);
+
         if(userLogin != null){
             LoginResponse.UserLogin userLoginData = LoginResponse.UserLogin.builder()
                     .userId(String.valueOf(userLogin.getId()))
@@ -106,4 +112,10 @@ public class AuthController {
 
         return ResponseEntity.internalServerError().body(HttpStatus.INTERNAL_SERVER_ERROR.toString());
     }
+
+//    @GetMapping("/refresh")
+//    @ApiMessage("Get user by refresh token successfully")
+//    public ResponseEntity<?> getUserByRefreshToken(@CookieValue(name = "refresh_token") String refreshToken) {
+//        Jwt decodedToken = this.securityUtil.
+//    }
 }

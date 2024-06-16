@@ -9,6 +9,6 @@ public interface UserService {
     User createUser(RegisterUserDTO registerUserDTO) throws IllegalArgumentException;
     User findUserByUsername(String username);
 
-    void updateUserRefreshToken(String username, String refreshToken);
+    //void updateUserRefreshToken(String username, String refreshToken);
     List<User> getAllUsers();
 }

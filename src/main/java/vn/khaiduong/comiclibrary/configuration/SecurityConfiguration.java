@@ -4,6 +4,7 @@ import com.nimbusds.jose.jwk.source.ImmutableSecret;
 import com.nimbusds.jose.util.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import vn.khaiduong.comiclibrary.controller.AuthController;
 import vn.khaiduong.comiclibrary.util.SecurityUtil;
 import org.springframework.beans.factory.annotation.Value;

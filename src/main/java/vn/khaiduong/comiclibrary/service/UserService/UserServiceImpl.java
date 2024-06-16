@@ -41,21 +41,21 @@ public class UserServiceImpl implements UserService{
         return null;
     }
 
-    @Override
-    public void updateUserRefreshToken(String username, String refreshToken) {
-        User queryUser = findUserByUsername(username);
-
-        if(queryUser == null){
-            throw new IllegalArgumentException(ExceptionMessage.USER_NOT_EXIST);
-        }
-
-        if(StringUtils.isBlank(refreshToken)){
-            throw new IllegalArgumentException(ExceptionMessage.MISSING_TOKEN);
-        }
-
-        queryUser.setRefreshToken(refreshToken);
-        userRepository.save(queryUser);
-    }
+//    @Override
+//    public void updateUserRefreshToken(String username, String refreshToken) {
+//        User queryUser = findUserByUsername(username);
+//
+//        if(queryUser == null){
+//            throw new IllegalArgumentException(ExceptionMessage.USER_NOT_EXIST);
+//        }
+//
+//        if(StringUtils.isBlank(refreshToken)){
+//            throw new IllegalArgumentException(ExceptionMessage.MISSING_TOKEN);
+//        }
+//
+//        queryUser.setRefreshToken(refreshToken);
+//        userRepository.save(queryUser);
+//    }
 
     @Override
     public List<User> getAllUsers() {

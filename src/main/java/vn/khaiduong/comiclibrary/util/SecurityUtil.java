@@ -1,5 +1,6 @@
 package vn.khaiduong.comiclibrary.util;
 
+import com.nimbusds.jose.util.Base64;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
@@ -11,6 +12,8 @@ import org.springframework.security.oauth2.jwt.*;
 import org.springframework.stereotype.Service;
 import vn.khaiduong.comiclibrary.Response.LoginResponse;
 
+import javax.crypto.SecretKey;
+import javax.crypto.spec.SecretKeySpec;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Optional;
@@ -45,7 +48,7 @@ public final class SecurityUtil {
         return this.jwtEncoder.encode(JwtEncoderParameters.from(jwsHeader, claims)).getTokenValue();
     }
 
-    public String createRefreshToken(String email, LoginResponse.UserLogin userLogin) {
+    public String createRefreshToken(String email) {
         Instant now = Instant.now();
         Instant validity;
 
@@ -54,7 +57,6 @@ public final class SecurityUtil {
                 .issuedAt(now)
                 .expiresAt(validity)
                 .subject(email)
-                .claim("user", userLogin)
                 .build();
 
         JwsHeader jwsHeader = JwsHeader.with(JWT_ALGORITHM).build();
@@ -77,5 +79,9 @@ public final class SecurityUtil {
             return s;
         }
         return null;
+    }
+
+    public long getRefreshTokenExpiration(){
+        return jwtRefreshTokenExpiration;
     }
 }
