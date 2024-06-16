@@ -36,7 +36,7 @@ public class AuthController {
     @PostMapping("/login")
     @ApiMessage("Login successfully")
     public ResponseEntity<Object> login(@Valid @RequestBody LoginDTO loginDTO) {
-        log.debug("REST request to login with username : {}", loginDTO.getUsername());
+        log.info("REST request to login with username : {}", loginDTO.getUsername());
         UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
                 loginDTO.getUsername(),
                 loginDTO.getPassword()
@@ -82,7 +82,7 @@ public class AuthController {
     @PostMapping("/register")
     @ApiMessage("Created account successfully")
     public ResponseEntity<?> createUser(@Valid @RequestBody UserDTO userDTO) throws IllegalArgumentException {
-        log.debug("REST request to register account with username : {}", userDTO.getEmail());
+        log.info("REST request to register account with username : {}", userDTO.getEmail());
         User newUser = userService.createUser(userDTO);
         return ResponseEntity.status(HttpStatus.CREATED).body(newUser);
     }
