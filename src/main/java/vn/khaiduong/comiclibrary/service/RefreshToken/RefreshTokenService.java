@@ -5,5 +5,5 @@ import vn.khaiduong.comiclibrary.domain.User;
 
 public interface RefreshTokenService {
     RefreshToken createRefreshToken(User user, boolean isMobile);
-    RefreshToken recycleRefreshToken(User user, boolean isMobile);
+    RefreshToken recycleRefreshToken(String email,String token);
 }

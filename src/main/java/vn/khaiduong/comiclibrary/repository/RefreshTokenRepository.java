@@ -8,4 +8,5 @@ import vn.khaiduong.comiclibrary.domain.User;
 @Repository
 public interface RefreshTokenRepository extends JpaRepository<RefreshToken, Long> {
     RefreshToken findRefreshTokenByUserAndIsMobile(User user, boolean isMobile);
+    RefreshToken findRefreshTokenByToken(String token);
 }

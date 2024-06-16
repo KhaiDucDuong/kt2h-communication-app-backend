@@ -3,6 +3,7 @@ package vn.khaiduong.comiclibrary.service.RefreshToken;
 import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import vn.khaiduong.comiclibrary.constant.ExceptionMessage;
 import vn.khaiduong.comiclibrary.domain.RefreshToken;
 import vn.khaiduong.comiclibrary.domain.User;
 import vn.khaiduong.comiclibrary.repository.RefreshTokenRepository;
@@ -38,7 +39,14 @@ public class RefreshTokenServiceImpl implements RefreshTokenService{
     }
 
     @Override
-    public RefreshToken recycleRefreshToken(User user, boolean isMobile) {
+    public RefreshToken recycleRefreshToken(String email, String token) {
+        RefreshToken existingRefreshToken = refreshTokenRepository.findRefreshTokenByToken(token);
+
+        if(existingRefreshToken == null){
+            throw new IllegalArgumentException(ExceptionMessage.REFRESH_TOKEN_NOT_EXIST);
+        }
+
+        String refreshTokenValue = securityUtil.createRefreshToken(email);
         return null;
     }
 }

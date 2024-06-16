@@ -30,6 +30,8 @@ import vn.khaiduong.comiclibrary.util.annotation.ApiMessage;
 @RequestMapping("/api/auth")
 @RequiredArgsConstructor
 public class AuthController {
+    @Value("${jwt.refresh-token-cookie-name}")
+    private String refreshTokenCookieName;
     private final Logger log = LoggerFactory.getLogger(AuthController.class);
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
     private final SecurityUtil securityUtil;
@@ -71,7 +73,7 @@ public class AuthController {
 
         //set refresh token in response cookie
         ResponseCookie responseCookie = ResponseCookie
-                .from("refresh_token", refreshTokenValue)
+                .from(refreshTokenCookieName, refreshTokenValue)
                 .httpOnly(true)
                 .secure(true)
                 .path("/")
@@ -113,9 +115,9 @@ public class AuthController {
         return ResponseEntity.internalServerError().body(HttpStatus.INTERNAL_SERVER_ERROR.toString());
     }
 
-//    @GetMapping("/refresh")
-//    @ApiMessage("Get user by refresh token successfully")
-//    public ResponseEntity<?> getUserByRefreshToken(@CookieValue(name = "refresh_token") String refreshToken) {
-//        Jwt decodedToken = this.securityUtil.
-//    }
+    @GetMapping("/refresh")
+    @ApiMessage("Get user by refresh token successfully")
+    public ResponseEntity<?> getUserByRefreshToken(@CookieValue(name = "refresh_token") String refreshToken) {
+        return ResponseEntity.ok().body(null);
+    }
 }
