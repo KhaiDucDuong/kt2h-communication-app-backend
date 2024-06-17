@@ -47,6 +47,9 @@ public class RefreshTokenServiceImpl implements RefreshTokenService{
         }
 
         String refreshTokenValue = securityUtil.createRefreshToken(email);
-        return null;
+        existingRefreshToken.setToken(refreshTokenValue);
+        existingRefreshToken.setExpiryDate(Instant.now().plusSeconds(securityUtil.getRefreshTokenExpiration()));
+
+        return refreshTokenRepository.save(existingRefreshToken);
     }
 }

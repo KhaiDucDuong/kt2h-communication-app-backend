@@ -118,6 +118,44 @@ public class AuthController {
     @GetMapping("/refresh")
     @ApiMessage("Get user by refresh token successfully")
     public ResponseEntity<?> getUserByRefreshToken(@CookieValue(name = "refresh_token") String refreshToken) {
-        return ResponseEntity.ok().body(null);
+        log.debug("REST request to refresh token");
+
+        String username = SecurityUtil.getCurrentUserLogin().isPresent() ? SecurityUtil.getCurrentUserLogin().get() : "";
+        String currentToken = SecurityUtil.getCurrentUserJWT().isPresent() ? SecurityUtil.getCurrentUserJWT().get() : "";
+
+        //recycle refresh token
+        RefreshToken newRefreshToken = refreshTokenService.recycleRefreshToken(username, currentToken);
+        User currentUser = newRefreshToken.getUser();
+        String refreshTokenValue = newRefreshToken.getToken();
+
+        LoginResponse.UserLogin userLoginData = LoginResponse.UserLogin.builder()
+                .userId(String.valueOf(currentUser.getId()))
+                .email(currentUser.getEmail())
+                .fullName(currentUser.getFullName())
+                .build();
+
+        //create access token
+        String accessToken = securityUtil.createAccessToken(SecurityUtil.getAuthentication(), userLoginData);
+
+        LoginResponse loginResponse = LoginResponse.builder()
+                .access_token(accessToken)
+                .user(userLoginData)
+                .build();
+
+        //set refresh token in response cookie
+        ResponseCookie responseCookie = ResponseCookie
+                .from(refreshTokenCookieName, refreshTokenValue)
+                .httpOnly(true)
+                .secure(true)
+                .path("/")
+                .maxAge(jwtRefreshTokenExpiration)
+                //.domain()
+                .build();
+
+        log.debug("REST request to refresh token with username {} successfully", username);
+
+        return ResponseEntity.ok()
+                .header(HttpHeaders.SET_COOKIE, responseCookie.toString())
+                .body(loginResponse);
     }
 }

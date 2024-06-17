@@ -9,6 +9,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.oauth2.jose.jws.MacAlgorithm;
 import org.springframework.security.oauth2.jwt.*;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.stereotype.Service;
 import vn.khaiduong.comiclibrary.Response.LoginResponse;
 
@@ -79,6 +80,17 @@ public final class SecurityUtil {
             return s;
         }
         return null;
+    }
+
+    public static Optional<String> getCurrentUserJWT() {
+        SecurityContext securityContext = SecurityContextHolder.getContext();
+        return Optional.ofNullable((JwtAuthenticationToken) securityContext.getAuthentication())
+                .filter(authentication -> authentication.getToken() != null)
+                .map(authentication -> (String) authentication.getToken().getTokenValue());
+    }
+
+    public static Authentication getAuthentication() {
+        return SecurityContextHolder.getContext().getAuthentication();
     }
 
     public long getRefreshTokenExpiration(){
