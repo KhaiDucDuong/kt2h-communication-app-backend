@@ -37,13 +37,14 @@ public class GlobalExceptionHandler {
         } else if (ex instanceof MethodArgumentNotValidException){
             return handleMethodArgumentNotValidException((MethodArgumentNotValidException) ex, request);
         } else if (ex instanceof UsernameNotFoundException || ex instanceof BadCredentialsException){
-            return handleConstraintViolationException(ex);
+            return handleFailedAuthenticationException(ex);
         } else if (ex instanceof HttpRequestMethodNotSupportedException){
             return handleHttpRequestMethodNotSupportedException(ex);
         } else if (ex instanceof PropertyReferenceException){
             return handlePropertyReferenceException(ex);
+        } else if (ex instanceof TokenExpiredException){
+            return handleTokenExpiredException(ex);
         }
-
 
         RestResponse<Object> res = new RestResponse<Object>();
         res.setStatusCode(HttpStatus.INTERNAL_SERVER_ERROR.value());
@@ -82,7 +83,7 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(res);
     }
 
-    private ResponseEntity<Object> handleConstraintViolationException(Exception ex) {
+    private ResponseEntity<Object> handleFailedAuthenticationException(Exception ex) {
         RestResponse<Object> res = new RestResponse<Object>();
         res.setStatusCode(HttpStatus.UNAUTHORIZED.value());
         res.setError(ex.getMessage());
@@ -94,8 +95,8 @@ public class GlobalExceptionHandler {
     private ResponseEntity<Object> handleHttpRequestMethodNotSupportedException(Exception ex) {
         RestResponse<Object> res = new RestResponse<Object>();
         res.setStatusCode(HttpStatus.NOT_FOUND.value());
-        res.setError(HttpStatus.NOT_FOUND);
-        res.setMessage(ex.getMessage());
+        res.setError(ex.getMessage());
+        res.setMessage("Method Not Found Exception");
 
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(res);
     }
@@ -103,9 +104,18 @@ public class GlobalExceptionHandler {
     private ResponseEntity<Object> handlePropertyReferenceException(Exception ex) {
         RestResponse<Object> res = new RestResponse<Object>();
         res.setStatusCode(HttpStatus.BAD_REQUEST.value());
-        res.setError(HttpStatus.BAD_REQUEST);
-        res.setMessage(ex.getMessage());
+        res.setError(ex.getMessage());
+        res.setMessage("Property Reference Exception");
 
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(res);
+    }
+
+    private ResponseEntity<Object> handleTokenExpiredException(Exception ex) {
+        RestResponse<Object> res = new RestResponse<Object>();
+        res.setStatusCode(HttpStatus.UNAUTHORIZED.value());
+        res.setError(ex.getMessage());
+        res.setMessage("Token Expired Exception");
+
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(res);
     }
 }

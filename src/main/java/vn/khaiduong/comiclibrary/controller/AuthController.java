@@ -7,6 +7,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
+import vn.khaiduong.comiclibrary.Exception.TokenExpiredException;
 import vn.khaiduong.comiclibrary.Response.LoginResponse;
 import vn.khaiduong.comiclibrary.configuration.SecurityConfiguration;
 import vn.khaiduong.comiclibrary.domain.RefreshToken;
@@ -117,11 +118,10 @@ public class AuthController {
 
     @GetMapping("/refresh")
     @ApiMessage("Get user by refresh token successfully")
-    public ResponseEntity<?> getUserByRefreshToken(@CookieValue(name = "refresh_token") String refreshToken) {
-        log.debug("REST request to refresh token");
-
+    public ResponseEntity<?> getUserByRefreshToken() throws TokenExpiredException {
         String username = SecurityUtil.getCurrentUserLogin().isPresent() ? SecurityUtil.getCurrentUserLogin().get() : "";
         String currentToken = SecurityUtil.getCurrentUserJWT().isPresent() ? SecurityUtil.getCurrentUserJWT().get() : "";
+        log.debug("REST request to refresh token from username {}", username);
 
         //recycle refresh token
         RefreshToken newRefreshToken = refreshTokenService.recycleRefreshToken(username, currentToken);
@@ -157,5 +157,29 @@ public class AuthController {
         return ResponseEntity.ok()
                 .header(HttpHeaders.SET_COOKIE, responseCookie.toString())
                 .body(loginResponse);
+    }
+
+    @PostMapping("/logout")
+    @ApiMessage("Logged user out successfully")
+    public ResponseEntity<?> logoutUser() throws TokenExpiredException {
+        String username = SecurityUtil.getCurrentUserLogin().isPresent() ? SecurityUtil.getCurrentUserLogin().get() : "";
+        String currentToken = SecurityUtil.getCurrentUserJWT().isPresent() ? SecurityUtil.getCurrentUserJWT().get() : "";
+        log.debug("REST request to logout from username {}", username);
+
+        refreshTokenService.invalidateToken(currentToken);
+
+        ResponseCookie responseCookie = ResponseCookie
+                .from(refreshTokenCookieName, "")
+                .httpOnly(true)
+                .secure(true)
+                .path("/")
+                .maxAge(0)
+                //.domain()
+                .build();
+
+        log.debug("REST request to refresh token with username {} successfully", username);
+        return ResponseEntity.ok()
+                .header(HttpHeaders.SET_COOKIE, responseCookie.toString())
+                .body("Logout user " + username);
     }
 }
