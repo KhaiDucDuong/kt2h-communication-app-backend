@@ -5,12 +5,15 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 import vn.khaiduong.comiclibrary.Exception.TokenExpiredException;
 import vn.khaiduong.comiclibrary.Response.LoginResponse;
 import vn.khaiduong.comiclibrary.configuration.SecurityConfiguration;
+import vn.khaiduong.comiclibrary.domain.Authority;
 import vn.khaiduong.comiclibrary.domain.RefreshToken;
+import vn.khaiduong.comiclibrary.domain.Role;
 import vn.khaiduong.comiclibrary.domain.User;
 import vn.khaiduong.comiclibrary.dto.LoginDTO;
 import vn.khaiduong.comiclibrary.dto.RegisterUserDTO;
@@ -27,12 +30,13 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import vn.khaiduong.comiclibrary.util.annotation.ApiMessage;
 
+import java.util.Collection;
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/auth")
 @RequiredArgsConstructor
 public class AuthController {
-    @Value("${jwt.refresh-token-cookie-name}")
-    private String refreshTokenCookieName;
     private final Logger log = LoggerFactory.getLogger(AuthController.class);
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
     private final SecurityUtil securityUtil;
@@ -54,6 +58,8 @@ public class AuthController {
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
         User userLogin = userService.findUserByUsername(loginDTO.getUsername());
+        List<Authority> userAuthorities = userLogin.getRoles().stream().map(Role::getAuthorities).toList().stream().flatMap(Collection::stream).toList();
+
         LoginResponse.UserLogin userLoginData = LoginResponse.UserLogin.builder()
                 .userId(String.valueOf(userLogin.getId()))
                 .email(userLogin.getEmail())
@@ -61,7 +67,7 @@ public class AuthController {
                 .build();
 
         //create access token
-        String accessToken = securityUtil.createAccessToken(authentication, userLoginData);
+        String accessToken = securityUtil.createAccessToken(authentication, userAuthorities);
 
         //create refresh token for user
         RefreshToken refreshToken = this.refreshTokenService.createRefreshToken(userLogin, false); //isMobile is default to false for now
@@ -74,7 +80,7 @@ public class AuthController {
 
         //set refresh token in response cookie
         ResponseCookie responseCookie = ResponseCookie
-                .from(refreshTokenCookieName, refreshTokenValue)
+                .from("refresh_token", refreshTokenValue)
                 .httpOnly(true)
                 .secure(true)
                 .path("/")
@@ -102,7 +108,7 @@ public class AuthController {
     public ResponseEntity<?> getAccount() {
         log.debug("REST request to get current account");
         String username = SecurityUtil.getCurrentUserLogin().isPresent() ? SecurityUtil.getCurrentUserLogin().get() : "";
-        User userLogin = userService.findUserByUsername(username);
+            User userLogin = userService.findUserByUsername(username);
 
         if(userLogin != null){
             LoginResponse.UserLogin userLoginData = LoginResponse.UserLogin.builder()
@@ -118,13 +124,11 @@ public class AuthController {
 
     @GetMapping("/refresh")
     @ApiMessage("Get user by refresh token successfully")
-    public ResponseEntity<?> getUserByRefreshToken() throws TokenExpiredException {
-        String username = SecurityUtil.getCurrentUserLogin().isPresent() ? SecurityUtil.getCurrentUserLogin().get() : "";
-        String currentToken = SecurityUtil.getCurrentUserJWT().isPresent() ? SecurityUtil.getCurrentUserJWT().get() : "";
-        log.debug("REST request to refresh token from username {}", username);
+    public ResponseEntity<?> getUserByRefreshToken(@CookieValue(name = "refresh_token") String refreshToken) throws TokenExpiredException {
+        log.debug("REST request to refresh token");
 
         //recycle refresh token
-        RefreshToken newRefreshToken = refreshTokenService.recycleRefreshToken(username, currentToken);
+        RefreshToken newRefreshToken = refreshTokenService.recycleRefreshToken(refreshToken);
         User currentUser = newRefreshToken.getUser();
         String refreshTokenValue = newRefreshToken.getToken();
 
@@ -135,7 +139,9 @@ public class AuthController {
                 .build();
 
         //create access token
-        String accessToken = securityUtil.createAccessToken(SecurityUtil.getAuthentication(), userLoginData);
+        List<Authority> userAuthorities = currentUser.getRoles().stream()
+                .map(Role::getAuthorities).toList().stream().flatMap(Collection::stream).toList();
+        String accessToken = securityUtil.createAccessToken(SecurityUtil.getAuthentication(), userAuthorities);
 
         LoginResponse loginResponse = LoginResponse.builder()
                 .access_token(accessToken)
@@ -144,7 +150,7 @@ public class AuthController {
 
         //set refresh token in response cookie
         ResponseCookie responseCookie = ResponseCookie
-                .from(refreshTokenCookieName, refreshTokenValue)
+                .from("refresh_token", refreshTokenValue)
                 .httpOnly(true)
                 .secure(true)
                 .path("/")
@@ -152,7 +158,7 @@ public class AuthController {
                 //.domain()
                 .build();
 
-        log.debug("REST request to refresh token with username {} successfully", username);
+        log.debug("REST request to refresh token with username {} successfully", currentUser);
 
         return ResponseEntity.ok()
                 .header(HttpHeaders.SET_COOKIE, responseCookie.toString())
@@ -161,15 +167,14 @@ public class AuthController {
 
     @PostMapping("/logout")
     @ApiMessage("Logged user out successfully")
-    public ResponseEntity<?> logoutUser() throws TokenExpiredException {
-        String username = SecurityUtil.getCurrentUserLogin().isPresent() ? SecurityUtil.getCurrentUserLogin().get() : "";
-        String currentToken = SecurityUtil.getCurrentUserJWT().isPresent() ? SecurityUtil.getCurrentUserJWT().get() : "";
-        log.debug("REST request to logout from username {}", username);
+    public ResponseEntity<?> logoutUser(@CookieValue(name = "refresh_token") String refreshToken) throws TokenExpiredException {
+        log.debug("REST request to logout");
 
-        refreshTokenService.invalidateToken(currentToken);
+        RefreshToken newRefreshToken = refreshTokenService.invalidateToken(refreshToken);
+        User loggedOutUser = newRefreshToken.getUser();
 
         ResponseCookie responseCookie = ResponseCookie
-                .from(refreshTokenCookieName, "")
+                .from("refresh_token", "")
                 .httpOnly(true)
                 .secure(true)
                 .path("/")
@@ -177,9 +182,9 @@ public class AuthController {
                 //.domain()
                 .build();
 
-        log.debug("REST request to refresh token with username {} successfully", username);
+        log.debug("REST request to refresh token with username {} successfully", loggedOutUser.getEmail());
         return ResponseEntity.ok()
                 .header(HttpHeaders.SET_COOKIE, responseCookie.toString())
-                .body("Logout user " + username);
+                .body("Logout user " + loggedOutUser.getEmail());
     }
 }

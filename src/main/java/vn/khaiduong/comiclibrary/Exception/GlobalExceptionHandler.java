@@ -3,8 +3,10 @@ package vn.khaiduong.comiclibrary.Exception;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.mapping.PropertyReferenceException;
+import org.springframework.security.authorization.AuthorizationDeniedException;
 import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.MissingRequestCookieException;
 import org.springframework.web.context.request.NativeWebRequest;
 import vn.khaiduong.comiclibrary.constant.ExceptionMessage;
 import vn.khaiduong.comiclibrary.Response.RestResponse;
@@ -44,6 +46,10 @@ public class GlobalExceptionHandler {
             return handlePropertyReferenceException(ex);
         } else if (ex instanceof TokenExpiredException){
             return handleTokenExpiredException(ex);
+        } else if (ex instanceof MissingRequestCookieException){
+            return handleMissingRequestCookieException(ex);
+        } else if (ex instanceof AuthorizationDeniedException){
+            return handleAuthorizationDeniedException(ex);
         }
 
         RestResponse<Object> res = new RestResponse<Object>();
@@ -117,5 +123,23 @@ public class GlobalExceptionHandler {
         res.setMessage("Token Expired Exception");
 
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(res);
+    }
+
+    private ResponseEntity<Object> handleMissingRequestCookieException(Exception ex) {
+        RestResponse<Object> res = new RestResponse<Object>();
+        res.setStatusCode(HttpStatus.BAD_REQUEST.value());
+        res.setError(ex.getMessage());
+        res.setMessage("Missing Request Cookie Exception");
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(res);
+    }
+
+    private ResponseEntity<Object> handleAuthorizationDeniedException(Exception ex) {
+        RestResponse<Object> res = new RestResponse<Object>();
+        res.setStatusCode(HttpStatus.FORBIDDEN.value());
+        res.setError(ex.getMessage());
+        res.setMessage("Authorization Denied Exception");
+
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(res);
     }
 }

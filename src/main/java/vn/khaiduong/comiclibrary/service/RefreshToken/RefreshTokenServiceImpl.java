@@ -40,7 +40,7 @@ public class RefreshTokenServiceImpl implements RefreshTokenService{
     }
 
     @Override
-    public RefreshToken recycleRefreshToken(String email, String token) throws TokenExpiredException {
+    public RefreshToken recycleRefreshToken(String token) throws TokenExpiredException {
         RefreshToken existingRefreshToken = refreshTokenRepository.findRefreshTokenByToken(token);
 
         if(existingRefreshToken == null){
@@ -51,7 +51,7 @@ public class RefreshTokenServiceImpl implements RefreshTokenService{
             throw new TokenExpiredException(ExceptionMessage.EXPIRED_TOKEN);
         }
 
-        String refreshTokenValue = securityUtil.createRefreshToken(email);
+        String refreshTokenValue = securityUtil.createRefreshToken(existingRefreshToken.getUser().getEmail());
         existingRefreshToken.setToken(refreshTokenValue);
         existingRefreshToken.setExpiryDate(Instant.now().plusSeconds(securityUtil.getRefreshTokenExpiration()));
 
@@ -59,7 +59,7 @@ public class RefreshTokenServiceImpl implements RefreshTokenService{
     }
 
     @Override
-    public void invalidateToken(String token) throws TokenExpiredException {
+    public RefreshToken invalidateToken(String token) throws TokenExpiredException {
         RefreshToken existingRefreshToken = refreshTokenRepository.findRefreshTokenByToken(token);
 
         if(existingRefreshToken == null){
@@ -71,6 +71,6 @@ public class RefreshTokenServiceImpl implements RefreshTokenService{
         }
 
         existingRefreshToken.setExpiryDate(Instant.now());
-        refreshTokenRepository.save(existingRefreshToken);
+        return refreshTokenRepository.save(existingRefreshToken);
     }
 }

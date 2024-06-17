@@ -39,7 +39,21 @@ public class User extends AbstractAuditingEntity {
     @Column(name = "password", length = 60, nullable = false)
     private String password;
 
+    @Column(name = "is_activated")
+    @Builder.Default
+    private Boolean isActivated = true;
+
+    @Column(name = "is_banned")
+    @Builder.Default
+    private Boolean isBanned = false;
+
+    @JsonIgnore
     @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "id")
     private List<RefreshToken> refreshTokens;
+
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(name = "user_role", joinColumns = @JoinColumn(name = "user_id", nullable = false),
+            inverseJoinColumns = @JoinColumn(name = "role_id", nullable = false))
+    private List<Role> roles;
 }

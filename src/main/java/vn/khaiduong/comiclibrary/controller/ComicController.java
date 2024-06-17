@@ -2,6 +2,7 @@ package vn.khaiduong.comiclibrary.controller;
 
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.access.prepost.PreAuthorize;
 import vn.khaiduong.comiclibrary.Response.ResultPaginationResponse;
 import vn.khaiduong.comiclibrary.domain.Comic;
 import vn.khaiduong.comiclibrary.dto.ComicDTO;
@@ -31,6 +32,7 @@ public class ComicController {
 
     @PostMapping("")
     @ApiMessage("Created comic")
+    @PreAuthorize("hasAnyAuthority('WRITE_COMIC', 'ADMIN_AUTHORITY')")
     public ResponseEntity<?> createComic(@Valid @RequestBody ComicDTO comicDTO) {
         Comic newComic = comicService.createComic(comicDTO);
         return ResponseEntity.status(HttpStatus.CREATED).body(newComic);

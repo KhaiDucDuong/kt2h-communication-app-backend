@@ -27,7 +27,7 @@ public class RefreshToken {
     @Column(name = "is_mobile")
     private boolean isMobile;
 
-    @OneToOne(fetch = FetchType.EAGER)
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     private User user;
 }

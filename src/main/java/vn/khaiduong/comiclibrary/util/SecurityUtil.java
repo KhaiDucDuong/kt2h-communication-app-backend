@@ -12,11 +12,14 @@ import org.springframework.security.oauth2.jwt.*;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.stereotype.Service;
 import vn.khaiduong.comiclibrary.Response.LoginResponse;
+import vn.khaiduong.comiclibrary.domain.Authority;
+import vn.khaiduong.comiclibrary.domain.Role;
 
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -33,16 +36,18 @@ public final class SecurityUtil {
 
     private final JwtEncoder jwtEncoder;
 
-    public String createAccessToken(Authentication authentication, LoginResponse.UserLogin userLogin) {
+    public String createAccessToken(Authentication authentication, List<Authority> authorities) {
         Instant now = Instant.now();
         Instant validity;
+
+        List<String> authorityNameList = authorities.stream().map(Authority::getName).toList();
 
         validity = now.plus(this.jwtAccessTokenExpiration, ChronoUnit.SECONDS);
         JwtClaimsSet claims = JwtClaimsSet.builder()
                 .issuedAt(now)
                 .expiresAt(validity)
                 .subject(authentication.getName())
-                .claim("user", userLogin)
+                .claim("authorities", authorityNameList)
                 .build();
 
         JwsHeader jwsHeader = JwsHeader.with(JWT_ALGORITHM).build();

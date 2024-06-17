@@ -1,5 +1,6 @@
 package vn.khaiduong.comiclibrary.controller;
 
+import org.springframework.security.access.prepost.PreAuthorize;
 import vn.khaiduong.comiclibrary.domain.User;
 import vn.khaiduong.comiclibrary.service.UserService.UserService;
 import lombok.RequiredArgsConstructor;
@@ -18,6 +19,7 @@ public class UserController {
 
     @GetMapping("")
     @ApiMessage("Fetched all users")
+    @PreAuthorize("hasAnyAuthority('ADMIN_AUTHORITY')")
     public ResponseEntity<?> getAllUsers(){
         List<User> userList = userService.getAllUsers();
         return ResponseEntity.status(HttpStatus.OK).body(userList);
