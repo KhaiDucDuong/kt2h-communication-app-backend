@@ -3,9 +3,9 @@ server:
 spring:
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://localhost:3306/comic_library
-    username: root
-    password: Khai_1211
+    url: jdbc:mysql://comiclibrary.c96wceknz5dj.ap-southeast-1.rds.amazonaws.com:3306/comic_library
+    username: admin
+    password: Khai1211!
 
   jpa:
     show-sql: true
