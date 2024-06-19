@@ -2,7 +2,7 @@ package vn.khaiduong.comiclibrary.controller;
 
 import org.springframework.security.access.prepost.PreAuthorize;
 import vn.khaiduong.comiclibrary.domain.User;
-import vn.khaiduong.comiclibrary.service.UserService.UserService;
+import vn.khaiduong.comiclibrary.service.UserService.IUserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,7 +15,7 @@ import java.util.List;
 @RequestMapping("/api/users")
 @RequiredArgsConstructor
 public class UserController {
-    private final UserService userService;
+    private final IUserService userService;
 
     @GetMapping("")
     @ApiMessage("Fetched all users")

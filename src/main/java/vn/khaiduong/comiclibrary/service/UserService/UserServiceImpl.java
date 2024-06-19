@@ -1,6 +1,5 @@
 package vn.khaiduong.comiclibrary.service.UserService;
 
-import org.apache.commons.lang3.StringUtils;
 import vn.khaiduong.comiclibrary.constant.ExceptionMessage;
 import vn.khaiduong.comiclibrary.domain.User;
 import vn.khaiduong.comiclibrary.dto.RegisterUserDTO;
@@ -13,7 +12,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class UserServiceImpl implements UserService{
+public class UserServiceImpl implements IUserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
 

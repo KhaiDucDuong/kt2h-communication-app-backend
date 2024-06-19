@@ -5,7 +5,7 @@ import vn.khaiduong.comiclibrary.dto.RegisterUserDTO;
 
 import java.util.List;
 
-public interface UserService {
+public interface IUserService {
     User createUser(RegisterUserDTO registerUserDTO) throws IllegalArgumentException;
     User findUserByUsername(String username);
 

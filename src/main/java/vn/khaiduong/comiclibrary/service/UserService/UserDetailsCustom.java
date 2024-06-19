@@ -11,16 +11,13 @@ import org.springframework.stereotype.Component;
 import vn.khaiduong.comiclibrary.domain.Authority;
 import vn.khaiduong.comiclibrary.domain.Role;
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Component("userDetailsService")
 public class UserDetailsCustom implements UserDetailsService {
-    private final UserService userService;
+    private final IUserService userService;
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         vn.khaiduong.comiclibrary.domain.User user = userService.findUserByUsername(username);

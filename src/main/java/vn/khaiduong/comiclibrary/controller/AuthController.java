@@ -5,20 +5,17 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 import vn.khaiduong.comiclibrary.Exception.TokenExpiredException;
 import vn.khaiduong.comiclibrary.Response.LoginResponse;
-import vn.khaiduong.comiclibrary.configuration.SecurityConfiguration;
 import vn.khaiduong.comiclibrary.domain.Authority;
 import vn.khaiduong.comiclibrary.domain.RefreshToken;
 import vn.khaiduong.comiclibrary.domain.Role;
 import vn.khaiduong.comiclibrary.domain.User;
 import vn.khaiduong.comiclibrary.dto.LoginDTO;
 import vn.khaiduong.comiclibrary.dto.RegisterUserDTO;
-import vn.khaiduong.comiclibrary.service.RefreshToken.RefreshTokenService;
-import vn.khaiduong.comiclibrary.service.UserService.UserService;
+import vn.khaiduong.comiclibrary.service.RefreshToken.IRefreshTokenService;
+import vn.khaiduong.comiclibrary.service.UserService.IUserService;
 import vn.khaiduong.comiclibrary.util.SecurityUtil;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -40,8 +37,8 @@ public class AuthController {
     private final Logger log = LoggerFactory.getLogger(AuthController.class);
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
     private final SecurityUtil securityUtil;
-    private final UserService userService;
-    private final RefreshTokenService refreshTokenService;
+    private final IUserService userService;
+    private final IRefreshTokenService refreshTokenService;
 
     @Value("${jwt.refresh-token-expiration-in-seconds}")
     private long jwtRefreshTokenExpiration;

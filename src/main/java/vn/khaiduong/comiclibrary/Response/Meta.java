@@ -1,13 +1,13 @@
 package vn.khaiduong.comiclibrary.Response;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 @Getter
 @Setter
 @Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class Meta {
     @JsonProperty("page")
     private int page;

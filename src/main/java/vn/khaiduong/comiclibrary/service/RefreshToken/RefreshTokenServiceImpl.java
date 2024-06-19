@@ -1,6 +1,5 @@
 package vn.khaiduong.comiclibrary.service.RefreshToken;
 
-import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import vn.khaiduong.comiclibrary.Exception.TokenExpiredException;
@@ -14,7 +13,7 @@ import java.time.Instant;
 
 @RequiredArgsConstructor
 @Service
-public class RefreshTokenServiceImpl implements RefreshTokenService{
+public class RefreshTokenServiceImpl implements IRefreshTokenService {
     private final SecurityUtil securityUtil;
     private final RefreshTokenRepository refreshTokenRepository;
     @Override

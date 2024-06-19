@@ -16,6 +16,11 @@ spring:
         dialect: org.hibernate.dialect.MySQLDialect
 
   data:
+    redis:
+      host: redis-13005.c252.ap-southeast-1-1.ec2.redns.redis-cloud.com
+      port: 13005
+      password: YUGlni8un2dWM5NgFoEITHD5g0w1uuUg
+      username: default
     web:
       pageable:
         default-page-size: 20

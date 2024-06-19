@@ -4,7 +4,7 @@ import vn.khaiduong.comiclibrary.Exception.TokenExpiredException;
 import vn.khaiduong.comiclibrary.domain.RefreshToken;
 import vn.khaiduong.comiclibrary.domain.User;
 
-public interface RefreshTokenService {
+public interface IRefreshTokenService {
     RefreshToken createRefreshToken(User user, boolean isMobile);
     RefreshToken recycleRefreshToken(String token) throws TokenExpiredException;
     RefreshToken invalidateToken(String token) throws TokenExpiredException;
