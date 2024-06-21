@@ -8,7 +8,7 @@ import java.util.Map;
 import java.util.Set;
 
 public interface BaseRedisService {
-    void set(String key, String value) throws JsonProcessingException;
+    void set(String key, Object value) throws JsonProcessingException;
 
     void setTimeToLiveInSeconds(String key, long timeoutInSeconds);
     void setTimeToLiveInMinutes(String key, long timeoutInMinutes);
@@ -16,7 +16,6 @@ public interface BaseRedisService {
     void setTimeToLiveInDays(String key, long timeoutInDays);
 
     void hashSet(String key, String field, Object value) throws JsonProcessingException;
-
     boolean hashExists(String key, String field);
 
     Object get(String key);

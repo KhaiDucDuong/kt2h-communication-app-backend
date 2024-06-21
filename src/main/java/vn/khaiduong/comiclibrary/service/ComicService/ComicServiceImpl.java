@@ -3,6 +3,7 @@ package vn.khaiduong.comiclibrary.service.ComicService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -22,7 +23,6 @@ import java.util.List;
 @Service
 public class ComicServiceImpl implements IComicService {
     private final ComicRepository comicRepository;
-    private final IComicRedisService comicRedisService;
     private final BaseRedisServiceImpl baseRedisService;
     private final ObjectMapper redisObjectMapper;
 
@@ -41,10 +41,12 @@ public class ComicServiceImpl implements IComicService {
     @Override
     public ResultPaginationResponse getAllComics(Pageable pageable) throws JsonProcessingException {
         ResultPaginationResponse response;
-        String comicHashField = RedisUtil.getKeyFrom(COMIC_FIELD_PREFIX, pageable);
-        if(baseRedisService.hashExists(COMIC_HASH_KEY, comicHashField)){
-            String objectString = (String) baseRedisService.hashGet(COMIC_HASH_KEY, comicHashField);
-            response = redisObjectMapper.readValue(objectString, new TypeReference<ResultPaginationResponse>() {});
+        String comicKey = RedisUtil.getKeyFrom(COMIC_HASH_KEY, pageable);
+        String redisCachedData = (String) baseRedisService.get(comicKey);
+        if(!StringUtils.isBlank(redisCachedData)){
+            //reset data expiration in redis
+            baseRedisService.setTimeToLiveInMinutes(comicKey, redisComicExpirationInMinutes);
+            response = redisObjectMapper.readValue(redisCachedData, new TypeReference<ResultPaginationResponse>() {});
         } else {
             Page<Comic> comicPage = comicRepository.findAll(pageable);
             Meta meta = Meta.builder()
@@ -57,8 +59,10 @@ public class ComicServiceImpl implements IComicService {
                     .meta(meta)
                     .result(comicPage.getContent())
                     .build();
-            baseRedisService.hashSet(COMIC_HASH_KEY, comicHashField, response);
-            baseRedisService.setTimeToLiveInMinutes(COMIC_HASH_KEY, redisComicExpirationInMinutes);
+
+            //set data in redis and expiration
+            baseRedisService.set(comicKey, response);
+            baseRedisService.setTimeToLiveInMinutes(comicKey, redisComicExpirationInMinutes);
         }
 
         return response;

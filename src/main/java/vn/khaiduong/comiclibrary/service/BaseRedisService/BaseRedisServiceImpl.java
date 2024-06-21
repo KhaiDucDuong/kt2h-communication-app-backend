@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -23,7 +24,7 @@ public class BaseRedisServiceImpl implements BaseRedisService{
     private final ObjectMapper redisObjectMapper;
 
     @Override
-    public void set(String key, String value) throws JsonProcessingException {
+    public void set(String key, Object value) throws JsonProcessingException {
         String mappedValue = redisObjectMapper.writeValueAsString(value);
         redisTemplate.opsForValue().set(key, mappedValue);
     }
