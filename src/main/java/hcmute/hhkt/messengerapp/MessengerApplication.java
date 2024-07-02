@@ -7,10 +7,10 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 //@SpringBootApplication(exclude = { SecurityAutoConfiguration.class })
 
 @SpringBootApplication
-public class ComicLibraryApplication {
+public class MessengerApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(ComicLibraryApplication.class, args);
+		SpringApplication.run(MessengerApplication.class, args);
 	}
 
 }
