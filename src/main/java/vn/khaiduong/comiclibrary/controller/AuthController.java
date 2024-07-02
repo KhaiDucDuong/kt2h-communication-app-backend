@@ -1,17 +1,22 @@
 package vn.khaiduong.comiclibrary.controller;
 
+import com.nimbusds.jose.shaded.gson.Gson;
+import com.nimbusds.jose.shaded.gson.JsonObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.ResponseCookie;
+import org.springframework.http.*;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestTemplate;
 import vn.khaiduong.comiclibrary.Exception.TokenExpiredException;
 import vn.khaiduong.comiclibrary.Response.LoginResponse;
 import vn.khaiduong.comiclibrary.domain.Authority;
 import vn.khaiduong.comiclibrary.domain.RefreshToken;
 import vn.khaiduong.comiclibrary.domain.Role;
 import vn.khaiduong.comiclibrary.domain.User;
+import vn.khaiduong.comiclibrary.dto.GoogleAuthorizationDTO;
 import vn.khaiduong.comiclibrary.dto.LoginDTO;
 import vn.khaiduong.comiclibrary.dto.RegisterUserDTO;
 import vn.khaiduong.comiclibrary.service.RefreshToken.IRefreshTokenService;
@@ -19,8 +24,6 @@ import vn.khaiduong.comiclibrary.service.UserService.IUserService;
 import vn.khaiduong.comiclibrary.util.SecurityUtil;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.Authentication;
@@ -39,6 +42,11 @@ public class AuthController {
     private final SecurityUtil securityUtil;
     private final IUserService userService;
     private final IRefreshTokenService refreshTokenService;
+
+    @Value("${spring.security.oauth2.client.registration.google-login.client-id}")
+    private String googleClientId;
+    @Value("${spring.security.oauth2.client.registration.google-login.client-secret}")
+    private String googleClientSecrect;
 
     @Value("${jwt.refresh-token-expiration-in-seconds}")
     private long jwtRefreshTokenExpiration;
@@ -184,4 +192,43 @@ public class AuthController {
                 .header(HttpHeaders.SET_COOKIE, responseCookie.toString())
                 .body("Logout user " + loggedOutUser.getEmail());
     }
+
+        @GetMapping("/oauth2/google")
+        public String grantCode(@RequestParam("code") String code
+                //, @RequestParam("scope") String scope, @RequestParam("authuser") String authUser, @RequestParam("prompt") String prompt
+        ) {
+            RestTemplate restTemplate = new RestTemplate();
+            HttpHeaders httpHeaders = new HttpHeaders();
+            httpHeaders.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+
+            MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
+            params.add("code", code);
+            params.add("redirect_uri", "http://localhost:3000");
+            params.add("client_id", googleClientId);
+            params.add("client_secret", googleClientSecrect);
+            params.add("scope", "https://www.googleapis.com/auth/userinfo.profile");
+            params.add("scope", "https://www.googleapis.com/auth/userinfo.email");
+            params.add("scope", "openid");
+            params.add("grant_type", "authorization_code");
+
+            HttpEntity<MultiValueMap<String, String>> requestEntity = new HttpEntity<>(params, httpHeaders);
+
+            String url = "https://oauth2.googleapis.com/token";
+            GoogleAuthorizationDTO response = restTemplate.postForObject(url, requestEntity, GoogleAuthorizationDTO.class);
+
+            JsonObject jsonObject;
+            if(response != null){
+                httpHeaders.setBearerAuth(response.getAccessToken());
+
+                HttpEntity<String> newRequestEntity = new HttpEntity<>(httpHeaders);
+
+                String newUrl = "https://www.googleapis.com/oauth2/v2/userinfo";
+                ResponseEntity<String> newResponse = restTemplate.exchange(newUrl, HttpMethod.GET, newRequestEntity, String.class);
+                jsonObject = new Gson().fromJson(newResponse.getBody(), JsonObject.class);
+                return "hello 2";
+            }
+
+            return "hello";
+        }
+
 }

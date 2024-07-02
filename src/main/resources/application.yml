@@ -27,6 +27,15 @@ spring:
         one-indexed-parameters: true
         max-page-size: 50
 
+  security:
+    oauth2:
+      client:
+        registration:
+          google-login:
+            provider: google
+            client-id: 49619057630-ij5tirenev88rlsull9dtbr3jher6mm3.apps.googleusercontent.com
+            client-secret: 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
+
 api:
   prefix: /api
 
