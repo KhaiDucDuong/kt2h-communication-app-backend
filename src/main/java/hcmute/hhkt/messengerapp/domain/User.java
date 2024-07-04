@@ -75,11 +75,6 @@ public class User extends AbstractAuditingEntity {
 //    @Builder.Default
 //    private Boolean isBanned = false;
 
-    @JsonIgnore
-    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
-    @JoinColumn(name = "id")
-    private List<RefreshToken> refreshTokens;
-
 //    @ManyToMany(fetch = FetchType.LAZY)
 //    @JoinTable(name = "user_role", joinColumns = @JoinColumn(name = "user_id", nullable = false),
 //            inverseJoinColumns = @JoinColumn(name = "role_id", nullable = false))

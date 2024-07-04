@@ -1,5 +1,6 @@
 package hcmute.hhkt.messengerapp.domain;
 
+import hcmute.hhkt.messengerapp.domain.enums.Device;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -25,10 +26,11 @@ public class RefreshToken {
     @Column(name = "expiry_date", nullable = false)
     private Instant expiryDate;
 
-    @Column(name = "is_mobile")
-    private boolean isMobile;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "device", length = 20, nullable = false)
+    private Device device;
 
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", referencedColumnName = "id")
-    private User user;
+    @JoinColumn(name = "account_id", referencedColumnName = "id")
+    private Account account;
 }

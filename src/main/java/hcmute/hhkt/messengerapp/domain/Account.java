@@ -42,4 +42,9 @@ public class Account extends AbstractAuditingEntity{
 
     @OneToOne(mappedBy = "account", fetch = FetchType.LAZY)
     private User user;
+
+    @JsonIgnore
+    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "id")
+    private List<RefreshToken> refreshTokens;
 }

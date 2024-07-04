@@ -2,6 +2,7 @@ package hcmute.hhkt.messengerapp.controller;
 
 import com.nimbusds.jose.shaded.gson.Gson;
 import com.nimbusds.jose.shaded.gson.JsonObject;
+import hcmute.hhkt.messengerapp.domain.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -17,10 +18,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 import hcmute.hhkt.messengerapp.Exception.TokenExpiredException;
 import hcmute.hhkt.messengerapp.Response.LoginResponse;
-import hcmute.hhkt.messengerapp.domain.Authority;
-import hcmute.hhkt.messengerapp.domain.RefreshToken;
-import hcmute.hhkt.messengerapp.domain.Role;
-import hcmute.hhkt.messengerapp.domain.User;
 import hcmute.hhkt.messengerapp.dto.GoogleAuthorizationDTO;
 import hcmute.hhkt.messengerapp.dto.LoginDTO;
 import hcmute.hhkt.messengerapp.dto.RegisterUserDTO;
@@ -142,13 +139,15 @@ public class AuthController {
 
         //recycle refresh token
         RefreshToken newRefreshToken = refreshTokenService.recycleRefreshToken(refreshToken);
-        User currentUser = newRefreshToken.getUser();
+        //User currentUser = newRefreshToken.getUser();
+        Account currentAccount = newRefreshToken.getAccount();
+
         String refreshTokenValue = newRefreshToken.getToken();
 
         LoginResponse.UserLogin userLoginData = LoginResponse.UserLogin.builder()
-                .userId(String.valueOf(currentUser.getId()))
-                .email(currentUser.getEmail())
-                .fullName(currentUser.getLastName())
+                .userId(String.valueOf(currentAccount.getId()))
+                .email(currentAccount.getUsername())
+                .fullName("...")
                 .build();
 
         //create access token
@@ -173,7 +172,7 @@ public class AuthController {
                 //.domain()
                 .build();
 
-        log.debug("REST request to refresh token with username {} successfully", currentUser);
+        log.debug("REST request to refresh token with username {} successfully", currentAccount.getUsername());
 
         return ResponseEntity.ok()
                 .header(HttpHeaders.SET_COOKIE, responseCookie.toString())
@@ -186,7 +185,8 @@ public class AuthController {
         log.debug("REST request to logout");
 
         RefreshToken newRefreshToken = refreshTokenService.invalidateToken(refreshToken);
-        User loggedOutUser = newRefreshToken.getUser();
+        //User loggedOutUser = newRefreshToken.getUser();
+        Account loggedOutAccount = newRefreshToken.getAccount();
 
         ResponseCookie responseCookie = ResponseCookie
                 .from("refresh_token", "")
@@ -197,10 +197,10 @@ public class AuthController {
                 //.domain()
                 .build();
 
-        log.debug("REST request to refresh token with username {} successfully", loggedOutUser.getEmail());
+        log.debug("REST request to refresh token with username {} successfully", loggedOutAccount.getUsername());
         return ResponseEntity.ok()
                 .header(HttpHeaders.SET_COOKIE, responseCookie.toString())
-                .body("Logout user " + loggedOutUser.getEmail());
+                .body("Logout user " + loggedOutAccount.getUsername());
     }
 
         @GetMapping("/oauth2/google")
