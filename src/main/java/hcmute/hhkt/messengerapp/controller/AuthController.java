@@ -6,6 +6,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
+import org.springframework.security.oauth2.client.OAuth2AuthorizeRequest;
+import org.springframework.security.oauth2.client.OAuth2AuthorizedClient;
+import org.springframework.security.oauth2.client.OAuth2AuthorizedClientManager;
+import org.springframework.security.oauth2.core.OAuth2AccessToken;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
@@ -42,10 +46,11 @@ public class AuthController {
     private final SecurityUtil securityUtil;
     private final IUserService userService;
     private final IRefreshTokenService refreshTokenService;
+    private final OAuth2AuthorizedClientManager authorizedClientManager;
 
-    @Value("${spring.security.oauth2.client.registration.google-login.client-id}")
+    @Value("${spring.security.oauth2.client.registration.google.client-id}")
     private String googleClientId;
-    @Value("${spring.security.oauth2.client.registration.google-login.client-secret}")
+    @Value("${spring.security.oauth2.client.registration.google.client-secret}")
     private String googleClientSecrect;
 
     @Value("${jwt.refresh-token-expiration-in-seconds}")
@@ -194,41 +199,61 @@ public class AuthController {
     }
 
         @GetMapping("/oauth2/google")
-        public String grantCode(@RequestParam("code") String code
-                //, @RequestParam("scope") String scope, @RequestParam("authuser") String authUser, @RequestParam("prompt") String prompt
+        public String grantCode(
+                //@RequestParam("code") String code
+                Authentication authentication
         ) {
-            RestTemplate restTemplate = new RestTemplate();
-            HttpHeaders httpHeaders = new HttpHeaders();
-            httpHeaders.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+//            RestTemplate restTemplate = new RestTemplate();
+//            HttpHeaders httpHeaders = new HttpHeaders();
+//            httpHeaders.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+//
+//            MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
+//            params.add("code", code);
+//            params.add("redirect_uri", "http://localhost:3000");
+//            params.add("client_id", googleClientId);
+//            params.add("client_secret", googleClientSecrect);
+//            params.add("scope", "https://www.googleapis.com/auth/userinfo.profile");
+//            params.add("scope", "https://www.googleapis.com/auth/userinfo.email");
+//            params.add("scope", "openid");
+//            params.add("grant_type", "authorization_code");
+//
+//            HttpEntity<MultiValueMap<String, String>> requestEntity = new HttpEntity<>(params, httpHeaders);
+//
+//            String url = "https://oauth2.googleapis.com/token";
+//            GoogleAuthorizationDTO response = restTemplate.postForObject(url, requestEntity, GoogleAuthorizationDTO.class);
+//
+//            JsonObject jsonObject;
+//            if(response != null){
+//                httpHeaders.setBearerAuth(response.getAccessToken());
+//
+//                HttpEntity<String> newRequestEntity = new HttpEntity<>(httpHeaders);
+//
+//                String newUrl = "https://www.googleapis.com/oauth2/v2/userinfo";
+//                ResponseEntity<String> newResponse = restTemplate.exchange(newUrl, HttpMethod.GET, newRequestEntity, String.class);
+//                jsonObject = new Gson().fromJson(newResponse.getBody(), JsonObject.class);
+//                return "hello 2";
+//            }
 
-            MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
-            params.add("code", code);
-            params.add("redirect_uri", "http://localhost:3000");
-            params.add("client_id", googleClientId);
-            params.add("client_secret", googleClientSecrect);
-            params.add("scope", "https://www.googleapis.com/auth/userinfo.profile");
-            params.add("scope", "https://www.googleapis.com/auth/userinfo.email");
-            params.add("scope", "openid");
-            params.add("grant_type", "authorization_code");
-
-            HttpEntity<MultiValueMap<String, String>> requestEntity = new HttpEntity<>(params, httpHeaders);
-
-            String url = "https://oauth2.googleapis.com/token";
-            GoogleAuthorizationDTO response = restTemplate.postForObject(url, requestEntity, GoogleAuthorizationDTO.class);
-
-            JsonObject jsonObject;
-            if(response != null){
-                httpHeaders.setBearerAuth(response.getAccessToken());
-
-                HttpEntity<String> newRequestEntity = new HttpEntity<>(httpHeaders);
-
-                String newUrl = "https://www.googleapis.com/oauth2/v2/userinfo";
-                ResponseEntity<String> newResponse = restTemplate.exchange(newUrl, HttpMethod.GET, newRequestEntity, String.class);
-                jsonObject = new Gson().fromJson(newResponse.getBody(), JsonObject.class);
-                return "hello 2";
-            }
+            OAuth2AuthorizeRequest authorizeRequest = OAuth2AuthorizeRequest.withClientRegistrationId("google")
+                    .principal(authentication)
+                    .build();
+            OAuth2AuthorizedClient authorizedClient = this.authorizedClientManager.authorize(authorizeRequest);
+            OAuth2AccessToken accessToken = authorizedClient.getAccessToken();
 
             return "hello";
         }
 
+    @GetMapping("/authorized/google")
+    public String test(
+            //@RequestParam("code") String code
+            Authentication authentication
+    ) {
+        OAuth2AuthorizeRequest authorizeRequest = OAuth2AuthorizeRequest.withClientRegistrationId("google")
+                .principal(authentication)
+                .build();
+        OAuth2AuthorizedClient authorizedClient = this.authorizedClientManager.authorize(authorizeRequest);
+        OAuth2AccessToken accessToken = authorizedClient.getAccessToken();
+
+        return "hello";
+    }
 }

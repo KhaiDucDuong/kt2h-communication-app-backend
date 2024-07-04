@@ -18,7 +18,7 @@ public class RefreshToken {
     @Column(name="id")
     private long id;
 
-    @Column(name = "token", nullable = false, unique = true, columnDefinition = "MEDIUMTEXT")
+    @Column(name = "token", nullable = false, unique = true, columnDefinition = "TEXT")
     private String token;
 
     @Column(name = "expiry_date", nullable = false)

@@ -2,18 +2,18 @@ server:
   port: 8080
 spring:
   datasource:
-    driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://comiclibrary.c96wceknz5dj.ap-southeast-1.rds.amazonaws.com:3306/comic_library
-    username: admin
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://message-server.c96wceknz5dj.ap-southeast-1.rds.amazonaws.com:5432/message_db
+    username: postgres
     password: Khai1211!
 
   jpa:
     show-sql: true
     hibernate:
-      ddl-auto: update
+      ddl-auto: create-drop
     properties:
       hibernate:
-        dialect: org.hibernate.dialect.MySQLDialect
+        dialect: org.hibernate.dialect.PostgreSQLDialect
 
   data:
     redis:
@@ -31,10 +31,14 @@ spring:
     oauth2:
       client:
         registration:
-          google-login:
+          google:
             provider: google
             client-id: 49619057630-ij5tirenev88rlsull9dtbr3jher6mm3.apps.googleusercontent.com
             client-secret: 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
+            authorization-grant-type: authorization_code
+            scope: profile,email,openid
+            redirect-uri: http://localhost:3000
+#            redirect-uri: http://localhost:8080/login/oauth2/code/
 
 api:
   prefix: /api

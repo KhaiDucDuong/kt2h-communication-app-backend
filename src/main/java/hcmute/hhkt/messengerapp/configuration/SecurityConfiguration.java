@@ -2,6 +2,7 @@ package hcmute.hhkt.messengerapp.configuration;
 
 import com.nimbusds.jose.jwk.source.ImmutableSecret;
 import com.nimbusds.jose.util.Base64;
+import hcmute.hhkt.messengerapp.service.UserService.CustomOAuth2UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpMethod;
@@ -37,7 +38,9 @@ public class SecurityConfiguration {
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http,
-                                           CustomAuthenticationEntryPoint customAuthenticationEntryPoint) throws Exception {
+                                           CustomAuthenticationEntryPoint customAuthenticationEntryPoint,
+                                           CustomOAuth2UserService customOAuth2UserService,
+                                           CustomGoogleAuthenticationSuccessHandler customGoogleAuthenticationSuccessHandler) throws Exception {
         http
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(
@@ -49,7 +52,11 @@ public class SecurityConfiguration {
                 .oauth2ResourceServer((oauth2) -> oauth2.jwt(Customizer.withDefaults())
                         .authenticationEntryPoint(customAuthenticationEntryPoint)
                 )
-                .oauth2Login(Customizer.withDefaults())
+                .oauth2Login(oauth2Login ->
+                        oauth2Login
+                                .userInfoEndpoint(userInfoEndpoint ->
+                                        userInfoEndpoint.userService(customOAuth2UserService))
+                                .successHandler(customGoogleAuthenticationSuccessHandler))
 //                .exceptionHandling(exceptions -> exceptions
 //                        .authenticationEntryPoint(customAuthenticationEntryPoint) //401
 //                        .accessDeniedHandler(new BearerTokenAccessDeniedHandler())) //403
