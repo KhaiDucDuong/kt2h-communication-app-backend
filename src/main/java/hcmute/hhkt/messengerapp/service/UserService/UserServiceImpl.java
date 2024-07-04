@@ -23,9 +23,10 @@ public class UserServiceImpl implements IUserService {
 
         String harshPassword = passwordEncoder.encode(registerUserDTO.getPassword());
         User newUser = User.builder()
-                .fullName(registerUserDTO.getFullName())
+                .firstName(registerUserDTO.getFullName())
+                .lastName(registerUserDTO.getFullName())
                 .email(registerUserDTO.getEmail())
-                .password(harshPassword)
+//                .password(harshPassword)
                 .build();
         return userRepository.save(newUser);
     }

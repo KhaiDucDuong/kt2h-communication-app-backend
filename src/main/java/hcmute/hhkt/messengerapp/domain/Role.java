@@ -5,6 +5,7 @@ import jakarta.validation.constraints.Size;
 import lombok.*;
 
 import java.util.List;
+import java.util.UUID;
 
 @Getter
 @Setter
@@ -15,9 +16,9 @@ import java.util.List;
 @Table(name ="roles")
 public class Role {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name="id")
-    private long id;
+    private UUID id;
 
     @Size(min = 1, max = 50)
     @Column(name="name", nullable = false, unique = true)
