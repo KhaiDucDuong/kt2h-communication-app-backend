@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 
+import java.util.UUID;
+
 @Getter
 @Setter
 @Entity
@@ -11,11 +13,11 @@ import lombok.*;
 @AllArgsConstructor
 @Builder
 @Table(name ="comics")
-public class Comic extends AbstractAuditingEntity{
+public class Comic extends AbstractAuditingEntity {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name="id")
-    private long id;
+    private UUID id;
 
     @Size(max = 100)
     @Column(name="name", nullable = false)

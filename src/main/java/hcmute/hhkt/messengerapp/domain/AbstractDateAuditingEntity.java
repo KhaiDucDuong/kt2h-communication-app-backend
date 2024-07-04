@@ -18,19 +18,11 @@ import java.time.Instant;
 @Setter
 @MappedSuperclass
 @EntityListeners(AuditingEntityListener.class)
-public abstract class AbstractAuditingEntity {
-    @CreatedBy
-    @Column(name = "created_by", nullable = false, length = 50, updatable = false)
-    private String createdBy;
-
+public abstract class AbstractDateAuditingEntity {
     @CreatedDate
     @Column(name = "created_at", updatable = false)
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss a", timezone = "GMT+7")
     private Instant createdDate = Instant.now();
-
-    @LastModifiedBy
-    @Column(name = "last_modified_by", length = 50)
-    private String lastModifiedBy;
 
     @LastModifiedDate
     @Column(name = "last_modified_at")

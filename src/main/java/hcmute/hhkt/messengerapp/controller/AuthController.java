@@ -6,6 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.oauth2.client.OAuth2AuthorizeRequest;
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClient;
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClientManager;
@@ -34,6 +35,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import hcmute.hhkt.messengerapp.util.annotation.ApiMessage;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -68,12 +70,13 @@ public class AuthController {
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
         User userLogin = userService.findUserByUsername(loginDTO.getUsername());
-        List<Authority> userAuthorities = userLogin.getRoles().stream().map(Role::getAuthorities).toList().stream().flatMap(Collection::stream).toList();
+//        List<Authority> userAuthorities = userLogin.getRoles().stream().map(Role::getAuthorities).toList().stream().flatMap(Collection::stream).toList();
+        List<Authority> userAuthorities = new ArrayList<Authority>();
 
         LoginResponse.UserLogin userLoginData = LoginResponse.UserLogin.builder()
                 .userId(String.valueOf(userLogin.getId()))
                 .email(userLogin.getEmail())
-                .fullName(userLogin.getFullName())
+                .fullName(userLogin.getLastName())
                 .build();
 
         //create access token
@@ -124,7 +127,7 @@ public class AuthController {
             LoginResponse.UserLogin userLoginData = LoginResponse.UserLogin.builder()
                     .userId(String.valueOf(userLogin.getId()))
                     .email(userLogin.getEmail())
-                    .fullName(userLogin.getFullName())
+                    .fullName(userLogin.getLastName())
                     .build();
             return ResponseEntity.ok().body(userLoginData);
         }
@@ -145,12 +148,14 @@ public class AuthController {
         LoginResponse.UserLogin userLoginData = LoginResponse.UserLogin.builder()
                 .userId(String.valueOf(currentUser.getId()))
                 .email(currentUser.getEmail())
-                .fullName(currentUser.getFullName())
+                .fullName(currentUser.getLastName())
                 .build();
 
         //create access token
-        List<Authority> userAuthorities = currentUser.getRoles().stream()
-                .map(Role::getAuthorities).toList().stream().flatMap(Collection::stream).toList();
+//        List<Authority> userAuthorities = currentUser.getRoles().stream()
+//                .map(Role::getAuthorities).toList().stream().flatMap(Collection::stream).toList();
+        List<Authority> userAuthorities = new ArrayList<Authority>();
+
         String accessToken = securityUtil.createAccessToken(SecurityUtil.getAuthentication(), userAuthorities);
 
         LoginResponse loginResponse = LoginResponse.builder()
