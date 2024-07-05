@@ -30,7 +30,7 @@ public class RefreshToken {
     @Column(name = "device", length = 20, nullable = false)
     private Device device;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "account_id", referencedColumnName = "id")
     private Account account;
 }

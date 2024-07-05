@@ -30,11 +30,11 @@ public class User extends AbstractAuditingEntity {
     @Column(name="image", nullable = false)
     private String image;
 
-    @Size(max = 20)
+    @Size(min = 1, max = 20)
     @Column(name="first_name", nullable = false)
     private String firstName;
 
-    @Size(max = 20)
+    @Size(min = 1, max = 20)
     @Column(name="last_name", nullable = false)
     private String lastName;
 
