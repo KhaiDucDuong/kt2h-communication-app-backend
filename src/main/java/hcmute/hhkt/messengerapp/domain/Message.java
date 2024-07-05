@@ -15,16 +15,16 @@ import java.util.UUID;
 @Builder
 @Table(name ="messages")
 public class Message extends AbstractDateAuditingEntity{
-    @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    @Column(name="id")
-    private UUID id;
+        @Id
+        @GeneratedValue(strategy = GenerationType.UUID)
+        @Column(name="id")
+        private UUID id;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "conversation_id", referencedColumnName = "id")
     private Conversation conversationId;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "sender_id", referencedColumnName = "id")
     private User senderId;
 

@@ -23,7 +23,7 @@ public class Conversation extends AbstractDateAuditingEntity{
     @Column(name="creator_nickname", nullable = false)
     private String creatorNickname;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "creator_id", referencedColumnName = "id")
     private User creatorId;
 
@@ -31,7 +31,7 @@ public class Conversation extends AbstractDateAuditingEntity{
     @Column(name="target_nickname", nullable = false)
     private String targetNickname;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "target_id", referencedColumnName = "id")
     private User targetId;
 }
