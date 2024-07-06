@@ -45,6 +45,5 @@ public class Account extends AbstractAuditingEntity{
 
     @JsonIgnore
     @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
-    @JoinColumn(name = "id")
     private List<RefreshToken> refreshTokens;
 }

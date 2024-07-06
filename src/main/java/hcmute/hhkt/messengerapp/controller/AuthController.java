@@ -4,7 +4,9 @@ import com.nimbusds.jose.shaded.gson.Gson;
 import com.nimbusds.jose.shaded.gson.JsonObject;
 import hcmute.hhkt.messengerapp.Response.RegisterUserResponse;
 import hcmute.hhkt.messengerapp.domain.*;
+import hcmute.hhkt.messengerapp.domain.enums.Device;
 import hcmute.hhkt.messengerapp.service.AccountService.IAccountService;
+import hcmute.hhkt.messengerapp.util.RegrexUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -57,6 +59,7 @@ public class AuthController {
 
     @Value("${jwt.refresh-token-expiration-in-seconds}")
     private long jwtRefreshTokenExpiration;
+
     @PostMapping("/login")
     @ApiMessage("Login successfully")
     public ResponseEntity<Object> login(@Valid @RequestBody LoginDTO loginDTO) {
@@ -69,11 +72,10 @@ public class AuthController {
         Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
-        Account loggedInAccount = accountService.findAccountByUserName(loginDTO.getUsername());
         //find the logged-in user, if an account is found then the user logs in with username, else with email
-        User loggedInUser = loggedInAccount != null
-                ? userService.findUserByAccount(loggedInAccount)
-                : userService.findUserByEmail(loginDTO.getUsername());
+        User loggedInUser = RegrexUtil.isEmail(loginDTO.getUsername())
+                ? userService.findUserByEmail(loginDTO.getUsername())
+                : userService.findUserByAccount(accountService.findAccountByUserName(loginDTO.getUsername()));
 
 //        List<Authority> userAuthorities = userLogin.getRoles().stream().map(Role::getAuthorities).toList().stream().flatMap(Collection::stream).toList();
 //        List<Authority> userAuthorities = new ArrayList<Authority>();
@@ -88,28 +90,28 @@ public class AuthController {
         //create access token
         String accessToken = securityUtil.createAccessToken(authentication);
 
-//        //create refresh token for user
-//        RefreshToken refreshToken = this.refreshTokenService.createRefreshToken(loggedInUser, false); //isMobile is default to false for now
-//        String refreshTokenValue = refreshToken.getToken();
+        //create refresh token for user
+        RefreshToken refreshToken = this.refreshTokenService.createRefreshToken(loggedInUser, Device.BROWSER); //Default device is browser for now
+        String refreshTokenValue = refreshToken.getToken();
 
         LoginResponse loginResponse = LoginResponse.builder()
                 .access_token(accessToken)
                 .user(userLoginData)
                 .build();
-//
-//        //set refresh token in response cookie
-//        ResponseCookie responseCookie = ResponseCookie
-//                .from("refresh_token", refreshTokenValue)
-//                .httpOnly(true)
-//                .secure(true)
-//                .path("/")
-//                .maxAge(jwtRefreshTokenExpiration)
-//                //.domain()
-//                .build();
+
+        //set refresh token in response cookie
+        ResponseCookie responseCookie = ResponseCookie
+                .from("refresh_token", refreshTokenValue)
+                .httpOnly(true)
+                .secure(true)
+                .path("/")
+                .maxAge(jwtRefreshTokenExpiration)
+                //.domain()
+                .build();
 
         log.debug("REST request to login with username {} successfully", loginDTO.getUsername());
         return ResponseEntity.ok()
-//                .header(HttpHeaders.SET_COOKIE, responseCookie.toString())
+                .header(HttpHeaders.SET_COOKIE, responseCookie.toString())
                 .body(loginResponse);
     }
 
@@ -128,9 +130,9 @@ public class AuthController {
     public ResponseEntity<?> getAccount() {
         log.debug("REST request to get current account");
         String username = SecurityUtil.getCurrentUserLogin().isPresent() ? SecurityUtil.getCurrentUserLogin().get() : "";
-            User loggedInUser = userService.findUserByUsername(username);
+        User loggedInUser = userService.findUserByUsername(username);
 
-        if(loggedInUser != null){
+        if (loggedInUser != null) {
             LoginResponse.UserLogin userLoginData = LoginResponse.UserLogin.builder()
                     .userId(String.valueOf(loggedInUser.getId()))
                     .email(loggedInUser.getEmail())
@@ -215,11 +217,11 @@ public class AuthController {
                 .body("Logout user " + loggedOutAccount.getUsername());
     }
 
-        @GetMapping("/oauth2/google")
-        public String grantCode(
-                //@RequestParam("code") String code
-                Authentication authentication
-        ) {
+    @GetMapping("/oauth2/google")
+    public String grantCode(
+            //@RequestParam("code") String code
+            Authentication authentication
+    ) {
 //            RestTemplate restTemplate = new RestTemplate();
 //            HttpHeaders httpHeaders = new HttpHeaders();
 //            httpHeaders.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
@@ -251,14 +253,14 @@ public class AuthController {
 //                return "hello 2";
 //            }
 
-            OAuth2AuthorizeRequest authorizeRequest = OAuth2AuthorizeRequest.withClientRegistrationId("google")
-                    .principal(authentication)
-                    .build();
-            OAuth2AuthorizedClient authorizedClient = this.authorizedClientManager.authorize(authorizeRequest);
-            OAuth2AccessToken accessToken = authorizedClient.getAccessToken();
+        OAuth2AuthorizeRequest authorizeRequest = OAuth2AuthorizeRequest.withClientRegistrationId("google")
+                .principal(authentication)
+                .build();
+        OAuth2AuthorizedClient authorizedClient = this.authorizedClientManager.authorize(authorizeRequest);
+        OAuth2AccessToken accessToken = authorizedClient.getAccessToken();
 
-            return "hello";
-        }
+        return "hello";
+    }
 
     @GetMapping("/authorized/google")
     public String test(
