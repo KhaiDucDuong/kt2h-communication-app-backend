@@ -1,12 +1,15 @@
 package hcmute.hhkt.messengerapp.service.UserService;
 
 import hcmute.hhkt.messengerapp.constant.ExceptionMessage;
+import hcmute.hhkt.messengerapp.domain.Account;
 import hcmute.hhkt.messengerapp.domain.User;
 import hcmute.hhkt.messengerapp.dto.RegisterUserDTO;
 import hcmute.hhkt.messengerapp.repository.UserRepository;
+import hcmute.hhkt.messengerapp.service.AccountService.AccountService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -14,19 +17,20 @@ import java.util.List;
 @RequiredArgsConstructor
 public class UserServiceImpl implements IUserService {
     private final UserRepository userRepository;
-    private final PasswordEncoder passwordEncoder;
+    private final AccountService accountService;
 
+    @Transactional
     public User createUser(RegisterUserDTO registerUserDTO) throws IllegalArgumentException {
         if(userRepository.existsUserByEmail(registerUserDTO.getEmail())){
             throw new IllegalArgumentException(ExceptionMessage.EMAIL_IS_TAKEN);
         }
 
-        String harshPassword = passwordEncoder.encode(registerUserDTO.getPassword());
+        Account newAccount = accountService.createAccount(registerUserDTO);
         User newUser = User.builder()
-                .firstName(registerUserDTO.getFullName())
-                .lastName(registerUserDTO.getFullName())
+                .firstName(registerUserDTO.getFirstName())
+                .lastName(registerUserDTO.getLastName())
                 .email(registerUserDTO.getEmail())
-//                .password(harshPassword)
+                .account(newAccount)
                 .build();
         return userRepository.save(newUser);
     }

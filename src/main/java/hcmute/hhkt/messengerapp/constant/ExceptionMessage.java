@@ -2,6 +2,7 @@ package hcmute.hhkt.messengerapp.constant;
 
 public class ExceptionMessage {
     public static final String EMAIL_IS_TAKEN = "Email has been taken";
+    public static final String USERNAME_IS_TAKEN = "Username has been taken";
     public static final String LOGIN_FAILED = "Username or password is incorrect";
     public static final String INVALID_TOKEN = "Token is invalid (token has expired or in the wrong format)";
     public static final String MISSING_TOKEN = "Token is missing.";

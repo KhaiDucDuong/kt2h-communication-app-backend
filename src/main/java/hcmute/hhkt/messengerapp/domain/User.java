@@ -27,7 +27,7 @@ public class User extends AbstractAuditingEntity {
     private UUID id;
 
     @Size(max = 100)
-    @Column(name="image", nullable = false)
+    @Column(name="image")
     private String image;
 
     @Size(min = 1, max = 20)

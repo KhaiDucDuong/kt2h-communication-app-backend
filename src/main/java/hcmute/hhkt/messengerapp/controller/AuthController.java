@@ -2,7 +2,9 @@ package hcmute.hhkt.messengerapp.controller;
 
 import com.nimbusds.jose.shaded.gson.Gson;
 import com.nimbusds.jose.shaded.gson.JsonObject;
+import hcmute.hhkt.messengerapp.Response.RegisterUserResponse;
 import hcmute.hhkt.messengerapp.domain.*;
+import hcmute.hhkt.messengerapp.service.AccountService.IAccountService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -44,6 +46,7 @@ public class AuthController {
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
     private final SecurityUtil securityUtil;
     private final IUserService userService;
+    private final IAccountService accountService;
     private final IRefreshTokenService refreshTokenService;
     private final OAuth2AuthorizedClientManager authorizedClientManager;
 
@@ -107,10 +110,11 @@ public class AuthController {
     @PostMapping("/register")
     @ApiMessage("Created account successfully")
     public ResponseEntity<?> createUser(@Valid @RequestBody RegisterUserDTO registerUserDTO) throws IllegalArgumentException {
-        log.debug("REST request to register account with username : {}", registerUserDTO.getEmail());
+        log.debug("REST request to register account with username : {}", registerUserDTO.getUsername());
 
         User newUser = userService.createUser(registerUserDTO);
-        return ResponseEntity.status(HttpStatus.CREATED).body(newUser);
+        RegisterUserResponse responseData = RegisterUserResponse.createResponse(newUser);
+        return ResponseEntity.status(HttpStatus.CREATED).body(responseData);
     }
 
     @GetMapping("/getAccount")
