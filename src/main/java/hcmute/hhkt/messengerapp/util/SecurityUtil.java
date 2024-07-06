@@ -31,11 +31,11 @@ public final class SecurityUtil {
 
     private final JwtEncoder jwtEncoder;
 
-    public String createAccessToken(Authentication authentication, List<Authority> authorities) {
+    public String createAccessToken(Authentication authentication) {
         Instant now = Instant.now();
         Instant validity;
 
-        List<String> authorityNameList = authorities.stream().map(Authority::getName).toList();
+        List<String> authorityNameList = authentication.getAuthorities().stream().map(Object::toString).toList();
 
         validity = now.plus(this.jwtAccessTokenExpiration, ChronoUnit.SECONDS);
         JwtClaimsSet claims = JwtClaimsSet.builder()

@@ -86,14 +86,14 @@ public class AuthController {
                 .build();
 
         //create access token
-//        String accessToken = securityUtil.createAccessToken(authentication, userAuthorities);
+        String accessToken = securityUtil.createAccessToken(authentication);
 
 //        //create refresh token for user
 //        RefreshToken refreshToken = this.refreshTokenService.createRefreshToken(loggedInUser, false); //isMobile is default to false for now
 //        String refreshTokenValue = refreshToken.getToken();
-//
+
         LoginResponse loginResponse = LoginResponse.builder()
-                .access_token(null)
+                .access_token(accessToken)
                 .user(userLoginData)
                 .build();
 //
@@ -167,7 +167,7 @@ public class AuthController {
 //                .map(Role::getAuthorities).toList().stream().flatMap(Collection::stream).toList();
         List<Authority> userAuthorities = new ArrayList<Authority>();
 
-        String accessToken = securityUtil.createAccessToken(SecurityUtil.getAuthentication(), userAuthorities);
+        String accessToken = securityUtil.createAccessToken(SecurityUtil.getAuthentication());
 
         LoginResponse loginResponse = LoginResponse.builder()
                 .access_token(accessToken)
