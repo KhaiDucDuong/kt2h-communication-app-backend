@@ -10,6 +10,7 @@ import hcmute.hhkt.messengerapp.domain.RefreshToken;
 import hcmute.hhkt.messengerapp.domain.User;
 import hcmute.hhkt.messengerapp.repository.RefreshTokenRepository;
 import hcmute.hhkt.messengerapp.util.SecurityUtil;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 
@@ -19,9 +20,10 @@ public class RefreshTokenServiceImpl implements IRefreshTokenService {
     private final SecurityUtil securityUtil;
     private final RefreshTokenRepository refreshTokenRepository;
     @Override
-    public RefreshToken createRefreshToken(User user, boolean isMobile) {
-//        RefreshToken existingRefreshToken = refreshTokenRepository.findRefreshTokenByUserAndIsMobile(user, isMobile);
-        RefreshToken existingRefreshToken = refreshTokenRepository.findRefreshTokenByAccountAndDevice(new Account(), Device.BROWSER);
+    @Transactional
+    public RefreshToken createRefreshToken(User user, Device device) {
+        Account userAccount = user.getAccount();
+        RefreshToken existingRefreshToken = refreshTokenRepository.findRefreshTokenByAccountAndDevice(userAccount, Device.BROWSER);
         String refreshTokenValue = securityUtil.createRefreshToken(user.getEmail());
 
         RefreshToken newRefreshToken;
@@ -32,11 +34,9 @@ public class RefreshTokenServiceImpl implements IRefreshTokenService {
         } else {
             newRefreshToken = RefreshToken.builder()
                     .token(refreshTokenValue)
-                    //.isMobile(isMobile) // the default is false for now
-                    .device(Device.BROWSER) //the default is BROWSER for now
+                    .device(device)
                     .expiryDate(Instant.now().plusSeconds(securityUtil.getRefreshTokenExpiration()))
-                    //.user(user)
-                    .account(new Account())
+                    .account(userAccount)
                     .build();
         }
 
@@ -55,7 +55,7 @@ public class RefreshTokenServiceImpl implements IRefreshTokenService {
             throw new TokenExpiredException(ExceptionMessage.EXPIRED_TOKEN);
         }
 
-//        String refreshTokenValue = securityUtil.createRefreshToken(existingRefreshToken.getUser().getEmail());
+//      String refreshTokenValue = securityUtil.createRefreshToken(existingRefreshToken.getUser().getEmail());
         String refreshTokenValue = securityUtil.createRefreshToken(existingRefreshToken.getAccount().getUsername());
         existingRefreshToken.setToken(refreshTokenValue);
         existingRefreshToken.setExpiryDate(Instant.now().plusSeconds(securityUtil.getRefreshTokenExpiration()));

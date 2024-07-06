@@ -3,6 +3,7 @@ package hcmute.hhkt.messengerapp.domain;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import hcmute.hhkt.messengerapp.domain.enums.SystemRole;
 import hcmute.hhkt.messengerapp.domain.enums.UserStatus;
+import hcmute.hhkt.messengerapp.util.RegrexUtil;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
@@ -27,7 +28,7 @@ public class User extends AbstractAuditingEntity {
     private UUID id;
 
     @Size(max = 100)
-    @Column(name="image", nullable = false)
+    @Column(name="image")
     private String image;
 
     @Size(min = 1, max = 20)
@@ -38,7 +39,7 @@ public class User extends AbstractAuditingEntity {
     @Column(name="last_name", nullable = false)
     private String lastName;
 
-    @Email
+    @Email(regexp= RegrexUtil.emailRegrexRFC5322)
     @Size(min = 5, max = 254)
     @Column(length = 254, unique = true, nullable = false)
     private String email;

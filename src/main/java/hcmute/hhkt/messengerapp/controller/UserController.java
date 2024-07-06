@@ -19,7 +19,7 @@ public class UserController {
 
     @GetMapping("")
     @ApiMessage("Fetched all users")
-    @PreAuthorize("hasAnyAuthority('ADMIN_AUTHORITY')")
+    @PreAuthorize("hasAnyAuthority('ADMIN')")
     public ResponseEntity<?> getAllUsers(){
         List<User> userList = userService.getAllUsers();
         return ResponseEntity.status(HttpStatus.OK).body(userList);

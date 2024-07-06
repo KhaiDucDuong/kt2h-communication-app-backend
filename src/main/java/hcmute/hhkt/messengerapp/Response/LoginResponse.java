@@ -24,8 +24,11 @@ public class LoginResponse {
         @JsonProperty("email")
         private String email;
 
-        @JsonProperty("full_name")
-        private String fullName;
+        @JsonProperty("first_name")
+        private String firstName;
+
+        @JsonProperty("last_name")
+        private String lastName;
 
         @JsonProperty("user_id")
         private String userId;
