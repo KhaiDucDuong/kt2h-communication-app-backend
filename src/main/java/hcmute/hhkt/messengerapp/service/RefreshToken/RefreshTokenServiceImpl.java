@@ -22,7 +22,6 @@ public class RefreshTokenServiceImpl implements IRefreshTokenService {
     @Override
     @Transactional
     public RefreshToken createRefreshToken(User user, Device device) {
-//        RefreshToken existingRefreshToken = refreshTokenRepository.findRefreshTokenByUserAndIsMobile(user, isMobile);
         Account userAccount = user.getAccount();
         RefreshToken existingRefreshToken = refreshTokenRepository.findRefreshTokenByAccountAndDevice(userAccount, Device.BROWSER);
         String refreshTokenValue = securityUtil.createRefreshToken(user.getEmail());
@@ -56,7 +55,7 @@ public class RefreshTokenServiceImpl implements IRefreshTokenService {
             throw new TokenExpiredException(ExceptionMessage.EXPIRED_TOKEN);
         }
 
-//        String refreshTokenValue = securityUtil.createRefreshToken(existingRefreshToken.getUser().getEmail());
+//      String refreshTokenValue = securityUtil.createRefreshToken(existingRefreshToken.getUser().getEmail());
         String refreshTokenValue = securityUtil.createRefreshToken(existingRefreshToken.getAccount().getUsername());
         existingRefreshToken.setToken(refreshTokenValue);
         existingRefreshToken.setExpiryDate(Instant.now().plusSeconds(securityUtil.getRefreshTokenExpiration()));
