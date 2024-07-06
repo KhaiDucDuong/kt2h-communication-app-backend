@@ -69,41 +69,47 @@ public class AuthController {
         Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
-        User userLogin = userService.findUserByUsername(loginDTO.getUsername());
+        Account loggedInAccount = accountService.findAccountByUserName(loginDTO.getUsername());
+        //find the logged-in user, if an account is found then the user logs in with username, else with email
+        User loggedInUser = loggedInAccount != null
+                ? userService.findUserByAccount(loggedInAccount)
+                : userService.findUserByEmail(loginDTO.getUsername());
+
 //        List<Authority> userAuthorities = userLogin.getRoles().stream().map(Role::getAuthorities).toList().stream().flatMap(Collection::stream).toList();
-        List<Authority> userAuthorities = new ArrayList<Authority>();
+//        List<Authority> userAuthorities = new ArrayList<Authority>();
 
         LoginResponse.UserLogin userLoginData = LoginResponse.UserLogin.builder()
-                .userId(String.valueOf(userLogin.getId()))
-                .email(userLogin.getEmail())
-                .fullName(userLogin.getLastName())
+                .userId(String.valueOf(loggedInUser.getId()))
+                .email(loggedInUser.getEmail())
+                .firstName(loggedInUser.getFirstName())
+                .lastName(loggedInUser.getLastName())
                 .build();
 
         //create access token
-        String accessToken = securityUtil.createAccessToken(authentication, userAuthorities);
+//        String accessToken = securityUtil.createAccessToken(authentication, userAuthorities);
 
-        //create refresh token for user
-        RefreshToken refreshToken = this.refreshTokenService.createRefreshToken(userLogin, false); //isMobile is default to false for now
-        String refreshTokenValue = refreshToken.getToken();
-
+//        //create refresh token for user
+//        RefreshToken refreshToken = this.refreshTokenService.createRefreshToken(loggedInUser, false); //isMobile is default to false for now
+//        String refreshTokenValue = refreshToken.getToken();
+//
         LoginResponse loginResponse = LoginResponse.builder()
-                .access_token(accessToken)
+                .access_token(null)
                 .user(userLoginData)
                 .build();
-
-        //set refresh token in response cookie
-        ResponseCookie responseCookie = ResponseCookie
-                .from("refresh_token", refreshTokenValue)
-                .httpOnly(true)
-                .secure(true)
-                .path("/")
-                .maxAge(jwtRefreshTokenExpiration)
-                //.domain()
-                .build();
+//
+//        //set refresh token in response cookie
+//        ResponseCookie responseCookie = ResponseCookie
+//                .from("refresh_token", refreshTokenValue)
+//                .httpOnly(true)
+//                .secure(true)
+//                .path("/")
+//                .maxAge(jwtRefreshTokenExpiration)
+//                //.domain()
+//                .build();
 
         log.debug("REST request to login with username {} successfully", loginDTO.getUsername());
         return ResponseEntity.ok()
-                .header(HttpHeaders.SET_COOKIE, responseCookie.toString())
+//                .header(HttpHeaders.SET_COOKIE, responseCookie.toString())
                 .body(loginResponse);
     }
 
@@ -122,13 +128,14 @@ public class AuthController {
     public ResponseEntity<?> getAccount() {
         log.debug("REST request to get current account");
         String username = SecurityUtil.getCurrentUserLogin().isPresent() ? SecurityUtil.getCurrentUserLogin().get() : "";
-            User userLogin = userService.findUserByUsername(username);
+            User loggedInUser = userService.findUserByUsername(username);
 
-        if(userLogin != null){
+        if(loggedInUser != null){
             LoginResponse.UserLogin userLoginData = LoginResponse.UserLogin.builder()
-                    .userId(String.valueOf(userLogin.getId()))
-                    .email(userLogin.getEmail())
-                    .fullName(userLogin.getLastName())
+                    .userId(String.valueOf(loggedInUser.getId()))
+                    .email(loggedInUser.getEmail())
+                    .firstName(loggedInUser.getFirstName())
+                    .lastName(loggedInUser.getLastName())
                     .build();
             return ResponseEntity.ok().body(userLoginData);
         }
@@ -151,7 +158,8 @@ public class AuthController {
         LoginResponse.UserLogin userLoginData = LoginResponse.UserLogin.builder()
                 .userId(String.valueOf(currentAccount.getId()))
                 .email(currentAccount.getUsername())
-                .fullName("...")
+                .firstName("...")
+                .lastName("...")
                 .build();
 
         //create access token

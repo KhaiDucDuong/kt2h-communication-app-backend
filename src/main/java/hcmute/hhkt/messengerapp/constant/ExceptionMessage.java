@@ -9,5 +9,5 @@ public class ExceptionMessage {
     public static final String EXPIRED_TOKEN = "Token is expired.";
     public static final String USER_NOT_EXIST = "User does not exist";
     public static final String REFRESH_TOKEN_NOT_EXIST = "Refresh token does not exist";
-
+    public static final String USERNAME_IS_EMAIL = "Username cannot be email";
 }

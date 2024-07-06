@@ -1,6 +1,7 @@
 package hcmute.hhkt.messengerapp.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import hcmute.hhkt.messengerapp.util.RegrexUtil;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
@@ -23,7 +24,7 @@ public class RegisterUserDTO {
     @JsonProperty("username")
     private String username;
 
-    @Email(message = "Email is invalid")
+    @Email(message = "Email is invalid", regexp= RegrexUtil.emailRegrexRFC5322)
     @NotBlank(message = "Email cannot be blank")
     @JsonProperty("email")
     private String email;
