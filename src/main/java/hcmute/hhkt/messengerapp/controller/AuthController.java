@@ -3,10 +3,12 @@ package hcmute.hhkt.messengerapp.controller;
 import com.nimbusds.jose.shaded.gson.Gson;
 import com.nimbusds.jose.shaded.gson.JsonObject;
 import hcmute.hhkt.messengerapp.Response.RegisterUserResponse;
+import hcmute.hhkt.messengerapp.constant.ExceptionMessage;
 import hcmute.hhkt.messengerapp.domain.*;
 import hcmute.hhkt.messengerapp.domain.enums.Device;
 import hcmute.hhkt.messengerapp.service.AccountService.IAccountService;
 import hcmute.hhkt.messengerapp.util.RegrexUtil;
+import jakarta.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -85,6 +87,9 @@ public class AuthController {
                 .email(loggedInUser.getEmail())
                 .firstName(loggedInUser.getFirstName())
                 .lastName(loggedInUser.getLastName())
+                .phone(loggedInUser.getPhone())
+                .image(loggedInUser.getImage())
+                .role(loggedInUser.getRole().name())
                 .build();
 
         //create access token
@@ -138,6 +143,9 @@ public class AuthController {
                     .email(loggedInUser.getEmail())
                     .firstName(loggedInUser.getFirstName())
                     .lastName(loggedInUser.getLastName())
+                    .phone(loggedInUser.getPhone())
+                    .image(loggedInUser.getImage())
+                    .role(loggedInUser.getRole().name())
                     .build();
             return ResponseEntity.ok().body(userLoginData);
         }
@@ -147,29 +155,42 @@ public class AuthController {
 
     @GetMapping("/refresh")
     @ApiMessage("Get user by refresh token successfully")
-    public ResponseEntity<?> getUserByRefreshToken(@CookieValue(name = "refresh_token") String refreshToken) throws TokenExpiredException {
+    public ResponseEntity<?> getUserByRefreshToken(@CookieValue(name = "refresh_token") String refreshToken,
+                                                   HttpServletRequest request) throws TokenExpiredException {
         log.debug("REST request to refresh token");
+        Device userDevice;
+        if(request.getHeader("User-Agent").contains("Mobi")) {
+            //mobile device
+            userDevice = Device.MOBILE;
+        } else {
+            //desktop device
+            userDevice = Device.BROWSER;
+        }
 
         //recycle refresh token
-        RefreshToken newRefreshToken = refreshTokenService.recycleRefreshToken(refreshToken);
-        //User currentUser = newRefreshToken.getUser();
+        RefreshToken newRefreshToken = refreshTokenService.recycleRefreshToken(refreshToken, userDevice);
+
         Account currentAccount = newRefreshToken.getAccount();
+        User user = currentAccount.getUser();
 
         String refreshTokenValue = newRefreshToken.getToken();
 
         LoginResponse.UserLogin userLoginData = LoginResponse.UserLogin.builder()
                 .userId(String.valueOf(currentAccount.getId()))
-                .email(currentAccount.getUsername())
-                .firstName("...")
-                .lastName("...")
+                .email(user.getEmail())
+                .firstName(user.getFirstName())
+                .lastName(user.getLastName())
+                .phone(user.getPhone())
+                .image(user.getImage())
+                .role(user.getRole().name())
                 .build();
 
         //create access token
 //        List<Authority> userAuthorities = currentUser.getRoles().stream()
 //                .map(Role::getAuthorities).toList().stream().flatMap(Collection::stream).toList();
-        List<Authority> userAuthorities = new ArrayList<Authority>();
-
-        String accessToken = securityUtil.createAccessToken(SecurityUtil.getAuthentication());
+        List<String> authorities = new ArrayList<String>();
+        authorities.add(user.getRole().name());
+        String accessToken = securityUtil.createAccessToken(authorities, user.getEmail());
 
         LoginResponse loginResponse = LoginResponse.builder()
                 .access_token(accessToken)

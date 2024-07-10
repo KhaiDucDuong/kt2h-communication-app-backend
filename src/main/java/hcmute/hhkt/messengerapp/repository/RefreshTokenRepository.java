@@ -14,4 +14,5 @@ public interface RefreshTokenRepository extends JpaRepository<RefreshToken, UUID
 //    RefreshToken findRefreshTokenByUserAndIsMobile(User user, boolean isMobile);
     RefreshToken findRefreshTokenByAccountAndDevice(Account account, Device device);
     RefreshToken findRefreshTokenByToken(String token);
+    RefreshToken findRefreshTokenByTokenAndDevice(String token, Device device);
 }

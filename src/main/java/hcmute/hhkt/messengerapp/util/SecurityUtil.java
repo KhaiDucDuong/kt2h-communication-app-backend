@@ -31,24 +31,6 @@ public final class SecurityUtil {
 
     private final JwtEncoder jwtEncoder;
 
-    public String createAccessToken(Authentication authentication) {
-        Instant now = Instant.now();
-        Instant validity;
-
-        List<String> authorityNameList = authentication.getAuthorities().stream().map(Object::toString).toList();
-
-        validity = now.plus(this.jwtAccessTokenExpiration, ChronoUnit.SECONDS);
-        JwtClaimsSet claims = JwtClaimsSet.builder()
-                .issuedAt(now)
-                .expiresAt(validity)
-                .subject(authentication.getName())
-                .claim("authorities", authorityNameList)
-                .build();
-
-        JwsHeader jwsHeader = JwsHeader.with(JWT_ALGORITHM).build();
-        return this.jwtEncoder.encode(JwtEncoderParameters.from(jwsHeader, claims)).getTokenValue();
-    }
-
     public String createAccessToken(Authentication authentication, String email) {
         Instant now = Instant.now();
         Instant validity;
@@ -67,7 +49,23 @@ public final class SecurityUtil {
         return this.jwtEncoder.encode(JwtEncoderParameters.from(jwsHeader, claims)).getTokenValue();
     }
 
-    public String createRefreshToken(String email) {
+    public String createAccessToken(List<String> authorities, String email) {
+        Instant now = Instant.now();
+        Instant validity;
+
+        validity = now.plus(this.jwtAccessTokenExpiration, ChronoUnit.SECONDS);
+        JwtClaimsSet claims = JwtClaimsSet.builder()
+                .issuedAt(now)
+                .expiresAt(validity)
+                .subject(email)
+                .claim("authorities", authorities)
+                .build();
+
+        JwsHeader jwsHeader = JwsHeader.with(JWT_ALGORITHM).build();
+        return this.jwtEncoder.encode(JwtEncoderParameters.from(jwsHeader, claims)).getTokenValue();
+    }
+
+    public String createRefreshToken(String subject) {
         Instant now = Instant.now();
         Instant validity;
 
@@ -75,7 +73,7 @@ public final class SecurityUtil {
         JwtClaimsSet claims = JwtClaimsSet.builder()
                 .issuedAt(now)
                 .expiresAt(validity)
-                .subject(email)
+                .subject(subject)
                 .build();
 
         JwsHeader jwsHeader = JwsHeader.with(JWT_ALGORITHM).build();
