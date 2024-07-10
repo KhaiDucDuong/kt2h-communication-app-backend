@@ -220,7 +220,6 @@ public class AuthController {
         log.debug("REST request to logout");
 
         RefreshToken newRefreshToken = refreshTokenService.invalidateToken(refreshToken);
-        //User loggedOutUser = newRefreshToken.getUser();
         Account loggedOutAccount = newRefreshToken.getAccount();
 
         ResponseCookie responseCookie = ResponseCookie
