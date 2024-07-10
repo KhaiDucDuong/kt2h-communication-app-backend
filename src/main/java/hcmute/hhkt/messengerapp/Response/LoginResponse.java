@@ -32,5 +32,14 @@ public class LoginResponse {
 
         @JsonProperty("user_id")
         private String userId;
+
+        @JsonProperty("image")
+        private String image;
+
+        @JsonProperty("phone")
+        private String phone;
+
+        @JsonProperty("role")
+        private String role;
     }
 }

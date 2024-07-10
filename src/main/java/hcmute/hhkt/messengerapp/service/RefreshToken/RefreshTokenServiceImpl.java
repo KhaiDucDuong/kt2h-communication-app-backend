@@ -23,8 +23,11 @@ public class RefreshTokenServiceImpl implements IRefreshTokenService {
     @Transactional
     public RefreshToken createRefreshToken(User user, Device device) {
         Account userAccount = user.getAccount();
-        RefreshToken existingRefreshToken = refreshTokenRepository.findRefreshTokenByAccountAndDevice(userAccount, Device.BROWSER);
-        String refreshTokenValue = securityUtil.createRefreshToken(user.getEmail());
+        RefreshToken existingRefreshToken = refreshTokenRepository.findRefreshTokenByAccountAndDevice(userAccount, device);
+
+//        String refreshTokenValue = securityUtil.createRefreshToken(user.getEmail());
+        //create refresh token with subject is username
+        String refreshTokenValue = securityUtil.createRefreshToken(userAccount.getUsername());
 
         RefreshToken newRefreshToken;
         if(existingRefreshToken != null) {
@@ -44,8 +47,8 @@ public class RefreshTokenServiceImpl implements IRefreshTokenService {
     }
 
     @Override
-    public RefreshToken recycleRefreshToken(String token) throws TokenExpiredException {
-        RefreshToken existingRefreshToken = refreshTokenRepository.findRefreshTokenByToken(token);
+    public RefreshToken recycleRefreshToken(String token, Device device) throws TokenExpiredException {
+        RefreshToken existingRefreshToken = refreshTokenRepository.findRefreshTokenByTokenAndDevice(token, device);
 
         if(existingRefreshToken == null){
             throw new IllegalArgumentException(ExceptionMessage.REFRESH_TOKEN_NOT_EXIST);
@@ -55,7 +58,7 @@ public class RefreshTokenServiceImpl implements IRefreshTokenService {
             throw new TokenExpiredException(ExceptionMessage.EXPIRED_TOKEN);
         }
 
-//      String refreshTokenValue = securityUtil.createRefreshToken(existingRefreshToken.getUser().getEmail());
+        //create refresh token with subject is username
         String refreshTokenValue = securityUtil.createRefreshToken(existingRefreshToken.getAccount().getUsername());
         existingRefreshToken.setToken(refreshTokenValue);
         existingRefreshToken.setExpiryDate(Instant.now().plusSeconds(securityUtil.getRefreshTokenExpiration()));
