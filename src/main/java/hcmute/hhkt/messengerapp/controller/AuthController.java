@@ -88,7 +88,7 @@ public class AuthController {
                 .build();
 
         //create access token
-        String accessToken = securityUtil.createAccessToken(authentication);
+        String accessToken = securityUtil.createAccessToken(authentication, loggedInUser.getEmail());
 
         //create refresh token for user
         RefreshToken refreshToken = this.refreshTokenService.createRefreshToken(loggedInUser, Device.BROWSER); //Default device is browser for now

@@ -49,6 +49,24 @@ public final class SecurityUtil {
         return this.jwtEncoder.encode(JwtEncoderParameters.from(jwsHeader, claims)).getTokenValue();
     }
 
+    public String createAccessToken(Authentication authentication, String email) {
+        Instant now = Instant.now();
+        Instant validity;
+
+        List<String> authorityNameList = authentication.getAuthorities().stream().map(Object::toString).toList();
+
+        validity = now.plus(this.jwtAccessTokenExpiration, ChronoUnit.SECONDS);
+        JwtClaimsSet claims = JwtClaimsSet.builder()
+                .issuedAt(now)
+                .expiresAt(validity)
+                .subject(email)
+                .claim("authorities", authorityNameList)
+                .build();
+
+        JwsHeader jwsHeader = JwsHeader.with(JWT_ALGORITHM).build();
+        return this.jwtEncoder.encode(JwtEncoderParameters.from(jwsHeader, claims)).getTokenValue();
+    }
+
     public String createRefreshToken(String email) {
         Instant now = Instant.now();
         Instant validity;
