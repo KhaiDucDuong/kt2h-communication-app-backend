@@ -3,9 +3,9 @@ server:
 spring:
   datasource:
     driver-class-name: org.postgresql.Driver
-    url: jdbc:postgresql://message-server.c96wceknz5dj.ap-southeast-1.rds.amazonaws.com:5432/message_db
-    username: postgres
-    password: Khai1211!
+    url: jdbc:postgresql://pg-11f0ec6c-online-chatting.e.aivencloud.com:12579/defaultdb
+    username: avnadmin
+    password: AVNS_B73WJR0lU3YvacA-3C8
 
   jpa:
     show-sql: true
