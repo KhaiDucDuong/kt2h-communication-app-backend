@@ -1,5 +1,6 @@
 package hcmute.hhkt.messengerapp.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import hcmute.hhkt.messengerapp.util.RegrexUtil;
 import jakarta.validation.constraints.Email;
@@ -10,6 +11,7 @@ import org.hibernate.validator.constraints.Length;
 
 @Getter
 @Setter
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class RegisterUserDTO {
     @NotBlank(message = "First name cannot be blank")
     @JsonProperty("first_name")
