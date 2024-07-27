@@ -13,11 +13,6 @@ import java.util.UUID;
 @Builder
 @Table(name ="friendships")
 public class Friendship extends AbstractDateAuditingEntity{
-//    @Id
-//    @GeneratedValue(strategy = GenerationType.UUID)
-//    @Column(name="id")
-//    private UUID id;
-
     @Id
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", referencedColumnName = "id")
