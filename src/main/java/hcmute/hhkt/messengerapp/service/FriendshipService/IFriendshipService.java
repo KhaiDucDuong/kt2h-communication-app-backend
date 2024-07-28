@@ -13,4 +13,5 @@ public interface IFriendshipService {
     Friendship createFriendship(UUID requestedUser, UUID acceptedUser);
     Friendship findFriendshipById(User user, User friend);
     void deleteFriendship(User requestedUser, User deletedUser);
+    boolean existFriendshipById(User user, User friend);
 }

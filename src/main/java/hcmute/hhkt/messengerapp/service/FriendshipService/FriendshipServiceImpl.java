@@ -64,4 +64,12 @@ public class FriendshipServiceImpl implements IFriendshipService {
 
         friendshipRepository.delete(friendship);
     }
+
+    @Override
+    public boolean existFriendshipById(User user, User friend) {
+        Friendship.FriendshipId id = new Friendship.FriendshipId(user, friend);
+        Friendship.FriendshipId reversedId = new Friendship.FriendshipId(friend, user);
+
+        return friendshipRepository.existsById(id) || friendshipRepository.existsById(reversedId);
+    }
 }
