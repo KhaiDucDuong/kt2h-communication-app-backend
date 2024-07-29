@@ -22,11 +22,11 @@ public class FriendRequest extends AbstractDateAuditingEntity{
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "sender_id", referencedColumnName = "id")
-    private User senderId;
+    private User sender;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "receiver_id", referencedColumnName = "id")
-    private User receiverId;
+    private User receiver;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "status", length = 20, nullable = false)

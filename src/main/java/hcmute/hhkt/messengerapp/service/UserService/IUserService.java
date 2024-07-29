@@ -5,6 +5,7 @@ import hcmute.hhkt.messengerapp.domain.User;
 import hcmute.hhkt.messengerapp.dto.RegisterUserDTO;
 
 import java.util.List;
+import java.util.UUID;
 
 public interface IUserService {
     User createUser(RegisterUserDTO registerUserDTO) throws IllegalArgumentException;
@@ -14,4 +15,6 @@ public interface IUserService {
 
     //void updateUserRefreshToken(String username, String refreshToken);
     List<User> getAllUsers();
+
+    User findById(UUID id);
 }

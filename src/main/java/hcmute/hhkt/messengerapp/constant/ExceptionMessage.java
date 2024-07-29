@@ -10,4 +10,13 @@ public class ExceptionMessage {
     public static final String USER_NOT_EXIST = "User does not exist";
     public static final String REFRESH_TOKEN_NOT_EXIST = "Refresh token does not exist";
     public static final String USERNAME_IS_EMAIL = "Username cannot be email";
+    public static final String FRIENDSHIP_NOT_EXIST = "Friendship does not exist";
+    public static final String FRIEND_REQUEST_NOT_FOUND = "Friend request does not exist";
+    public static final String FRIENDSHIP_EXIST = "Friendship has existed";
+    public static final String FRIEND_REQUEST_EXIST = "Friend request has existed";
+    public static final String FRIEND_REQUEST_IDENTICAL_SENDER_RECEIVER = "Friend request cannot have the same sender and receiver";
+    public static final String FRIEND_REQUEST_INVALID_NEW_STATUS = "Friend request new status is not allowed";
+    public static final String ILLEGAL_FRIEND_REQUEST_UPDATE_STATUS_CALLER = "This user cannot make changes to the friend request";
+    public static final String MISSING_PARAMETERS = "Missing parameters in request";
+    public static final String ILLEGAL_FRIEND_REQUEST_DELETE_CALLER = "This user cannot delete the friend request";
 }
