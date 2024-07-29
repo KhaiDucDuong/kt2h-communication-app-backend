@@ -6,6 +6,7 @@ import hcmute.hhkt.messengerapp.Response.ResultPaginationResponse;
 import hcmute.hhkt.messengerapp.constant.ExceptionMessage;
 import hcmute.hhkt.messengerapp.domain.FriendRequest;
 import hcmute.hhkt.messengerapp.domain.User;
+import hcmute.hhkt.messengerapp.domain.enums.FriendRequestStatus;
 import hcmute.hhkt.messengerapp.dto.FriendRequestDTO;
 import hcmute.hhkt.messengerapp.service.FriendRequestService.FriendRequestServiceImpl;
 import hcmute.hhkt.messengerapp.service.FriendshipService.FriendshipServiceImpl;
@@ -92,8 +93,29 @@ public class FriendRequestController {
 
         User currentUser = userService.findUserByEmail(email);
         if(currentUser != updatedFriendRequest.getReceiver()){
-            throw new UnauthorizedRequestException(ExceptionMessage.ILLEGAL_FRIEND_REQUEST_CALLER);
+            throw new UnauthorizedRequestException(ExceptionMessage.ILLEGAL_FRIEND_REQUEST_UPDATE_STATUS_CALLER);
         }
+
+        //create friendship if the FR is accepted
+        if(FriendRequestStatus.ACCEPTED == updatedFriendRequest.getStatus()){
+            friendshipService.createFriendship(updatedFriendRequest.getSender(), updatedFriendRequest.getReceiver());
+        }
+
         return ResponseEntity.ok().body(FriendRequestResponse.generateFriendRequestResponse(updatedFriendRequest));
+    }
+
+    @DeleteMapping("")
+    @ApiMessage("Deleted friend request successfully")
+    @Transactional
+    public ResponseEntity<?> deleteFriendRequest(@Valid @RequestBody FriendRequestDTO friendRequestDTO) throws UnauthorizedRequestException {
+        String email = SecurityUtil.getCurrentUserLogin().isPresent() ? SecurityUtil.getCurrentUserLogin().get() : "";
+        log.debug("REST request to delete friend request id {} from user {}", friendRequestDTO.getId(), email);
+
+        if(friendRequestDTO.getId()==null){
+            throw new IllegalArgumentException(ExceptionMessage.MISSING_PARAMETERS);
+        }
+        User currentUser = userService.findUserByEmail(email);
+        friendRequestService.deleteFriendRequest(friendRequestDTO.getId(), currentUser);
+        return ResponseEntity.ok().body("Deleted friend request id " + friendRequestDTO.getId());
     }
 }

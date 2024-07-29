@@ -13,6 +13,7 @@ public interface IFriendRequestService {
     ResultPaginationResponse findUserIncomingFriendRequestList(User user, Pageable pageable);
     FriendRequest sendFriendRequest(User senderUser, User recipientUser);
     FriendRequest findFriendRequestById(UUID friendRequestId);
+    FriendRequest findFriendRequestBySenderAndRecipient(User sender, User recipient);
     FriendRequest updateFriendRequestStatus(UUID friendRequestId, String newStatus);
-    void deleteFriendRequest(UUID friendRequestId);
+    void deleteFriendRequest(UUID friendRequestId, User requestedUser);
 }

@@ -4,13 +4,17 @@ import hcmute.hhkt.messengerapp.Response.FriendshipResponse;
 import hcmute.hhkt.messengerapp.Response.Meta;
 import hcmute.hhkt.messengerapp.Response.ResultPaginationResponse;
 import hcmute.hhkt.messengerapp.constant.ExceptionMessage;
+import hcmute.hhkt.messengerapp.domain.FriendRequest;
 import hcmute.hhkt.messengerapp.domain.Friendship;
 import hcmute.hhkt.messengerapp.domain.User;
+import hcmute.hhkt.messengerapp.repository.FriendRequestRepository;
 import hcmute.hhkt.messengerapp.repository.FriendshipRepository;
+import hcmute.hhkt.messengerapp.service.FriendRequestService.FriendRequestServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,6 +24,8 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class FriendshipServiceImpl implements IFriendshipService {
     private final FriendshipRepository friendshipRepository;
+    private final FriendRequestServiceImpl friendRequestService;
+    private final FriendRequestRepository friendRequestRepository;
 
     @Override
     public ResultPaginationResponse findUserFriendList(User user, Pageable pageable) {
@@ -43,8 +49,12 @@ public class FriendshipServiceImpl implements IFriendshipService {
     }
 
     @Override
-    public Friendship createFriendship(UUID requestedUser, UUID acceptedUser) {
-        return null;
+    public Friendship createFriendship(User user, User friend) {
+        Friendship newFriendShip = Friendship.builder()
+                .user(user)
+                .friend(friend)
+                .build();
+        return friendshipRepository.save(newFriendShip);
     }
 
     @Override
@@ -55,11 +65,17 @@ public class FriendshipServiceImpl implements IFriendshipService {
     }
 
     @Override
+    @Transactional
     public void deleteFriendship(User requestedUser, User deletedUser) {
         Friendship.FriendshipId id = new Friendship.FriendshipId(requestedUser, deletedUser);
         Friendship friendship = findFriendshipById(requestedUser, deletedUser);
         if(friendship == null){
             throw new IllegalArgumentException(ExceptionMessage.FRIENDSHIP_NOT_EXIST);
+        }
+
+        FriendRequest existingFriendRequest = friendRequestService.findFriendRequestBySenderAndRecipient(friendship.getUser(), friendship.getFriend());
+        if(existingFriendRequest != null){
+            friendRequestRepository.delete(existingFriendRequest);
         }
 
         friendshipRepository.delete(friendship);

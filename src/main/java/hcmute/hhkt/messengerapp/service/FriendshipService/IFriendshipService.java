@@ -10,7 +10,7 @@ import java.util.UUID;
 
 public interface IFriendshipService {
     ResultPaginationResponse findUserFriendList(User userId, Pageable pageable);
-    Friendship createFriendship(UUID requestedUser, UUID acceptedUser);
+    Friendship createFriendship(User user, User friend);
     Friendship findFriendshipById(User user, User friend);
     void deleteFriendship(User requestedUser, User deletedUser);
     boolean existFriendshipById(User user, User friend);

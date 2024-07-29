@@ -48,6 +48,8 @@ public class GlobalExceptionHandler {
             return handleMissingRequestCookieException(ex);
         } else if (ex instanceof AuthorizationDeniedException){
             return handleAuthorizationDeniedException(ex);
+        } else if (ex instanceof UnauthorizedRequestException){
+            return handleUnauthorizedRequestException(ex);
         }
 
         RestResponse<Object> res = new RestResponse<Object>();
@@ -137,6 +139,15 @@ public class GlobalExceptionHandler {
         res.setStatusCode(HttpStatus.FORBIDDEN.value());
         res.setError(ex.getMessage());
         res.setMessage("Authorization Denied Exception");
+
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(res);
+    }
+
+    private ResponseEntity<Object> handleUnauthorizedRequestException(Exception ex){
+        RestResponse<Object> res = new RestResponse<Object>();
+        res.setStatusCode(HttpStatus.FORBIDDEN.value());
+        res.setError(ex.getMessage());
+        res.setMessage("Unauthorized Request Exception");
 
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body(res);
     }
