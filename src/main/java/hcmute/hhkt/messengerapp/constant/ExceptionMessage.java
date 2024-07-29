@@ -15,4 +15,7 @@ public class ExceptionMessage {
     public static final String FRIENDSHIP_EXIST = "Friendship has existed";
     public static final String FRIEND_REQUEST_EXIST = "Friend request has existed";
     public static final String FRIEND_REQUEST_IDENTICAL_SENDER_RECEIVER = "Friend request cannot have the same sender and receiver";
+    public static final String FRIEND_REQUEST_INVALID_NEW_STATUS = "Friend request new status is not allowed";
+    public static final String ILLEGAL_FRIEND_REQUEST_CALLER = "This user cannot make changes to the friend request";
+    public static final String MISSING_PARAMETERS = "Missing parameters in request";
 }

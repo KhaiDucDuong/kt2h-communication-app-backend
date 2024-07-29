@@ -8,6 +8,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.time.Instant;
+import java.util.List;
 import java.util.UUID;
 
 @Getter
@@ -63,5 +64,9 @@ public class FriendRequestResponse {
                 .sentDateTime(friendRequest.getCreatedDate())
                 .status(friendRequest.getStatus().name())
                 .build();
+    }
+
+    public static List<FriendRequestResponse> generateFriendRequestResponseList(List<FriendRequest> friendRequestList){
+        return friendRequestList.stream().map(FriendRequestResponse::generateFriendRequestResponse).toList();
     }
 }
