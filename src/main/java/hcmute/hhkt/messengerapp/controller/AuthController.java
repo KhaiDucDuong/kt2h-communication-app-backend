@@ -7,6 +7,7 @@ import hcmute.hhkt.messengerapp.constant.ExceptionMessage;
 import hcmute.hhkt.messengerapp.domain.*;
 import hcmute.hhkt.messengerapp.domain.enums.Device;
 import hcmute.hhkt.messengerapp.service.AccountService.IAccountService;
+import hcmute.hhkt.messengerapp.service.MailService.MailService;
 import hcmute.hhkt.messengerapp.util.RegrexUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
@@ -53,6 +54,7 @@ public class AuthController {
     private final IAccountService accountService;
     private final IRefreshTokenService refreshTokenService;
     private final OAuth2AuthorizedClientManager authorizedClientManager;
+    private final MailService mailService;
 
     @Value("${spring.security.oauth2.client.registration.google.client-id}")
     private String googleClientId;
@@ -292,6 +294,13 @@ public class AuthController {
                 .build();
         OAuth2AuthorizedClient authorizedClient = this.authorizedClientManager.authorize(authorizeRequest);
         OAuth2AccessToken accessToken = authorizedClient.getAccessToken();
+
+        return "hello";
+    }
+
+    @GetMapping("/mail/{email}")
+    public String testMail(@PathVariable String email) {
+        mailService.sendActivationEmail(email);
 
         return "hello";
     }

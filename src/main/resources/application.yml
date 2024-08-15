@@ -27,6 +27,18 @@ spring:
         one-indexed-parameters: true
         max-page-size: 50
 
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: greenjohnny531@gmail.com
+    password: jqdsxhbbdqwizqqx
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+
   security:
     oauth2:
       client:
