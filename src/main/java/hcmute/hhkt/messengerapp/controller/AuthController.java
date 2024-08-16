@@ -300,7 +300,11 @@ public class AuthController {
 
     @GetMapping("/mail/{email}")
     public String testMail(@PathVariable String email) {
-        mailService.sendActivationEmail(email);
+        User user = userService.findUserByEmail(email);
+        if(user == null){
+            throw new IllegalArgumentException(ExceptionMessage.USER_NOT_EXIST);
+        }
+        mailService.sendActivationEmail(user);
 
         return "hello";
     }

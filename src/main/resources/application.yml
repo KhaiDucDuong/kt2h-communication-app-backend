@@ -39,6 +39,12 @@ spring:
           starttls:
             enable: true
 
+  messages:
+    basename: i18n/messages
+
+  thymeleaf:
+    mode: HTML
+
   security:
     oauth2:
       client:
@@ -66,3 +72,7 @@ logging:
     hcmute.hhkt.messengerapp: TRACE
   file:
     name: log/dev.log
+
+front-end:
+  website:
+    url: http://localhost:3000
