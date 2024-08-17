@@ -6,6 +6,7 @@ import hcmute.hhkt.messengerapp.domain.User;
 import hcmute.hhkt.messengerapp.dto.RegisterUserDTO;
 import hcmute.hhkt.messengerapp.repository.UserRepository;
 import hcmute.hhkt.messengerapp.service.AccountService.AccountService;
+import hcmute.hhkt.messengerapp.service.MailService.MailService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -19,6 +20,7 @@ import java.util.UUID;
 public class UserServiceImpl implements IUserService {
     private final UserRepository userRepository;
     private final AccountService accountService;
+    private final MailService mailService;
 
     @Transactional
     public User createUser(RegisterUserDTO registerUserDTO) throws IllegalArgumentException {

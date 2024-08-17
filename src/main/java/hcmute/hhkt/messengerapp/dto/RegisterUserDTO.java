@@ -13,10 +13,12 @@ import org.hibernate.validator.constraints.Length;
 @Setter
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class RegisterUserDTO {
+    @Length(min = 1, max = 50, message = "First name must be between 1 and 50 characters")
     @NotBlank(message = "First name cannot be blank")
     @JsonProperty("first_name")
     private String firstName;
 
+    @Length(min = 1, max = 50, message = "Last name must be between 1 and 50 characters")
     @NotBlank(message = "Last name cannot be blank")
     @JsonProperty("last_name")
     private String lastName;

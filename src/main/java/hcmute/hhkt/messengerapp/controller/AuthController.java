@@ -128,6 +128,7 @@ public class AuthController {
         log.debug("REST request to register account with username : {}", registerUserDTO.getUsername());
 
         User newUser = userService.createUser(registerUserDTO);
+        mailService.sendActivationEmail(newUser, newUser.getAccount().getActivationKey());
         RegisterUserResponse responseData = RegisterUserResponse.createResponse(newUser);
         return ResponseEntity.status(HttpStatus.CREATED).body(responseData);
     }
@@ -304,7 +305,7 @@ public class AuthController {
         if(user == null){
             throw new IllegalArgumentException(ExceptionMessage.USER_NOT_EXIST);
         }
-        mailService.sendActivationEmail(user);
+
 
         return "hello";
     }

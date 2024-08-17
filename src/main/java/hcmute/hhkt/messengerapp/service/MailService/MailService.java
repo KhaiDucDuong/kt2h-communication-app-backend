@@ -32,6 +32,8 @@ public class MailService {
     @Value("${front-end.website.url}")
     private String websiteRootUrl;
     private static final String USER = "user";
+    private static final String ACTIVATION_CODE = "activationCode";
+    private static final String RESET_CODE = "reset";
     private static final String WEBSITE_ROOT_URL = "webUrl";
 
     private void sendEmailSync(String to, String subject, String content, boolean isMultipart, boolean isHtml) {
@@ -59,29 +61,31 @@ public class MailService {
         }
     }
 
-    private void sendEmailFromTemplateSync(User user, String templateName, String titleKey) {
-        if (user.getEmail() == null) {
+    private void sendEmailFromTemplateSync(User user, Context context, Locale locale, String templateName, String titleKey) {
+        if(user.getEmail() == null){
             log.debug("Email doesn't exist for user '{}'", user.getId());
             return;
         }
-        Locale locale = Locale.ENGLISH;
-        Context context = new Context(locale);
-        context.setVariable(USER, user);
-        context.setVariable(WEBSITE_ROOT_URL, websiteRootUrl);
+
         String content = templateEngine.process(templateName, context);
         String subject = messageSource.getMessage(titleKey, null, locale);
         this.sendEmailSync(user.getEmail(), subject, content, false, true);
     }
 
     @Async
-    public void sendActivationEmail(User user) {
+    public void sendActivationEmail(User user, String activationCode) {
         log.debug("Sending activation email to '{}'", user.getEmail());
-        this.sendEmailFromTemplateSync(user, "mail/activationEmail", "email.activation.title");
+        Locale locale = Locale.ENGLISH;
+        Context context = new Context(locale);
+        context.setVariable(USER, user);
+        context.setVariable(ACTIVATION_CODE, activationCode);
+        context.setVariable(WEBSITE_ROOT_URL, websiteRootUrl);
+        this.sendEmailFromTemplateSync(user, context, locale, "mail/activationEmail", "email.activation.title");
     }
 
     @Async
     public void sendCreationEmail(User user) {
         log.debug("Sending creation email to '{}'", user.getEmail());
-        this.sendEmailFromTemplateSync(user, "mail/creationEmail", "email.creation.title");
+//        this.sendEmailFromTemplateSync(user, "mail/creationEmail", "email.creation.title");
     }
 }

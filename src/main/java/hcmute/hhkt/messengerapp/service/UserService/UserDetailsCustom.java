@@ -53,8 +53,7 @@ public class UserDetailsCustom implements UserDetailsService {
         return new User(
                 username,
                 account.getPassword(),
-                //!isAccountUnactivateed,
-                true,
+                !isAccountUnactivated,
                 true,
                 true,
                 !isAccountBanned,

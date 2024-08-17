@@ -9,6 +9,7 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
@@ -39,6 +40,19 @@ public class Account extends AbstractAuditingEntity{
     @Column(name = "status", length = 20, nullable = false)
     @Builder.Default
     private AccountStatus status = AccountStatus.UNACTIVATED;
+
+    @Size(min = 20, max = 20)
+    @Column(name = "activation_key", length = 20)
+    @JsonIgnore
+    private String activationKey;
+
+    @Size(min = 20, max = 20)
+    @Column(name = "reset_key", length = 20)
+    @JsonIgnore
+    private String resetKey;
+
+    @Column(name = "reset_request_date")
+    private Instant resetRequestDate = null;
 
     @OneToOne(mappedBy = "account", fetch = FetchType.LAZY)
     private User user;

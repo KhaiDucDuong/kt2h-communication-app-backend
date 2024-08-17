@@ -4,10 +4,13 @@ import hcmute.hhkt.messengerapp.constant.ExceptionMessage;
 import hcmute.hhkt.messengerapp.domain.Account;
 import hcmute.hhkt.messengerapp.dto.RegisterUserDTO;
 import hcmute.hhkt.messengerapp.repository.AccountRepository;
+import hcmute.hhkt.messengerapp.util.RandomUtil;
 import hcmute.hhkt.messengerapp.util.RegrexUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.time.Instant;
 
 @Service
 @RequiredArgsConstructor
@@ -34,6 +37,7 @@ public class AccountService implements IAccountService{
         Account newAccount = Account.builder()
                 .username(registerUserDTO.getUsername())
                 .password(harshPassword)
+                .activationKey(RandomUtil.generateActivationKey())
                 .build();
         return accountRepository.save(newAccount);
     }

@@ -56,7 +56,7 @@
             <p th:text="#{email.activation.greeting(${user.firstName})}" class="greeting-text">Dear</p>
             <p th:text="#{email.activation.text1}" class="text"></p>
             <div class="confirm-btn" style="width: fit-content">
-                <a th:with="url=@{|${webUrl}/account/activate?key=${user.id}|}" th:href="${url}" class="confirm-text"
+                <a th:with="url=@{|${webUrl}/account/activate?key=${activationCode}|}" th:href="${url}" class="confirm-text"
                 style="line-height: 100%">Activation link</a>
             </div>
             <p class="text">
