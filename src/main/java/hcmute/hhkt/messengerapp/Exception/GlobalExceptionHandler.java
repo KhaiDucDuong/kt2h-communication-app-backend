@@ -39,6 +39,8 @@ public class GlobalExceptionHandler {
             return handleMethodArgumentNotValidException((MethodArgumentNotValidException) ex, request);
         } else if (ex instanceof UsernameNotFoundException || ex instanceof BadCredentialsException){
             return handleFailedAuthenticationException(ex);
+        } else if (ex instanceof UnactivatedAccountException) {
+            return handleUnactivatedAccountException(ex);
         } else if (ex instanceof HttpRequestMethodNotSupportedException){
             return handleHttpRequestMethodNotSupportedException(ex);
         } else if (ex instanceof PropertyReferenceException){
@@ -164,5 +166,12 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body(res);
     }
 
+    private ResponseEntity<Object> handleUnactivatedAccountException(Exception ex){
+        RestResponse<Object> res = new RestResponse<Object>();
+        res.setStatusCode(HttpStatus.FORBIDDEN.value());
+        res.setError(ex.getMessage());
+        res.setMessage("Unactivated Account");
 
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(res);
+    }
 }

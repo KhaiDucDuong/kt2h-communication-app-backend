@@ -46,6 +46,7 @@ public class SecurityConfiguration {
                 .authorizeHttpRequests(
                         authz -> authz
                                 .requestMatchers("/api/auth/login", "/api/auth/register", "/api/auth/refresh", "/api/auth/logout", "/api/auth/oauth2/google").permitAll()
+                                .requestMatchers("api/accounts/activate").permitAll()
                                 .requestMatchers(HttpMethod.GET, "/api/comics").permitAll()
                                 .anyRequest().authenticated()
                 )

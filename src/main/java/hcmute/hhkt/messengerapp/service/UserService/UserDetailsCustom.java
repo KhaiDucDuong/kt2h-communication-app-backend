@@ -48,12 +48,14 @@ public class UserDetailsCustom implements UserDetailsService {
         SimpleGrantedAuthority userRole = new SimpleGrantedAuthority(user.getRole().toString());
 
         boolean isAccountBanned = account.getStatus().equals(AccountStatus.BANNED);
-        boolean isAccountUnactivated = account.getStatus().equals(AccountStatus.UNACTIVATED);
+        //boolean isAccountUnactivated = account.getStatus().equals(AccountStatus.UNACTIVATED);
+        boolean isAccountDeactivated = account.getStatus().equals(AccountStatus.DEACTIVATED);
 
         return new User(
                 username,
                 account.getPassword(),
-                !isAccountUnactivated,
+                !isAccountDeactivated,
+//                true,
                 true,
                 true,
                 !isAccountBanned,

@@ -2,9 +2,11 @@ package hcmute.hhkt.messengerapp.controller;
 
 import com.nimbusds.jose.shaded.gson.Gson;
 import com.nimbusds.jose.shaded.gson.JsonObject;
+import hcmute.hhkt.messengerapp.Exception.UnactivatedAccountException;
 import hcmute.hhkt.messengerapp.Response.RegisterUserResponse;
 import hcmute.hhkt.messengerapp.constant.ExceptionMessage;
 import hcmute.hhkt.messengerapp.domain.*;
+import hcmute.hhkt.messengerapp.domain.enums.AccountStatus;
 import hcmute.hhkt.messengerapp.domain.enums.Device;
 import hcmute.hhkt.messengerapp.service.AccountService.IAccountService;
 import hcmute.hhkt.messengerapp.service.MailService.MailService;
@@ -14,6 +16,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
+import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.oauth2.client.OAuth2AuthorizeRequest;
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClient;
@@ -74,15 +77,24 @@ public class AuthController {
         );
 
         Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
+        Account loggedInAccount = null;
+        User loggedInUser = null;
+        if(RegrexUtil.isEmail(loginDTO.getUsername())){
+            loggedInUser = userService.findUserByEmail(loginDTO.getUsername());
+            loggedInAccount = loggedInUser.getAccount();
+        } else {
+            loggedInAccount = accountService.findAccountByUserName(loginDTO.getUsername());
+        }
+        //check if account is activated
+        if(loggedInAccount.getStatus() == AccountStatus.UNACTIVATED){
+            throw new UnactivatedAccountException(ExceptionMessage.UNACTIVATED_ACCOUNT);
+        }
+
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
-        //find the logged-in user, if an account is found then the user logs in with username, else with email
-        User loggedInUser = RegrexUtil.isEmail(loginDTO.getUsername())
-                ? userService.findUserByEmail(loginDTO.getUsername())
-                : userService.findUserByAccount(accountService.findAccountByUserName(loginDTO.getUsername()));
-
-//        List<Authority> userAuthorities = userLogin.getRoles().stream().map(Role::getAuthorities).toList().stream().flatMap(Collection::stream).toList();
-//        List<Authority> userAuthorities = new ArrayList<Authority>();
+        if(loggedInUser == null){
+            loggedInUser = loggedInAccount.getUser();
+        }
 
         LoginResponse.UserLogin userLoginData = LoginResponse.UserLogin.builder()
                 .userId(String.valueOf(loggedInUser.getId()))
