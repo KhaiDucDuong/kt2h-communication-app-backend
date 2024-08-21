@@ -246,7 +246,7 @@ public class AuthController {
                 //.domain()
                 .build();
 
-        log.debug("REST request to refresh token with username {} successfully", loggedOutAccount.getUsername());
+        log.debug("REST request to log out username {} successfully", loggedOutAccount.getUsername());
         return ResponseEntity.ok()
                 .header(HttpHeaders.SET_COOKIE, responseCookie.toString())
                 .body("Logout user " + loggedOutAccount.getUsername());
