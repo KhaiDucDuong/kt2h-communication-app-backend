@@ -10,4 +10,5 @@ public interface IAccountService {
     Account createAccount(RegisterUserDTO registerUserDTO);
     Optional<Account> activateRegistration(String key);
     boolean removeUnactivatedAccount(Account account);
+    String renewActivationCode(Account account);
 }

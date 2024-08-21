@@ -68,4 +68,10 @@ public class UserServiceImpl implements IUserService {
     public User findById(UUID id) {
         return userRepository.findById(id).orElse(null);
     }
+
+    @Override
+    public void resendActivationEmail(User user) {
+        String activationCode = accountService.renewActivationCode(user.getAccount());
+        mailService.sendActivationEmail(user, activationCode);
+    }
 }

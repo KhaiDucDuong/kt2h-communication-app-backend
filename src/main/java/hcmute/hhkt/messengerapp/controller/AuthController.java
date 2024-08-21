@@ -311,14 +311,13 @@ public class AuthController {
         return "hello";
     }
 
-    @GetMapping("/mail/{email}")
-    public String testMail(@PathVariable String email) {
+    @PostMapping("/renewActivationCode")
+    public ResponseEntity<?> renewActivationCode(@RequestParam(value = "email") String email){
         User user = userService.findUserByEmail(email);
         if(user == null){
             throw new IllegalArgumentException(ExceptionMessage.USER_NOT_EXIST);
         }
-
-
-        return "hello";
+        userService.resendActivationEmail(user);
+        return ResponseEntity.ok().body("Renew user activation code successfully");
     }
 }

@@ -12,9 +12,7 @@ public interface IUserService {
     User findUserByUsername(String username);
     User findUserByEmail(String email);
     User findUserByAccount(Account account);
-
-    //void updateUserRefreshToken(String username, String refreshToken);
     List<User> getAllUsers();
-
     User findById(UUID id);
+    void resendActivationEmail(User user);
 }

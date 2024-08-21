@@ -72,10 +72,19 @@ public class AccountService implements IAccountService{
         return true;
     }
 
+    @Override
+    public String renewActivationCode(Account account) {
+        if(account.getStatus() != AccountStatus.UNACTIVATED){
+            throw new IllegalArgumentException(ExceptionMessage.ACCOUNT_IS_NOT_UNACTIVATED);
+        }
+        account.setActivationKey(RandomUtil.generateActivationKey());
+        return accountRepository.save(account).getActivationKey();
+    }
+
     /**
      * Not activated users should be automatically deleted after 3 days.
      * <p>
-     * This is scheduled to get fired everyday, at 01:00 (am).
+     * This is scheduled to get fired every day, at 01:00 (am).
      */
     @Async
     @Scheduled(cron = "0 0 1 * * ?")
