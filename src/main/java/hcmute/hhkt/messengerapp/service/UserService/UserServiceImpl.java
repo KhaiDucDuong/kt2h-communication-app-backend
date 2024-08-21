@@ -24,6 +24,7 @@ public class UserServiceImpl implements IUserService {
 
     @Transactional
     public User createUser(RegisterUserDTO registerUserDTO) throws IllegalArgumentException {
+
         if(userRepository.existsUserByEmail(registerUserDTO.getEmail())){
             throw new IllegalArgumentException(ExceptionMessage.EMAIL_IS_TAKEN);
         }

@@ -10,10 +10,14 @@ import hcmute.hhkt.messengerapp.util.RegrexUtil;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
+import java.time.temporal.ChronoUnit;
+import java.util.Date;
 import java.util.Optional;
 
 @Service
@@ -55,5 +59,35 @@ public class AccountService implements IAccountService{
             log.debug("Activated account: {}", account);
             return accountRepository.save(account);
         });
+    }
+
+    @Override
+    public boolean removeUnactivatedAccount(Account account) {
+        if(account.getStatus() != AccountStatus.UNACTIVATED){
+            return false;
+        }
+        log.debug("Delete unactivated account: {}", account);
+        accountRepository.delete(account);
+        accountRepository.flush();
+        return true;
+    }
+
+    /**
+     * Not activated users should be automatically deleted after 3 days.
+     * <p>
+     * This is scheduled to get fired everyday, at 01:00 (am).
+     */
+    @Async
+    @Scheduled(cron = "0 0 1 * * ?")
+//    @Scheduled(fixedRate = 30000) //every 30 seconds - for testing
+    public void removeUnactivatedAccountsScheduler() {
+        log.debug("Remove unactivated accounts scheduler starts {}", Date.from(Instant.now()));
+        accountRepository
+                .findAllByStatusAndCreatedDateBefore(AccountStatus.UNACTIVATED, Instant.now().minus(3, ChronoUnit.DAYS))
+                .forEach(account -> {
+                    log.debug("Deleting  unactivated account {}", account.getUsername());
+                    accountRepository.delete(account);
+                });
+        log.debug("Remove unactivated accounts scheduler ends {}", Date.from(Instant.now()));
     }
 }
