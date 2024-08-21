@@ -19,4 +19,7 @@ public class ExceptionMessage {
     public static final String ILLEGAL_FRIEND_REQUEST_UPDATE_STATUS_CALLER = "This user cannot make changes to the friend request";
     public static final String MISSING_PARAMETERS = "Missing parameters in request";
     public static final String ILLEGAL_FRIEND_REQUEST_DELETE_CALLER = "This user cannot delete the friend request";
+    public static final String ACCOUNT_NOT_FOUND_BY_ACTIVATION_KEY = "No user was found for this activation key";
+    public static final String UNACTIVATED_ACCOUNT = "Account is unactivated";
+    public static final String ACCOUNT_IS_NOT_UNACTIVATED = "Account is not unactivated";
 }

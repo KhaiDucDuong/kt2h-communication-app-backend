@@ -10,7 +10,6 @@ import org.springframework.security.oauth2.jose.jws.MacAlgorithm;
 import org.springframework.security.oauth2.jwt.*;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.stereotype.Service;
-import hcmute.hhkt.messengerapp.domain.Authority;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;

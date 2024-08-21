@@ -6,20 +6,14 @@ import hcmute.hhkt.messengerapp.domain.enums.AccountStatus;
 import hcmute.hhkt.messengerapp.service.AccountService.IAccountService;
 import hcmute.hhkt.messengerapp.util.RegrexUtil;
 import lombok.RequiredArgsConstructor;
-import org.hibernate.validator.internal.constraintvalidators.bv.EmailValidator;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
-import hcmute.hhkt.messengerapp.domain.Authority;
-import hcmute.hhkt.messengerapp.domain.Role;
 
-import java.util.Collection;
 import java.util.Collections;
-import java.util.List;
 
 @RequiredArgsConstructor
 @Component("userDetailsService")
@@ -48,13 +42,14 @@ public class UserDetailsCustom implements UserDetailsService {
         SimpleGrantedAuthority userRole = new SimpleGrantedAuthority(user.getRole().toString());
 
         boolean isAccountBanned = account.getStatus().equals(AccountStatus.BANNED);
-        boolean isAccountUnactivated = account.getStatus().equals(AccountStatus.UNACTIVATED);
+        //boolean isAccountUnactivated = account.getStatus().equals(AccountStatus.UNACTIVATED);
+        boolean isAccountDeactivated = account.getStatus().equals(AccountStatus.DEACTIVATED);
 
         return new User(
                 username,
                 account.getPassword(),
-                //!isAccountUnactivateed,
-                true,
+                !isAccountDeactivated,
+//                true,
                 true,
                 true,
                 !isAccountBanned,

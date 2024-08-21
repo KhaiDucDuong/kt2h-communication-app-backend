@@ -3,6 +3,7 @@ package hcmute.hhkt.messengerapp.Exception;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.mapping.PropertyReferenceException;
+import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authorization.AuthorizationDeniedException;
 import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -38,6 +39,8 @@ public class GlobalExceptionHandler {
             return handleMethodArgumentNotValidException((MethodArgumentNotValidException) ex, request);
         } else if (ex instanceof UsernameNotFoundException || ex instanceof BadCredentialsException){
             return handleFailedAuthenticationException(ex);
+        } else if (ex instanceof UnactivatedAccountException) {
+            return handleUnactivatedAccountException(ex);
         } else if (ex instanceof HttpRequestMethodNotSupportedException){
             return handleHttpRequestMethodNotSupportedException(ex);
         } else if (ex instanceof PropertyReferenceException){
@@ -50,6 +53,8 @@ public class GlobalExceptionHandler {
             return handleAuthorizationDeniedException(ex);
         } else if (ex instanceof UnauthorizedRequestException){
             return handleUnauthorizedRequestException(ex);
+        } else if (ex instanceof DisabledException){
+            return handleDisabledException(ex);
         }
 
         RestResponse<Object> res = new RestResponse<Object>();
@@ -148,6 +153,24 @@ public class GlobalExceptionHandler {
         res.setStatusCode(HttpStatus.FORBIDDEN.value());
         res.setError(ex.getMessage());
         res.setMessage("Unauthorized Request Exception");
+
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(res);
+    }
+
+    private ResponseEntity<Object> handleDisabledException(Exception ex){
+        RestResponse<Object> res = new RestResponse<Object>();
+        res.setStatusCode(HttpStatus.FORBIDDEN.value());
+        res.setError(ex.getMessage());
+        res.setMessage("Account is disabled");
+
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(res);
+    }
+
+    private ResponseEntity<Object> handleUnactivatedAccountException(Exception ex){
+        RestResponse<Object> res = new RestResponse<Object>();
+        res.setStatusCode(HttpStatus.FORBIDDEN.value());
+        res.setError(ex.getMessage());
+        res.setMessage("Unactivated Account");
 
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body(res);
     }

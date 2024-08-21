@@ -31,12 +31,12 @@ public class User extends AbstractAuditingEntity {
     @Column(name="image")
     private String image;
 
-    @Size(min = 1, max = 20)
-    @Column(name="first_name", nullable = false)
+    @Size(min = 1, max = 50)
+    @Column(name="first_name", nullable = false, length = 50)
     private String firstName;
 
-    @Size(min = 1, max = 20)
-    @Column(name="last_name", nullable = false)
+    @Size(min = 1, max = 50)
+    @Column(name="last_name", nullable = false, length = 50)
     private String lastName;
 
     @Email(regexp= RegrexUtil.emailRegrexRFC5322)
