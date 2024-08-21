@@ -1,7 +1,6 @@
 package hcmute.hhkt.messengerapp.repository;
 
 import hcmute.hhkt.messengerapp.domain.Account;
-import hcmute.hhkt.messengerapp.domain.Authority;
 import hcmute.hhkt.messengerapp.domain.enums.AccountStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 
