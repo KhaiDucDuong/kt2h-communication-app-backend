@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 
+import java.util.List;
 import java.util.UUID;
 
 @Getter
@@ -25,7 +26,7 @@ public class Conversation extends AbstractDateAuditingEntity{
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "creator_id", referencedColumnName = "id")
-    private User creatorId;
+    private User creator;
 
     @Size(min = 1, max = 50)
     @Column(name="target_nickname", nullable = false)
@@ -33,5 +34,8 @@ public class Conversation extends AbstractDateAuditingEntity{
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "target_id", referencedColumnName = "id")
-    private User targetId;
+    private User target;
+
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "conversation", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Message> messages;
 }
