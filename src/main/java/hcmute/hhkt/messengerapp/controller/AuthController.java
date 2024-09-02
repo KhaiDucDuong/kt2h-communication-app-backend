@@ -191,7 +191,7 @@ public class AuthController {
         String refreshTokenValue = newRefreshToken.getToken();
 
         LoginResponse.UserLogin userLoginData = LoginResponse.UserLogin.builder()
-                .userId(String.valueOf(currentAccount.getId()))
+                .userId(String.valueOf(user.getId()))
                 .email(user.getEmail())
                 .firstName(user.getFirstName())
                 .lastName(user.getLastName())
