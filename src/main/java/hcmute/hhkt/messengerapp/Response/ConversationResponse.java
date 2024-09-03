@@ -28,6 +28,8 @@ public class ConversationResponse {
     @JsonProperty("target_nickname")
     private String targetNickname;
 
+    private String 
+
     public static ConversationResponse fromConversation(Conversation conversation){
         return ConversationResponse.builder()
                 .id(conversation.getId())

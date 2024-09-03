@@ -13,6 +13,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -43,6 +44,10 @@ public class ConversationServiceImpl implements IConversationService{
                 .pages(conversationPage.getTotalPages())
                 .total(conversationPage.getTotalElements())
                 .build();
+
+        List<Conversation> conversationList = conversationPage.getContent();
+        List<User> targets = conversationList.stream().map(conversation ->
+        {return conversation.getTarget() == user ? conversation.getCreator() : conversation.getTarget();}).toList();
 
         return ResultPaginationResponse.builder()
                 .meta(meta)
