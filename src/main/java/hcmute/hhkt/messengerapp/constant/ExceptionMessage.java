@@ -27,4 +27,5 @@ public class ExceptionMessage {
     public static final String MESSAGE_IS_BLANK = "Message content cannot be blank";
     public static final String ILLEGAL_MESSAGE_ORIGIN = "Message origin is illegal";
     public static final String INVALID_MESSAGE_SENDER = "Message cannot be sent by this user";
+    public static final String CONVERSATION_IDENTICAL_CREATOR_TARGET = "Conversation cannot have the same creator and target";
 }

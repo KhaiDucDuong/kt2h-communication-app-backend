@@ -31,13 +31,36 @@ public class ConversationServiceImpl implements IConversationService{
     }
 
     @Override
+    public Conversation findByTwoUsers(User finder, User toUser) {
+        Conversation queryConversation = conversationRepository.findConversationByTwoUsers(finder, toUser);
+
+        //create the conversation if it hasn't existed yet
+        if(queryConversation == null){
+            queryConversation = createConversation(finder, toUser);
+        }
+
+        return queryConversation;
+    }
+
+    @Override
     public Conversation createConversation(User creator, User target) {
-        return null;
+        if(creator == target){
+            throw new IllegalArgumentException(ExceptionMessage.CONVERSATION_IDENTICAL_CREATOR_TARGET);
+        }
+
+        Conversation conversation = Conversation.builder()
+                .creator(creator)
+                .creatorNickname(creator.getLastName() + " " + creator.getFirstName())
+                .target(target)
+                .targetNickname(target.getLastName() + " " + target.getFirstName())
+                .build();
+
+        return conversationRepository.save(conversation);
     }
 
     @Override
     public ResultPaginationResponse findUserConversations(User user, Pageable pageable) {
-        Page<Conversation> conversationPage = conversationRepository.findUserConversations(user, pageable);
+        Page<Conversation> conversationPage = conversationRepository.findConversationsByCreatorOrTarget(user, user, pageable);
         Meta meta = Meta.builder()
                 .page(conversationPage.getNumber() + 1)
                 .pageSize(conversationPage.getSize())
@@ -46,12 +69,12 @@ public class ConversationServiceImpl implements IConversationService{
                 .build();
 
         List<Conversation> conversationList = conversationPage.getContent();
-        List<User> targets = conversationList.stream().map(conversation ->
+        List<User> toUsers = conversationList.stream().map(conversation ->
         {return conversation.getTarget() == user ? conversation.getCreator() : conversation.getTarget();}).toList();
 
         return ResultPaginationResponse.builder()
                 .meta(meta)
-                .result(ConversationResponse.fromConversationList(conversationPage.getContent()))
+                .result(ConversationResponse.fromConversationList(conversationPage.getContent(), toUsers))
                 .build();
     }
 }

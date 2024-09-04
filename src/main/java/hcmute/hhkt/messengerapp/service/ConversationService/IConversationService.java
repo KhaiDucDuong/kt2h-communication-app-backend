@@ -9,6 +9,7 @@ import java.util.UUID;
 
 public interface IConversationService {
     Conversation findById(UUID conversationId);
+    Conversation findByTwoUsers(User finder, User toUser);
     Conversation createConversation(User creator, User target);
     ResultPaginationResponse findUserConversations(User user, Pageable pageable);
 }
