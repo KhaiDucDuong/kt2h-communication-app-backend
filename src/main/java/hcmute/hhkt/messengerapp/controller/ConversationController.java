@@ -65,7 +65,7 @@ public class ConversationController {
         Sort sort =  Sort.by(Sort.Direction.DESC, MESSAGE_SORT_BY);
         Pageable pageable = PageRequest.of(0, CONVERSATION_MESSAGE_PAGE_SIZE, sort);
         ResultPaginationResponse messagesPaginationResponse = messageService.getConversationMessages(conversation, pageable);
-        
+
         return ResponseEntity.ok().body(ConversationResponse.fromConversation(conversation, toUser, messagesPaginationResponse));
     }
 

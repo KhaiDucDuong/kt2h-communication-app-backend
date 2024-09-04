@@ -18,24 +18,18 @@ public class ConversationResponse {
     @JsonProperty("id")
     private UUID id;
 
-    @JsonProperty("creator_id")
-    private UUID creatorId;
+    @JsonProperty("requester_id")
+    private UUID requesterId;
 
-    @JsonProperty("creator_nickname")
-    private String creatorNickname;
-
-    @JsonProperty("target_id")
-    private UUID targetId;
-
-    @JsonProperty("target_nickname")
-    private String targetNickname;
+    @JsonProperty("requester_nickname")
+    private String requesterNickname;
 
     private ToUser toUser;
 
     private ResultPaginationResponse paginationResponse;
 
     @Builder
-    public class ToUser {
+    public static class ToUser {
         @JsonProperty("to_user_id")
         private UUID id;
 
@@ -48,61 +42,49 @@ public class ConversationResponse {
         @JsonProperty("to_user_last_name")
         private String lastName;
 
-        @JsonProperty("to_user_email")
-        private String email;
+        @JsonProperty("to_user_nickname")
+        private String nickname;
 
         @JsonProperty("to_user_status")
         private String status;
 
-        public static ToUser fromUser(User user){
+        public static ToUser fromUser(User user, String nickname){
             return ToUser.builder()
                     .id(user.getId())
                     .firstName(user.getFirstName())
                     .lastName(user.getLastName())
+                    .nickname(nickname)
                     .image(user.getImage())
-                    .email(user.getEmail())
                     .status(user.getStatus().name())
                     .build();
         }
     }
 
-    public static ConversationResponse fromConversation(Conversation conversation){
-        return ConversationResponse.builder()
-                .id(conversation.getId())
-                .creatorId(conversation.getCreator().getId())
-                .creatorNickname(conversation.getCreatorNickname())
-                .targetId(conversation.getTarget().getId())
-                .targetNickname(conversation.getTargetNickname())
-                .build();
-    }
-
     public static ConversationResponse fromConversation(Conversation conversation, User toUser){
-        return ConversationResponse.builder()
-                .id(conversation.getId())
-                .creatorId(conversation.getCreator().getId())
-                .creatorNickname(conversation.getCreatorNickname())
-                .targetId(conversation.getTarget().getId())
-                .targetNickname(conversation.getTargetNickname())
-                .toUser(ToUser.fromUser(toUser))
-                .build();
+        boolean isToUserCreator = toUser == conversation.getCreator();
+        ConversationResponse response = ConversationResponse.builder().id(conversation.getId()).build();
+        if(isToUserCreator){
+            response.setRequesterId(conversation.getTarget().getId());
+            response.setRequesterNickname(conversation.getTargetNickname());
+            response.setToUser(ToUser.fromUser(toUser, conversation.getCreatorNickname()));
+        } else {
+            response.setRequesterId(conversation.getCreator().getId());
+            response.setRequesterNickname(conversation.getCreatorNickname());
+            response.setToUser(ToUser.fromUser(toUser, conversation.getTargetNickname()));
+        }
+        return response;
     }
 
     public static ConversationResponse fromConversation(Conversation conversation, User toUser, ResultPaginationResponse paginationResponse){
-        return ConversationResponse.builder()
-                .id(conversation.getId())
-                .creatorId(conversation.getCreator().getId())
-                .creatorNickname(conversation.getCreatorNickname())
-                .targetId(conversation.getTarget().getId())
-                .targetNickname(conversation.getTargetNickname())
-                .toUser(ToUser.fromUser(toUser))
-                .paginationResponse(paginationResponse)
-                .build();
+        ConversationResponse response = ConversationResponse.fromConversation(conversation, toUser);
+        response.setPaginationResponse(paginationResponse);
+        return response;
     }
 
     public static List<ConversationResponse> fromConversationList(List<Conversation> conversationList, List<User> toUserList){
         List<ConversationResponse> conversationResponseList = new ArrayList<>();
         for(int i = 0; i < conversationList.size(); i++){
-            conversationResponseList.addLast(ConversationResponse.fromConversation(conversationList.get(i), toUserList.get(i)));
+            conversationResponseList.add(ConversationResponse.fromConversation(conversationList.get(i), toUserList.get(i)));
         }
         return conversationResponseList;
     }
