@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
@@ -23,6 +24,8 @@ public class MessageResponse {
     private String messageType;
     @JsonProperty("is_reacted")
     private Boolean isReacted;
+    @JsonProperty("sent_at")
+    private Instant sentAt;
 
     public static MessageResponse fromMessage(Message message){
         return MessageResponse.builder()
@@ -31,6 +34,7 @@ public class MessageResponse {
                 .senderId(message.getSender().getId())
                 .messageType(message.getMessageType().name())
                 .isReacted(message.getIsReacted())
+                .sentAt(message.getCreatedDate())
                 .build();
     }
 

@@ -13,12 +13,15 @@ import hcmute.hhkt.messengerapp.domain.enums.MessageType;
 import hcmute.hhkt.messengerapp.dto.MessageDTO;
 import hcmute.hhkt.messengerapp.repository.MessageRepository;
 import hcmute.hhkt.messengerapp.service.ConversationService.IConversationService;
+import hcmute.hhkt.messengerapp.service.UserService.IUserService;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
@@ -27,6 +30,7 @@ import java.util.UUID;
 public class MessageServiceImpl implements IMessageService{
     private final MessageRepository messageRepository;
     private final IConversationService conversationService;
+    private final IUserService userService;
     @Override
     public Message createMessage(MessageDTO messageDTO) {
         if(!MessageType.valueOf(messageDTO.getMessageType()).equals(MessageType.TEXT)){
@@ -41,18 +45,29 @@ public class MessageServiceImpl implements IMessageService{
             throw new IllegalArgumentException(ExceptionMessage.ILLEGAL_MESSAGE_ORIGIN);
         }
 
+        if(StringUtils.isBlank(messageDTO.getSenderId())){
+            throw new IllegalArgumentException(ExceptionMessage.MISSING_PARAMETERS);
+        }
+
+        User sender = userService.findById(UUID.fromString(messageDTO.getSenderId()));
+        if(sender == null){
+            throw new IllegalArgumentException(ExceptionMessage.USER_NOT_EXIST);
+        }
+
         Message message = Message.builder()
                 .message(messageDTO.getMessage())
                 .messageType(MessageType.valueOf(messageDTO.getMessageType()))
+                .sender(sender)
                 .build();
 
-        if(StringUtils.isBlank(messageDTO.getConversationId())){
+        if(!StringUtils.isBlank(messageDTO.getConversationId())){
             Conversation conversation = conversationService.findById(UUID.fromString(messageDTO.getConversationId()));
             message.setConversation(conversation);
             //set channel to null
         }
+
         //message comes from a channel
-        //else if (StringUtils.isBlank(messageDTO.getChannelId())){}
+        //else if (!StringUtils.isBlank(messageDTO.getChannelId())){}
 
         return messageRepository.save(message);
     }
