@@ -29,7 +29,7 @@ public class StompSocketController {
     private final IMessageService messageService;
 
     @MessageMapping("/private-message")
-    public ResponseEntity<?> receivePrivateMessage(@Payload MessageDTO messageDTO){
+    public void receivePrivateMessage(@Payload MessageDTO messageDTO){
         log.debug("Stomp private message from {}", messageDTO.getSenderId());
         UUID conversationId = UUID.fromString(messageDTO.getConversationId());
         Conversation conversation = conversationService.findById(conversationId);
@@ -42,8 +42,10 @@ public class StompSocketController {
             throw new IllegalArgumentException(ExceptionMessage.INVALID_MESSAGE_SENDER);
         }
         Message message = messageService.createMessage(messageDTO);
-        simpMessagingTemplate.convertAndSendToUser(toUser.getId().toString(),"/private", MessageResponse.fromMessage(message));
+        MessageResponse response = MessageResponse.fromMessage(message);
+        simpMessagingTemplate.convertAndSendToUser(toUser.getId().toString(),"/private", response);
+        simpMessagingTemplate.convertAndSendToUser(response.getSenderId().toString(),"/private", response);
         log.debug("Sending private message from {} to {} with content {}", messageDTO.getSenderId(), toUser.getId(), message.getMessage());
-        return ResponseEntity.ok().body(MessageResponse.fromMessage(message));
+//        return ResponseEntity.ok().body(MessageResponse.fromMessage(message));
     }
 }
