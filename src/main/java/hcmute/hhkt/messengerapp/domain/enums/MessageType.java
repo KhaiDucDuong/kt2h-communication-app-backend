@@ -1,12 +1,10 @@
 package hcmute.hhkt.messengerapp.domain.enums;
 
+import lombok.Getter;
+import lombok.Setter;
+
+@Getter
 public enum MessageType {
     TEXT,
-    FILE,
-    IMAGE,
-    GIF,
-    EMOJI,
-    STICKER,
-    AUDIO,
-
+    RECORDING;
 }

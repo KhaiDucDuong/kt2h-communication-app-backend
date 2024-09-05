@@ -48,6 +48,7 @@ public class SecurityConfiguration {
                                 .requestMatchers("/api/auth/login", "/api/auth/register", "/api/auth/refresh", "/api/auth/logout", "/api/auth/oauth2/google").permitAll()
                                 .requestMatchers("api/accounts/activate", "/api/auth/renewActivationCode").permitAll()
                                 .requestMatchers(HttpMethod.GET, "/api/comics").permitAll()
+                                .requestMatchers("/ws").permitAll()
                                 .anyRequest().authenticated()
                 )
                 .oauth2ResourceServer((oauth2) -> oauth2.jwt(Customizer.withDefaults())

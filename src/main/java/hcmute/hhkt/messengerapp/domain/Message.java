@@ -15,24 +15,24 @@ import java.util.UUID;
 @Builder
 @Table(name ="messages")
 public class Message extends AbstractDateAuditingEntity{
-        @Id
-        @GeneratedValue(strategy = GenerationType.UUID)
-        @Column(name="id")
-        private UUID id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
+    @Column(name="id")
+    private UUID id;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "conversation_id", referencedColumnName = "id")
-    private Conversation conversationId;
+    private Conversation conversation;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "sender_id", referencedColumnName = "id")
-    private User senderId;
+    private User sender;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "message_type", length = 20, nullable = false)
     private MessageType messageType;
 
-    @Column(name = "message", nullable = false, unique = true, columnDefinition = "TEXT")
+    @Column(name = "message", nullable = false, unique = false, columnDefinition = "TEXT")
     private String message;
 
     @Column(name = "is_deleted")
