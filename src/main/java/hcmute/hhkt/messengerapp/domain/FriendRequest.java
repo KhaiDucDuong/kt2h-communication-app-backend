@@ -5,6 +5,7 @@ import hcmute.hhkt.messengerapp.domain.enums.MessageType;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.List;
 import java.util.UUID;
 
 @Getter
@@ -32,4 +33,7 @@ public class FriendRequest extends AbstractDateAuditingEntity{
     @Column(name = "status", length = 20, nullable = false)
     @Builder.Default
     private FriendRequestStatus status = FriendRequestStatus.PENDING;
+
+    @OneToMany(mappedBy = "friendRequest", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<InvitationNotification> invitationNotifications;
 }
