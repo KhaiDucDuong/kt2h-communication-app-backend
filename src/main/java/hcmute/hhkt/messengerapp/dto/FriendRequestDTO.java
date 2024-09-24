@@ -18,6 +18,9 @@ public class FriendRequestDTO {
     @JsonProperty("receiver_id")
     private UUID receiverId;
 
+    @JsonProperty("receiver_username")
+    private String receiverUsername;
+
     @JsonProperty("status")
     private String status;
 }

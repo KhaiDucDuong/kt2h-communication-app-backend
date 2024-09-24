@@ -8,9 +8,11 @@ import hcmute.hhkt.messengerapp.domain.FriendRequest;
 import hcmute.hhkt.messengerapp.domain.User;
 import hcmute.hhkt.messengerapp.domain.enums.FriendRequestStatus;
 import hcmute.hhkt.messengerapp.dto.FriendRequestDTO;
+import hcmute.hhkt.messengerapp.service.ConversationService.ConversationServiceImpl;
 import hcmute.hhkt.messengerapp.service.FriendRequestService.FriendRequestServiceImpl;
 import hcmute.hhkt.messengerapp.service.FriendshipService.FriendshipServiceImpl;
 import hcmute.hhkt.messengerapp.service.UserService.UserServiceImpl;
+import hcmute.hhkt.messengerapp.util.RegrexUtil;
 import hcmute.hhkt.messengerapp.util.SecurityUtil;
 import hcmute.hhkt.messengerapp.util.annotation.ApiMessage;
 import jakarta.validation.Valid;
@@ -20,17 +22,22 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/friendRequests")
 @RequiredArgsConstructor
 public class FriendRequestController {
+    private final SimpMessagingTemplate simpMessagingTemplate;
     private final Logger log = LoggerFactory.getLogger(FriendRequestController.class);
     private final UserServiceImpl userService;
     private final FriendRequestServiceImpl friendRequestService;
     private final FriendshipServiceImpl friendshipService;
+    private final ConversationServiceImpl conversationService;
 
     @PostMapping("")
     @ApiMessage("Created friend request successfully")
@@ -39,11 +46,16 @@ public class FriendRequestController {
         log.debug("REST request to create friend request to user Id {} from {}", friendRequestDTO.getReceiverId(), email);
 
         User senderUser = userService.findUserByEmail(email);
-        if(friendRequestDTO.getReceiverId() == null){
-            throw new IllegalArgumentException(ExceptionMessage.MISSING_PARAMETERS);
+
+        User receiverUser = null;
+        if(friendRequestDTO.getReceiverId() != null){
+            receiverUser = userService.findById(friendRequestDTO.getReceiverId());
+        } else if(StringUtils.isNotBlank(friendRequestDTO.getReceiverUsername())){
+            String receiverUsername = friendRequestDTO.getReceiverUsername();
+            boolean usernameIsEmail = RegrexUtil.isEmail(receiverUsername);
+            receiverUser = usernameIsEmail ? userService.findUserByEmail(receiverUsername) : userService.findUserByUsername(receiverUsername);
         }
 
-        User receiverUser = userService.findById(friendRequestDTO.getReceiverId());
         if (senderUser == null || receiverUser == null) {
             throw new IllegalArgumentException(ExceptionMessage.USER_NOT_EXIST);
         }
@@ -99,6 +111,8 @@ public class FriendRequestController {
         //create friendship if the FR is accepted
         if(FriendRequestStatus.ACCEPTED == updatedFriendRequest.getStatus()){
             friendshipService.createFriendship(updatedFriendRequest.getSender(), updatedFriendRequest.getReceiver());
+            //find the conversation, if it doesn't exist then create one
+            conversationService.findByTwoUsers(updatedFriendRequest.getSender(), updatedFriendRequest.getReceiver());
         }
 
         return ResponseEntity.ok().body(FriendRequestResponse.generateFriendRequestResponse(updatedFriendRequest));
