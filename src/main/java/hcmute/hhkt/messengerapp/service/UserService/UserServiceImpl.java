@@ -41,12 +41,12 @@ public class UserServiceImpl implements IUserService {
 
     @Override
     public User findUserByUsername(String username) {
-        User queryUser = userRepository.findUserByEmail(username);
-        if(queryUser != null){
-            return queryUser;
+        Account account = accountService.findAccountByUserName(username);
+        if(account == null){
+            return null;
         }
 
-        return null;
+        return account.getUser();
     }
 
     @Override

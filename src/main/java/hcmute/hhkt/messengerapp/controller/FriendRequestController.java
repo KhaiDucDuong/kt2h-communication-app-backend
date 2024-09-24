@@ -11,6 +11,7 @@ import hcmute.hhkt.messengerapp.dto.FriendRequestDTO;
 import hcmute.hhkt.messengerapp.service.FriendRequestService.FriendRequestServiceImpl;
 import hcmute.hhkt.messengerapp.service.FriendshipService.FriendshipServiceImpl;
 import hcmute.hhkt.messengerapp.service.UserService.UserServiceImpl;
+import hcmute.hhkt.messengerapp.util.RegrexUtil;
 import hcmute.hhkt.messengerapp.util.SecurityUtil;
 import hcmute.hhkt.messengerapp.util.annotation.ApiMessage;
 import jakarta.validation.Valid;
@@ -23,6 +24,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/friendRequests")
@@ -41,11 +44,16 @@ public class FriendRequestController {
         log.debug("REST request to create friend request to user Id {} from {}", friendRequestDTO.getReceiverId(), email);
 
         User senderUser = userService.findUserByEmail(email);
-        if(friendRequestDTO.getReceiverId() == null){
-            throw new IllegalArgumentException(ExceptionMessage.MISSING_PARAMETERS);
+
+        User receiverUser = null;
+        if(friendRequestDTO.getReceiverId() != null){
+            receiverUser = userService.findById(friendRequestDTO.getReceiverId());
+        } else if(StringUtils.isNotBlank(friendRequestDTO.getReceiverUsername())){
+            String receiverUsername = friendRequestDTO.getReceiverUsername();
+            boolean usernameIsEmail = RegrexUtil.isEmail(receiverUsername);
+            receiverUser = usernameIsEmail ? userService.findUserByEmail(receiverUsername) : userService.findUserByUsername(receiverUsername);
         }
 
-        User receiverUser = userService.findById(friendRequestDTO.getReceiverId());
         if (senderUser == null || receiverUser == null) {
             throw new IllegalArgumentException(ExceptionMessage.USER_NOT_EXIST);
         }

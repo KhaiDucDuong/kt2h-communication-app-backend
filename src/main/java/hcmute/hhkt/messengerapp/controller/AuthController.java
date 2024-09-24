@@ -150,7 +150,7 @@ public class AuthController {
     public ResponseEntity<?> getAccount() {
         log.debug("REST request to get current account");
         String username = SecurityUtil.getCurrentUserLogin().isPresent() ? SecurityUtil.getCurrentUserLogin().get() : "";
-        User loggedInUser = userService.findUserByUsername(username);
+        User loggedInUser = userService.findUserByEmail(username);
 
         if (loggedInUser != null) {
             LoginResponse.UserLogin userLoginData = LoginResponse.UserLogin.builder()
