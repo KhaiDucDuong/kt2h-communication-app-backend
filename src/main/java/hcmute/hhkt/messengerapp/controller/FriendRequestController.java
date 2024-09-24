@@ -8,6 +8,7 @@ import hcmute.hhkt.messengerapp.domain.FriendRequest;
 import hcmute.hhkt.messengerapp.domain.User;
 import hcmute.hhkt.messengerapp.domain.enums.FriendRequestStatus;
 import hcmute.hhkt.messengerapp.dto.FriendRequestDTO;
+import hcmute.hhkt.messengerapp.service.ConversationService.ConversationServiceImpl;
 import hcmute.hhkt.messengerapp.service.FriendRequestService.FriendRequestServiceImpl;
 import hcmute.hhkt.messengerapp.service.FriendshipService.FriendshipServiceImpl;
 import hcmute.hhkt.messengerapp.service.UserService.UserServiceImpl;
@@ -36,6 +37,7 @@ public class FriendRequestController {
     private final UserServiceImpl userService;
     private final FriendRequestServiceImpl friendRequestService;
     private final FriendshipServiceImpl friendshipService;
+    private final ConversationServiceImpl conversationService;
 
     @PostMapping("")
     @ApiMessage("Created friend request successfully")
@@ -109,6 +111,8 @@ public class FriendRequestController {
         //create friendship if the FR is accepted
         if(FriendRequestStatus.ACCEPTED == updatedFriendRequest.getStatus()){
             friendshipService.createFriendship(updatedFriendRequest.getSender(), updatedFriendRequest.getReceiver());
+            //find the conversation, if it doesn't exist then create one
+            conversationService.findByTwoUsers(updatedFriendRequest.getSender(), updatedFriendRequest.getReceiver());
         }
 
         return ResponseEntity.ok().body(FriendRequestResponse.generateFriendRequestResponse(updatedFriendRequest));

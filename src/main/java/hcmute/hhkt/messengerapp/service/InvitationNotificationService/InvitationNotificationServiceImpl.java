@@ -5,5 +5,5 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-public class InvitationNotificationService implements IInvitationNotificationService{
+public class InvitationNotificationServiceImpl implements IInvitationNotificationService{
 }
