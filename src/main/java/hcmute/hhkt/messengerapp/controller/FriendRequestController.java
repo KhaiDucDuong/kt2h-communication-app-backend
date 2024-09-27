@@ -2,15 +2,18 @@ package hcmute.hhkt.messengerapp.controller;
 
 import hcmute.hhkt.messengerapp.Exception.UnauthorizedRequestException;
 import hcmute.hhkt.messengerapp.Response.FriendRequestResponse;
+import hcmute.hhkt.messengerapp.Response.InvitationNotificationResponse;
 import hcmute.hhkt.messengerapp.Response.ResultPaginationResponse;
 import hcmute.hhkt.messengerapp.constant.ExceptionMessage;
 import hcmute.hhkt.messengerapp.domain.FriendRequest;
+import hcmute.hhkt.messengerapp.domain.InvitationNotification;
 import hcmute.hhkt.messengerapp.domain.User;
 import hcmute.hhkt.messengerapp.domain.enums.FriendRequestStatus;
 import hcmute.hhkt.messengerapp.dto.FriendRequestDTO;
 import hcmute.hhkt.messengerapp.service.ConversationService.ConversationServiceImpl;
 import hcmute.hhkt.messengerapp.service.FriendRequestService.FriendRequestServiceImpl;
 import hcmute.hhkt.messengerapp.service.FriendshipService.FriendshipServiceImpl;
+import hcmute.hhkt.messengerapp.service.InvitationNotificationService.InvitationNotificationServiceImpl;
 import hcmute.hhkt.messengerapp.service.UserService.UserServiceImpl;
 import hcmute.hhkt.messengerapp.util.RegrexUtil;
 import hcmute.hhkt.messengerapp.util.SecurityUtil;
@@ -38,6 +41,7 @@ public class FriendRequestController {
     private final FriendRequestServiceImpl friendRequestService;
     private final FriendshipServiceImpl friendshipService;
     private final ConversationServiceImpl conversationService;
+    private final InvitationNotificationServiceImpl invitationNotificationService;
 
     @PostMapping("")
     @ApiMessage("Created friend request successfully")
@@ -64,6 +68,11 @@ public class FriendRequestController {
         }
 
         FriendRequest newFriendRequest = friendRequestService.sendFriendRequest(senderUser, receiverUser);
+
+        //create & send notification via web socket
+        InvitationNotification newInvitationNotification = invitationNotificationService.createInvitationNotification(receiverUser, newFriendRequest);
+        InvitationNotificationResponse notificationResponse = InvitationNotificationResponse.fromIntivationNotification(newInvitationNotification);
+        simpMessagingTemplate.convertAndSendToUser(receiverUser.getId().toString(),"/notification", notificationResponse);
 
         return ResponseEntity.ok().body(FriendRequestResponse.generateFriendRequestResponse(newFriendRequest));
     }

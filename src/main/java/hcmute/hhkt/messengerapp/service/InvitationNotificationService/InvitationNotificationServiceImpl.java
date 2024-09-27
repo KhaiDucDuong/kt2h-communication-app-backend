@@ -4,6 +4,7 @@ import hcmute.hhkt.messengerapp.Response.FriendRequestResponse;
 import hcmute.hhkt.messengerapp.Response.InvitationNotificationResponse;
 import hcmute.hhkt.messengerapp.Response.Meta;
 import hcmute.hhkt.messengerapp.Response.ResultPaginationResponse;
+import hcmute.hhkt.messengerapp.constant.ExceptionMessage;
 import hcmute.hhkt.messengerapp.domain.FriendRequest;
 import hcmute.hhkt.messengerapp.domain.InvitationNotification;
 import hcmute.hhkt.messengerapp.domain.User;
@@ -31,5 +32,17 @@ public class InvitationNotificationServiceImpl implements IInvitationNotificatio
                 .meta(meta)
                 .result(InvitationNotificationResponse.fromInvitationNotificationList(invitationNotificationPage.getContent()))
                 .build();
+    }
+
+    @Override
+    public InvitationNotification createInvitationNotification(User toUser, FriendRequest friendRequest) {
+        if(invitationNotificataionRepository.existsByFriendRequest(friendRequest)){
+            throw new IllegalArgumentException(ExceptionMessage.NOTIFICATION_EXIST);
+        }
+        InvitationNotification invitationNotification = InvitationNotification.builder()
+                .receiver(toUser)
+                .friendRequest(friendRequest)
+                .build();
+        return invitationNotificataionRepository.save(invitationNotification);
     }
 }

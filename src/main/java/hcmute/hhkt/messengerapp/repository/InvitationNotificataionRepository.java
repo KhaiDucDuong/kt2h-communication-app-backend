@@ -1,5 +1,6 @@
 package hcmute.hhkt.messengerapp.repository;
 
+import hcmute.hhkt.messengerapp.domain.FriendRequest;
 import hcmute.hhkt.messengerapp.domain.InvitationNotification;
 import hcmute.hhkt.messengerapp.domain.User;
 import org.springframework.data.domain.Page;
@@ -10,4 +11,5 @@ import java.util.UUID;
 
 public interface InvitationNotificataionRepository extends JpaRepository<InvitationNotification, UUID> {
     Page<InvitationNotification> findInvitationNotificationsByReceiver(User currentUser, Pageable pageable);
+    boolean existsByFriendRequest(FriendRequest friendRequest);
 }
