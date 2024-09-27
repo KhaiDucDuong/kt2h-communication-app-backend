@@ -18,9 +18,9 @@ public class InvitationNotification extends AbstractAuditingEntity{
     @Column(name="id")
     private UUID id;
 
-    @Column(name = "is_read")
-    @Builder.Default
-    private Boolean isRead = false;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "receiver_id", referencedColumnName = "id")
+    private User receiver;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "friend_request_id", referencedColumnName = "id")

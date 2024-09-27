@@ -84,4 +84,7 @@ public class User extends AbstractAuditingEntity {
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "account_id", referencedColumnName = "id")
     private Account account;
+
+    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "receiver", orphanRemoval = true)
+    private List<InvitationNotification> invitationNotifications;
 }
