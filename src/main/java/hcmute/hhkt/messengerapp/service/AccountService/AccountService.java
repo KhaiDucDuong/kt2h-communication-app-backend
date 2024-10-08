@@ -33,12 +33,12 @@ public class AccountService implements IAccountService{
 
     @Override
     public Account createAccount(RegisterUserDTO registerUserDTO) {
-        if(accountRepository.existsAccountByUsername(registerUserDTO.getUsername())){
-            throw new IllegalArgumentException(ExceptionMessage.USERNAME_IS_TAKEN);
-        }
-
         if(RegrexUtil.isEmail(registerUserDTO.getUsername())){
             throw new IllegalArgumentException(ExceptionMessage.USERNAME_IS_EMAIL);
+        }
+
+        if(accountRepository.existsAccountByUsername(registerUserDTO.getUsername())){
+            throw new IllegalArgumentException(ExceptionMessage.USERNAME_IS_TAKEN);
         }
 
         String harshPassword = passwordEncoder.encode(registerUserDTO.getPassword());
