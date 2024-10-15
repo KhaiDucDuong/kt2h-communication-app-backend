@@ -85,15 +85,16 @@ public class AuthController {
         } else {
             loggedInAccount = accountService.findAccountByUserName(loginDTO.getUsername());
         }
-        //check if account is activated
-        if(loggedInAccount.getStatus() == AccountStatus.UNACTIVATED){
-            throw new UnactivatedAccountException(ExceptionMessage.UNACTIVATED_ACCOUNT);
-        }
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
         if(loggedInUser == null){
             loggedInUser = loggedInAccount.getUser();
+        }
+
+        //check if account is activated
+        if(loggedInAccount.getStatus() == AccountStatus.UNACTIVATED) {
+            throw new UnactivatedAccountException(ExceptionMessage.UNACTIVATED_ACCOUNT, loggedInUser.getEmail());
         }
 
         LoginResponse.UserLogin userLoginData = LoginResponse.UserLogin.builder()
