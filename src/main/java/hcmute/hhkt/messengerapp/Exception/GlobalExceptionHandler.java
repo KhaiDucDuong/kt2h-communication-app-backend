@@ -1,5 +1,6 @@
 package hcmute.hhkt.messengerapp.Exception;
 
+import hcmute.hhkt.messengerapp.Response.UnactivatedAccountLoginResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.mapping.PropertyReferenceException;
@@ -40,7 +41,7 @@ public class GlobalExceptionHandler {
         } else if (ex instanceof UsernameNotFoundException || ex instanceof BadCredentialsException){
             return handleFailedAuthenticationException(ex);
         } else if (ex instanceof UnactivatedAccountException) {
-            return handleUnactivatedAccountException(ex);
+            return handleUnactivatedAccountException((UnactivatedAccountException) ex);
         } else if (ex instanceof HttpRequestMethodNotSupportedException){
             return handleHttpRequestMethodNotSupportedException(ex);
         } else if (ex instanceof PropertyReferenceException){
@@ -166,12 +167,12 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body(res);
     }
 
-    private ResponseEntity<Object> handleUnactivatedAccountException(Exception ex){
+    private ResponseEntity<Object> handleUnactivatedAccountException(UnactivatedAccountException ex){
         RestResponse<Object> res = new RestResponse<Object>();
         res.setStatusCode(HttpStatus.FORBIDDEN.value());
         res.setError(ex.getMessage());
         res.setMessage("Unactivated Account");
-
+        res.setData(new UnactivatedAccountLoginResponse(ex.getUnactivatedEmail()));
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body(res);
     }
 }
