@@ -30,7 +30,7 @@ public class GroupchatResponse {
     public static GroupchatResponse generateGroupchatResponse (Groupchat groupchat){
         return GroupchatResponse.builder()
                 .group_id(groupchat.getGroupid().toString())
-                .owner_id(groupchat.getOwner().toString())
+                .owner_id(groupchat.getOwner().getId().toString())
                 .group_name(groupchat.getGroupname())
                 .group_img(groupchat.getGroupIMG())
                 .build();
