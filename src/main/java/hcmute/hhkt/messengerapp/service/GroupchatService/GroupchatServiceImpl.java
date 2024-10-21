@@ -3,18 +3,20 @@ package hcmute.hhkt.messengerapp.service.GroupchatService;
 import hcmute.hhkt.messengerapp.domain.Groupchat;
 import hcmute.hhkt.messengerapp.domain.User;
 import hcmute.hhkt.messengerapp.repository.GroupchatRepository;
+import hcmute.hhkt.messengerapp.service.UserService.IUserService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import hcmute.hhkt.messengerapp.dto.GroupchatDTO;
 
+import java.util.List;
 import java.util.UUID;
 
+@RequiredArgsConstructor
 @Service
 public class GroupchatServiceImpl implements  IGroupchatService{
     private final GroupchatRepository groupchatRepository;
+    private final IUserService userService;
 
-    public GroupchatServiceImpl(GroupchatRepository groupchatRepository) {
-        this.groupchatRepository = groupchatRepository;
-    }
 
     @Override
     public Groupchat createGroupchat(GroupchatDTO groupchatDTO) {
@@ -26,5 +28,9 @@ public class GroupchatServiceImpl implements  IGroupchatService{
                 .QRcode("")
                 .owner(user).build();
         return groupchatRepository.save(groupchat);
+    }
+    @Override
+    public List<Groupchat> getAllgroupChat(String userID){
+        return groupchatRepository.getGroupchatByOwnerId(UUID.fromString(userID));
     }
 }

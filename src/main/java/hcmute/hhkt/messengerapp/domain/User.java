@@ -62,6 +62,8 @@ public class User extends AbstractAuditingEntity {
     @Builder.Default
     private SystemRole role = SystemRole.USER;
 
+
+
 //    @JsonIgnore
 //    @NotNull
 //    @Size(min = 60, max = 60)

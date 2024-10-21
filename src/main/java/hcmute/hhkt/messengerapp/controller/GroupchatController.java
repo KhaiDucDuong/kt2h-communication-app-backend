@@ -1,5 +1,7 @@
 package hcmute.hhkt.messengerapp.controller;
 
+import hcmute.hhkt.messengerapp.Response.GroupchatResponse;
+import hcmute.hhkt.messengerapp.domain.Groupchat;
 import hcmute.hhkt.messengerapp.dto.GroupchatDTO;
 import hcmute.hhkt.messengerapp.service.GroupchatService.IGroupchatService;
 import hcmute.hhkt.messengerapp.domain.User;
@@ -7,6 +9,7 @@ import hcmute.hhkt.messengerapp.service.FriendshipService.FriendshipServiceImpl;
 import hcmute.hhkt.messengerapp.service.UserService.UserServiceImpl;
 import hcmute.hhkt.messengerapp.util.SecurityUtil;
 import hcmute.hhkt.messengerapp.util.annotation.ApiMessage;
+import io.lettuce.core.dynamic.annotation.Param;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
@@ -18,6 +21,8 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.UUID;
+
+import static hcmute.hhkt.messengerapp.Response.GroupchatResponse.generateGroupchatListResponse;
 
 @RestController
 @RequestMapping("/api/groupchats")
@@ -37,4 +42,20 @@ public class GroupchatController {
             return ResponseEntity.status(404).body(e);
         }
     }
+
+
+    @GetMapping("/{id}")
+    public ResponseEntity<?> getGroupchat(@PathVariable String id){
+        try {
+            System.out.println("Group chat ID: " + id);
+            List<Groupchat> groupchatList = groupchatService.getAllgroupChat(id);
+            List<GroupchatResponse> response = generateGroupchatListResponse(groupchatList);
+        return ResponseEntity.ok().body(response);
+        }
+        catch (Exception e) {
+            return ResponseEntity.status(404).body(e);
+
+        }
+        }
+
 }
