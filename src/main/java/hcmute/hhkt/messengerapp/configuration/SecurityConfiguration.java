@@ -21,12 +21,14 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.web.bind.annotation.CrossOrigin;
 
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 
 @Configuration
 @EnableMethodSecurity(securedEnabled = true)
+@CrossOrigin
 public class SecurityConfiguration {
     @Value("${jwt.base64-secret}")
     private String jwtKey;
@@ -43,6 +45,7 @@ public class SecurityConfiguration {
                                            CustomGoogleAuthenticationSuccessHandler customGoogleAuthenticationSuccessHandler) throws Exception {
         http
                 .csrf(AbstractHttpConfigurer::disable)
+                .cors(Customizer.withDefaults())
                 .authorizeHttpRequests(
                         authz -> authz
                                 .requestMatchers("/api/auth/login", "/api/auth/register", "/api/auth/refresh", "/api/auth/logout", "/api/auth/oauth2/google").permitAll()
@@ -54,6 +57,7 @@ public class SecurityConfiguration {
                 .oauth2ResourceServer((oauth2) -> oauth2.jwt(Customizer.withDefaults())
                         .authenticationEntryPoint(customAuthenticationEntryPoint)
                 )
+
                 .oauth2Login(oauth2Login ->
                         oauth2Login
                                 .userInfoEndpoint(userInfoEndpoint ->

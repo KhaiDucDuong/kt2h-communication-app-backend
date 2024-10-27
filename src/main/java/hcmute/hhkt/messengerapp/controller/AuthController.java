@@ -16,6 +16,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.oauth2.client.OAuth2AuthorizeRequest;
@@ -147,6 +148,7 @@ public class AuthController {
     }
 
     @GetMapping("/getAccount")
+    @PreAuthorize("hasAnyAuthority('USER')")
     @ApiMessage("Fetched account successfully")
     public ResponseEntity<?> getAccount() {
         log.debug("REST request to get current account");
@@ -255,45 +257,45 @@ public class AuthController {
 
     @GetMapping("/oauth2/google")
     public String grantCode(
-            //@RequestParam("code") String code
-            Authentication authentication
+            @RequestParam("code") String code
+//            Authentication authentication
     ) {
-//            RestTemplate restTemplate = new RestTemplate();
-//            HttpHeaders httpHeaders = new HttpHeaders();
-//            httpHeaders.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
-//
-//            MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
-//            params.add("code", code);
-//            params.add("redirect_uri", "http://localhost:3000");
-//            params.add("client_id", googleClientId);
-//            params.add("client_secret", googleClientSecrect);
-//            params.add("scope", "https://www.googleapis.com/auth/userinfo.profile");
-//            params.add("scope", "https://www.googleapis.com/auth/userinfo.email");
-//            params.add("scope", "openid");
-//            params.add("grant_type", "authorization_code");
-//
-//            HttpEntity<MultiValueMap<String, String>> requestEntity = new HttpEntity<>(params, httpHeaders);
-//
-//            String url = "https://oauth2.googleapis.com/token";
-//            GoogleAuthorizationDTO response = restTemplate.postForObject(url, requestEntity, GoogleAuthorizationDTO.class);
-//
-//            JsonObject jsonObject;
-//            if(response != null){
-//                httpHeaders.setBearerAuth(response.getAccessToken());
-//
-//                HttpEntity<String> newRequestEntity = new HttpEntity<>(httpHeaders);
-//
-//                String newUrl = "https://www.googleapis.com/oauth2/v2/userinfo";
-//                ResponseEntity<String> newResponse = restTemplate.exchange(newUrl, HttpMethod.GET, newRequestEntity, String.class);
-//                jsonObject = new Gson().fromJson(newResponse.getBody(), JsonObject.class);
-//                return "hello 2";
-//            }
+            RestTemplate restTemplate = new RestTemplate();
+            HttpHeaders httpHeaders = new HttpHeaders();
+            httpHeaders.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
 
-        OAuth2AuthorizeRequest authorizeRequest = OAuth2AuthorizeRequest.withClientRegistrationId("google")
-                .principal(authentication)
-                .build();
-        OAuth2AuthorizedClient authorizedClient = this.authorizedClientManager.authorize(authorizeRequest);
-        OAuth2AccessToken accessToken = authorizedClient.getAccessToken();
+            MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
+            params.add("code", code);
+            params.add("redirect_uri", "http://localhost:3000");
+            params.add("client_id", googleClientId);
+            params.add("client_secret", googleClientSecrect);
+            params.add("scope", "https://www.googleapis.com/auth/userinfo.profile");
+            params.add("scope", "https://www.googleapis.com/auth/userinfo.email");
+            params.add("scope", "openid");
+            params.add("grant_type", "authorization_code");
+
+            HttpEntity<MultiValueMap<String, String>> requestEntity = new HttpEntity<>(params, httpHeaders);
+
+            String url = "https://oauth2.googleapis.com/token";
+            GoogleAuthorizationDTO response = restTemplate.postForObject(url, requestEntity, GoogleAuthorizationDTO.class);
+
+            JsonObject jsonObject;
+            if(response != null){
+                httpHeaders.setBearerAuth(response.getAccessToken());
+
+                HttpEntity<String> newRequestEntity = new HttpEntity<>(httpHeaders);
+
+                String newUrl = "https://www.googleapis.com/oauth2/v2/userinfo";
+                ResponseEntity<String> newResponse = restTemplate.exchange(newUrl, HttpMethod.GET, newRequestEntity, String.class);
+                jsonObject = new Gson().fromJson(newResponse.getBody(), JsonObject.class);
+                return "hello 2";
+            }
+
+//        OAuth2AuthorizeRequest authorizeRequest = OAuth2AuthorizeRequest.withClientRegistrationId("google")
+//                .principal(authentication)
+//                .build();
+//        OAuth2AuthorizedClient authorizedClient = this.authorizedClientManager.authorize(authorizeRequest);
+//        OAuth2AccessToken accessToken = authorizedClient.getAccessToken();
 
         return "hello";
     }

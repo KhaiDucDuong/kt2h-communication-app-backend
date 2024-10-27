@@ -29,6 +29,7 @@ public class UserController {
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasAnyAuthority('ADMIN')")
     @ApiMessage("Fetched user successfully")
     public ResponseEntity<?> getUserById(@PathVariable String id){
         UUID userId = UUID.fromString(id);

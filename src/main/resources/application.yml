@@ -55,8 +55,8 @@ spring:
             client-secret: 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
             authorization-grant-type: authorization_code
             scope: profile,email,openid
-            redirect-uri: http://localhost:3000
-#            redirect-uri: http://localhost:8080/login/oauth2/code/
+#            redirect-uri: http://localhost:3000/sign-in
+#            redirect-uri: http://localhost:8080/login/oauth2/code/google
 
 api:
   prefix: /api
