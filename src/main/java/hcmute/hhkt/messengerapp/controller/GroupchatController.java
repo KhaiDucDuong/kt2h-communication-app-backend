@@ -26,6 +26,7 @@ import java.util.UUID;
 import static hcmute.hhkt.messengerapp.Response.GroupchatResponse.generateGroupchatListResponse;
 
 @RestController
+@CrossOrigin(origins = "*")
 @RequestMapping("/api/groupchats")
 @RequiredArgsConstructor
 public class GroupchatController {
@@ -45,10 +46,9 @@ public class GroupchatController {
         }
     }
 
-
-    @GetMapping("/{id}")
+    @GetMapping("")
     @PreAuthorize("hasAnyAuthority('USER')")
-    public ResponseEntity<?> getGroupchat(@PathVariable String id){
+    public ResponseEntity<?> getGroupchat(@RequestParam String id){
         try {
             System.out.println("Group chat ID: " + id);
             List<Groupchat> groupchatList = groupchatService.getAllgroupChat(id);
