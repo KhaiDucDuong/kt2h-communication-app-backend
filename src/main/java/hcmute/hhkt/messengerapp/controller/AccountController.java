@@ -66,7 +66,7 @@ public class AccountController {
     }
 
     @PostMapping("")
-    @PreAuthorize("hasAnyAuthority('CREATE_ACCOUNT')")
+    @PreAuthorize("hasAnyAuthority(@accountAuthorityService.createAccountAuthority)")
     @Transactional
     @ApiMessage("Create account successfully")
     public ResponseEntity<?> createAccount(@Valid @RequestBody RegisterAccountDTO registerAccountDTO) {
@@ -79,15 +79,7 @@ public class AccountController {
         Account account = accountService.createAccount(registerAccountDTO, true);
         user = userService.setUserAccount(user, account);
 
-        LoginResponse.UserLogin userLoginData = LoginResponse.UserLogin.builder()
-                .userId(String.valueOf(user.getId()))
-                .email(user.getEmail())
-                .firstName(user.getFirstName())
-                .lastName(user.getLastName())
-                .phone(user.getPhone())
-                .image(user.getImage())
-                .role(user.getRole().name())
-                .build();
+        LoginResponse.UserLogin userLoginData = LoginResponse.UserLogin.fromUser(user);
 
         //create access token
         List<String> authorities = new ArrayList<String>();

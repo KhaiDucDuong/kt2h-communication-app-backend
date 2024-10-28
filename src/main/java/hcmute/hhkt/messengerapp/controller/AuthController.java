@@ -8,6 +8,7 @@ import hcmute.hhkt.messengerapp.constant.ExceptionMessage;
 import hcmute.hhkt.messengerapp.domain.*;
 import hcmute.hhkt.messengerapp.domain.enums.AccountStatus;
 import hcmute.hhkt.messengerapp.domain.enums.Device;
+import hcmute.hhkt.messengerapp.domain.enums.SpecialAuthority;
 import hcmute.hhkt.messengerapp.service.AccountService.IAccountService;
 import hcmute.hhkt.messengerapp.service.MailService.MailService;
 import hcmute.hhkt.messengerapp.util.RegrexUtil;
@@ -23,6 +24,7 @@ import org.springframework.security.oauth2.client.OAuth2AuthorizeRequest;
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClient;
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClientManager;
 import org.springframework.security.oauth2.core.OAuth2AccessToken;
+import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
@@ -98,15 +100,7 @@ public class AuthController {
             throw new UnactivatedAccountException(ExceptionMessage.UNACTIVATED_ACCOUNT, loggedInUser.getEmail());
         }
 
-        LoginResponse.UserLogin userLoginData = LoginResponse.UserLogin.builder()
-                .userId(String.valueOf(loggedInUser.getId()))
-                .email(loggedInUser.getEmail())
-                .firstName(loggedInUser.getFirstName())
-                .lastName(loggedInUser.getLastName())
-                .phone(loggedInUser.getPhone())
-                .image(loggedInUser.getImage())
-                .role(loggedInUser.getRole().name())
-                .build();
+        LoginResponse.UserLogin userLoginData = LoginResponse.UserLogin.fromUser(loggedInUser);
 
         //create access token
         String accessToken = securityUtil.createAccessToken(authentication, loggedInUser.getEmail());
@@ -148,27 +142,47 @@ public class AuthController {
     }
 
     @GetMapping("/getAccount")
-    @PreAuthorize("hasAnyAuthority('USER')")
+    @PreAuthorize("hasAnyAuthority('USER', @authAuthorityService.getGetAccountAuthority())")
     @ApiMessage("Fetched account successfully")
     public ResponseEntity<?> getAccount() {
         log.debug("REST request to get current account");
-        String username = SecurityUtil.getCurrentUserLogin().isPresent() ? SecurityUtil.getCurrentUserLogin().get() : "";
-        User loggedInUser = userService.findUserByEmail(username);
+        String email = SecurityUtil.getCurrentUserLogin().isPresent() ? SecurityUtil.getCurrentUserLogin().get() : "";
+        User loggedInUser = userService.findUserByEmail(email);
 
-        if (loggedInUser != null) {
-            LoginResponse.UserLogin userLoginData = LoginResponse.UserLogin.builder()
-                    .userId(String.valueOf(loggedInUser.getId()))
-                    .email(loggedInUser.getEmail())
-                    .firstName(loggedInUser.getFirstName())
-                    .lastName(loggedInUser.getLastName())
-                    .phone(loggedInUser.getPhone())
-                    .image(loggedInUser.getImage())
-                    .role(loggedInUser.getRole().name())
-                    .build();
-            return ResponseEntity.ok().body(userLoginData);
+        if (loggedInUser == null) {
+            throw new IllegalArgumentException(ExceptionMessage.USER_NOT_EXIST);
         }
 
-        return ResponseEntity.internalServerError().body(HttpStatus.INTERNAL_SERVER_ERROR.toString());
+        LoginResponse.UserLogin userLoginData = LoginResponse.UserLogin.fromUser(loggedInUser);
+
+        //create access token
+        List<String> authorities = new ArrayList<String>();
+        authorities.add(loggedInUser.getRole().name());
+        String accessToken = securityUtil.createAccessToken(authorities, loggedInUser.getEmail());
+
+        //create refresh token for user
+        RefreshToken refreshToken = this.refreshTokenService.createRefreshToken(loggedInUser, Device.BROWSER); //Default device is browser for now
+        String refreshTokenValue = refreshToken.getToken();
+
+        LoginResponse loginResponse = LoginResponse.builder()
+                .access_token(accessToken)
+                .user(userLoginData)
+                .build();
+
+        //set refresh token in response cookie
+        ResponseCookie responseCookie = ResponseCookie
+                .from("refresh_token", refreshTokenValue)
+                .httpOnly(true)
+                .secure(true)
+                .path("/")
+                .maxAge(jwtRefreshTokenExpiration)
+                //.domain()
+                .build();
+
+        log.debug("REST request to get current account from user {} successfully", email);
+        return ResponseEntity.status(HttpStatus.OK)
+                .header(HttpHeaders.SET_COOKIE, responseCookie.toString())
+                .body(loginResponse);
     }
 
     @GetMapping("/refresh")
@@ -255,65 +269,6 @@ public class AuthController {
                 .body("Logout user " + loggedOutAccount.getUsername());
     }
 
-    @GetMapping("/oauth2/google")
-    public String grantCode(
-            @RequestParam("code") String code
-//            Authentication authentication
-    ) {
-            RestTemplate restTemplate = new RestTemplate();
-            HttpHeaders httpHeaders = new HttpHeaders();
-            httpHeaders.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
-
-            MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
-            params.add("code", code);
-            params.add("redirect_uri", "http://localhost:3000");
-            params.add("client_id", googleClientId);
-            params.add("client_secret", googleClientSecrect);
-            params.add("scope", "https://www.googleapis.com/auth/userinfo.profile");
-            params.add("scope", "https://www.googleapis.com/auth/userinfo.email");
-            params.add("scope", "openid");
-            params.add("grant_type", "authorization_code");
-
-            HttpEntity<MultiValueMap<String, String>> requestEntity = new HttpEntity<>(params, httpHeaders);
-
-            String url = "https://oauth2.googleapis.com/token";
-            GoogleAuthorizationDTO response = restTemplate.postForObject(url, requestEntity, GoogleAuthorizationDTO.class);
-
-            JsonObject jsonObject;
-            if(response != null){
-                httpHeaders.setBearerAuth(response.getAccessToken());
-
-                HttpEntity<String> newRequestEntity = new HttpEntity<>(httpHeaders);
-
-                String newUrl = "https://www.googleapis.com/oauth2/v2/userinfo";
-                ResponseEntity<String> newResponse = restTemplate.exchange(newUrl, HttpMethod.GET, newRequestEntity, String.class);
-                jsonObject = new Gson().fromJson(newResponse.getBody(), JsonObject.class);
-                return "hello 2";
-            }
-
-//        OAuth2AuthorizeRequest authorizeRequest = OAuth2AuthorizeRequest.withClientRegistrationId("google")
-//                .principal(authentication)
-//                .build();
-//        OAuth2AuthorizedClient authorizedClient = this.authorizedClientManager.authorize(authorizeRequest);
-//        OAuth2AccessToken accessToken = authorizedClient.getAccessToken();
-
-        return "hello";
-    }
-
-    @GetMapping("/authorized/google")
-    public String test(
-            //@RequestParam("code") String code
-            Authentication authentication
-    ) {
-        OAuth2AuthorizeRequest authorizeRequest = OAuth2AuthorizeRequest.withClientRegistrationId("google")
-                .principal(authentication)
-                .build();
-        OAuth2AuthorizedClient authorizedClient = this.authorizedClientManager.authorize(authorizeRequest);
-        OAuth2AccessToken accessToken = authorizedClient.getAccessToken();
-
-        return "hello";
-    }
-
     @PostMapping("/renewActivationCode")
     public ResponseEntity<?> renewActivationCode(@RequestParam(value = "email") String email){
         User user = userService.findUserByEmail(email);
@@ -322,5 +277,12 @@ public class AuthController {
         }
         userService.resendActivationEmail(user);
         return ResponseEntity.ok().body("Renew user activation code successfully");
+    }
+
+    @Service("authAuthorityService")
+    protected class AuthAuthorityService {
+        public String getGetAccountAuthority(){
+            return SpecialAuthority.GET_CURRENT_USER.name();
+        }
     }
 }
