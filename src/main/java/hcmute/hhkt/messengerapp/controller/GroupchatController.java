@@ -17,6 +17,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -32,6 +33,7 @@ public class GroupchatController {
     private final IGroupchatService groupchatService;
 
     @PostMapping("/add")
+    @PreAuthorize("hasAnyAuthority('USER')")
     public ResponseEntity<?> addGroupchat(@Valid @RequestBody GroupchatDTO groupchat){
         try {
         String email = SecurityUtil.getCurrentUserLogin().isPresent() ? SecurityUtil.getCurrentUserLogin().get() : "";
@@ -44,8 +46,8 @@ public class GroupchatController {
         }
     }
 
-
     @GetMapping("")
+    @PreAuthorize("hasAnyAuthority('USER')")
     public ResponseEntity<?> getGroupchat(@RequestParam String id){
         try {
             System.out.println("Group chat ID: " + id);

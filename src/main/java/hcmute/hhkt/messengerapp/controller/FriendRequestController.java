@@ -26,6 +26,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
@@ -44,6 +45,7 @@ public class FriendRequestController {
     private final InvitationNotificationServiceImpl invitationNotificationService;
 
     @PostMapping("")
+    @PreAuthorize("hasAnyAuthority('USER')")
     @ApiMessage("Created friend request successfully")
     public ResponseEntity<?> createFriendRequest(@Valid @RequestBody FriendRequestDTO friendRequestDTO) {
         String email = SecurityUtil.getCurrentUserLogin().isPresent() ? SecurityUtil.getCurrentUserLogin().get() : "";
@@ -78,6 +80,7 @@ public class FriendRequestController {
     }
 
     @GetMapping("/incoming/me")
+    @PreAuthorize("hasAnyAuthority('USER')")
     @ApiMessage("Fetched incoming friend requests successfully")
     public ResponseEntity<?> getCurrentUserIncomingFriendRequests(Pageable pageable) {
         String email = SecurityUtil.getCurrentUserLogin().isPresent() ? SecurityUtil.getCurrentUserLogin().get() : "";
@@ -89,6 +92,7 @@ public class FriendRequestController {
     }
 
     @GetMapping("/outgoing/me")
+    @PreAuthorize("hasAnyAuthority('USER')")
     @ApiMessage("Fetched outgoing friend requests successfully")
     public ResponseEntity<?> getCurrentUserOutgoingFriendRequests(Pageable pageable) {
         String email = SecurityUtil.getCurrentUserLogin().isPresent() ? SecurityUtil.getCurrentUserLogin().get() : "";
@@ -100,6 +104,7 @@ public class FriendRequestController {
     }
 
     @PutMapping("")
+    @PreAuthorize("hasAnyAuthority('USER')")
     @ApiMessage("Updated friend request status successfully")
     @Transactional
     public ResponseEntity<?> updateFriendRequestStatus(@Valid @RequestBody FriendRequestDTO friendRequestDTO) throws UnauthorizedRequestException {
@@ -128,6 +133,7 @@ public class FriendRequestController {
     }
 
     @DeleteMapping("")
+    @PreAuthorize("hasAnyAuthority('USER')")
     @ApiMessage("Deleted friend request successfully")
     @Transactional
     public ResponseEntity<?> deleteFriendRequest(@Valid @RequestBody FriendRequestDTO friendRequestDTO) throws UnauthorizedRequestException {

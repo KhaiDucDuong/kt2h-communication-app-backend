@@ -3,6 +3,7 @@ package hcmute.hhkt.messengerapp.dto;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import hcmute.hhkt.messengerapp.util.RegrexUtil;
+import jakarta.annotation.Nullable;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
@@ -11,6 +12,9 @@ import org.hibernate.validator.constraints.Length;
 
 @Getter
 @Setter
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class RegisterUserDTO {
     @Length(min = 1, max = 50, message = "First name must be between 1 and 50 characters")
