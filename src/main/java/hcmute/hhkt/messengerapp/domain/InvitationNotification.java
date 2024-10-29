@@ -1,5 +1,7 @@
 package hcmute.hhkt.messengerapp.domain;
 
+import hcmute.hhkt.messengerapp.domain.enums.AccountStatus;
+import hcmute.hhkt.messengerapp.domain.enums.InvitationNotificationType;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -18,11 +20,15 @@ public class InvitationNotification extends AbstractAuditingEntity{
     @Column(name="id")
     private UUID id;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "type", length = 50, nullable = false)
+    private InvitationNotificationType type;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "receiver_id", referencedColumnName = "id")
     private User receiver;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "friend_request_id", referencedColumnName = "id")
     private FriendRequest friendRequest;
 }

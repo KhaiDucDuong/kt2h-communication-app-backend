@@ -8,6 +8,7 @@ import hcmute.hhkt.messengerapp.constant.ExceptionMessage;
 import hcmute.hhkt.messengerapp.domain.FriendRequest;
 import hcmute.hhkt.messengerapp.domain.InvitationNotification;
 import hcmute.hhkt.messengerapp.domain.User;
+import hcmute.hhkt.messengerapp.domain.enums.InvitationNotificationType;
 import hcmute.hhkt.messengerapp.repository.InvitationNotificataionRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -35,14 +36,35 @@ public class InvitationNotificationServiceImpl implements IInvitationNotificatio
     }
 
     @Override
-    public InvitationNotification createInvitationNotification(User toUser, FriendRequest friendRequest) {
+    public InvitationNotification createInvitationNotification(User toUser, FriendRequest friendRequest, InvitationNotificationType notificationType) {
         if(invitationNotificataionRepository.existsByFriendRequest(friendRequest)){
             throw new IllegalArgumentException(ExceptionMessage.NOTIFICATION_EXIST);
         }
         InvitationNotification invitationNotification = InvitationNotification.builder()
                 .receiver(toUser)
                 .friendRequest(friendRequest)
+                .type(notificationType)
                 .build();
         return invitationNotificataionRepository.save(invitationNotification);
+    }
+
+    @Override
+    public InvitationNotification updateInvitationNotificationType(InvitationNotification invitationNotification, InvitationNotificationType notificationType) {
+        InvitationNotificationType currentType = invitationNotification.getType();
+        if(currentType.equals(InvitationNotificationType.FRIEND_REQUEST_RECEIVED) && notificationType.equals(InvitationNotificationType.FRIEND_REQUEST_ACCEPTED)){
+            invitationNotification.setType(notificationType);
+            return invitationNotificataionRepository.save(invitationNotification);
+        }
+        if(currentType.equals(InvitationNotificationType.GROUP_INVITATION_RECEIVED) && notificationType.equals(InvitationNotificationType.GROUP_INVITATION_ACCEPTED)){
+            invitationNotification.setType(notificationType);
+            return invitationNotificataionRepository.save(invitationNotification);
+        }
+
+        throw new IllegalArgumentException(ExceptionMessage.INVALID_INVITATION_NOTIFICATION_TYPE);
+    }
+
+    @Override
+    public void deleteInvitationNotification(InvitationNotification invitationNotification) {
+        invitationNotificataionRepository.delete(invitationNotification);
     }
 }

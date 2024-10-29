@@ -113,9 +113,14 @@ public class FriendRequestServiceImpl implements IFriendRequestService {
         if (deletedFriendRequest == null) {
             throw new IllegalArgumentException(ExceptionMessage.FRIEND_REQUEST_NOT_FOUND);
         }
-        if (requestedUser != deletedFriendRequest.getSender()) {
+        deleteFriendRequest(deletedFriendRequest, requestedUser);
+    }
+
+    @Override
+    public void deleteFriendRequest(FriendRequest friendRequest, User requestedUser) {
+        if (requestedUser != friendRequest.getSender()) {
             throw new UnauthorizedRequestException(ExceptionMessage.ILLEGAL_FRIEND_REQUEST_DELETE_CALLER);
         }
-        friendRequestRepository.delete(deletedFriendRequest);
+        friendRequestRepository.delete(friendRequest);
     }
 }
