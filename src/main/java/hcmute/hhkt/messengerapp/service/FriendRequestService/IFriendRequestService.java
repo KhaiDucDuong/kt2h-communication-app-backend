@@ -16,4 +16,6 @@ public interface IFriendRequestService {
     FriendRequest findFriendRequestBySenderAndRecipient(User sender, User recipient);
     FriendRequest updateFriendRequestStatus(UUID friendRequestId, String newStatus);
     void deleteFriendRequest(UUID friendRequestId, User requestedUser);
+
+    void deleteFriendRequest(FriendRequest friendRequest, User requestedUser);
 }
