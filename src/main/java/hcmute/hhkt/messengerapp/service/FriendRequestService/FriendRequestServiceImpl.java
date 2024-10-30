@@ -15,6 +15,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.UUID;
 
 @RequiredArgsConstructor
@@ -24,7 +25,8 @@ public class FriendRequestServiceImpl implements IFriendRequestService {
 
     @Override
     public ResultPaginationResponse findUserOnGoingFriendRequestList(User user, Pageable pageable) {
-        Page<FriendRequest> friendRequestPage = friendRequestRepository.findFriendRequestsBySender(user, pageable);
+        List<FriendRequestStatus> queryStatuses = List.of(FriendRequestStatus.PENDING, FriendRequestStatus.REJECTED);
+        Page<FriendRequest> friendRequestPage = friendRequestRepository.findFriendRequestsBySenderAndStatusIn(user, queryStatuses, pageable);
         Meta meta = Meta.builder()
                 .page(friendRequestPage.getNumber() + 1)
                 .pageSize(friendRequestPage.getSize())
@@ -40,7 +42,7 @@ public class FriendRequestServiceImpl implements IFriendRequestService {
 
     @Override
     public ResultPaginationResponse findUserIncomingFriendRequestList(User user, Pageable pageable) {
-        Page<FriendRequest> friendRequestPage = friendRequestRepository.findFriendRequestsByReceiver(user, pageable);
+        Page<FriendRequest> friendRequestPage = friendRequestRepository.findFriendRequestsByReceiverAndStatus(user, FriendRequestStatus.PENDING, pageable);
         Meta meta = Meta.builder()
                 .page(friendRequestPage.getNumber() + 1)
                 .pageSize(friendRequestPage.getSize())

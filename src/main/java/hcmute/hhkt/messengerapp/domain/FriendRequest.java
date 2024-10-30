@@ -34,6 +34,6 @@ public class FriendRequest extends AbstractDateAuditingEntity{
     @Builder.Default
     private FriendRequestStatus status = FriendRequestStatus.PENDING;
 
-    @OneToOne(mappedBy = "friendRequest", cascade = CascadeType.ALL, orphanRemoval = true)
-    private InvitationNotification invitationNotification;
+    @OneToMany(mappedBy = "friendRequest", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<InvitationNotification> invitationNotification;
 }

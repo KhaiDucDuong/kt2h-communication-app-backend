@@ -1,5 +1,6 @@
 package hcmute.hhkt.messengerapp.domain;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import hcmute.hhkt.messengerapp.domain.enums.AccountStatus;
 import hcmute.hhkt.messengerapp.domain.enums.InvitationNotificationType;
 import jakarta.persistence.*;
@@ -28,7 +29,11 @@ public class InvitationNotification extends AbstractAuditingEntity{
     @JoinColumn(name = "receiver_id", referencedColumnName = "id")
     private User receiver;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "friend_request_id", referencedColumnName = "id")
     private FriendRequest friendRequest;
+
+    @Column(name="is_deleted")
+    @Builder.Default
+    private boolean isDeleted = false;
 }

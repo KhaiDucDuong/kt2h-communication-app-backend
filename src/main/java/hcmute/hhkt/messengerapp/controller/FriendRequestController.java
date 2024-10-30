@@ -2,7 +2,6 @@ package hcmute.hhkt.messengerapp.controller;
 
 import hcmute.hhkt.messengerapp.Exception.UnauthorizedRequestException;
 import hcmute.hhkt.messengerapp.Response.FriendRequestResponse;
-import hcmute.hhkt.messengerapp.Response.InvitationNotificationResponse;
 import hcmute.hhkt.messengerapp.Response.InvitationNotificationSocketResponse;
 import hcmute.hhkt.messengerapp.Response.ResultPaginationResponse;
 import hcmute.hhkt.messengerapp.constant.ExceptionMessage;
@@ -33,8 +32,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.UUID;
-
 @RestController
 @RequestMapping("/api/friendRequests")
 @RequiredArgsConstructor
@@ -50,6 +47,7 @@ public class FriendRequestController {
     @PostMapping("")
     @PreAuthorize("hasAnyAuthority('USER')")
     @ApiMessage("Created friend request successfully")
+    @Transactional
     public ResponseEntity<?> createFriendRequest(@Valid @RequestBody FriendRequestDTO friendRequestDTO) {
         String email = SecurityUtil.getCurrentUserLogin().isPresent() ? SecurityUtil.getCurrentUserLogin().get() : "";
         log.debug("REST request to create friend request to user Id {} from {}", friendRequestDTO.getReceiverId(), email);
@@ -78,7 +76,7 @@ public class FriendRequestController {
         InvitationNotification newInvitationNotification = invitationNotificationService
                 .createInvitationNotification(receiverUser, newFriendRequest, InvitationNotificationType.FRIEND_REQUEST_RECEIVED);
         InvitationNotificationSocketResponse notificationResponse =
-                InvitationNotificationSocketResponse.fromIntivationNotificationWithEvent(newInvitationNotification, NotificationSocketEvent.RECEIVE_FRIEND_REQUEST);
+                InvitationNotificationSocketResponse.fromInvitationNotificationWithEvent(newInvitationNotification, NotificationSocketEvent.RECEIVE_FRIEND_REQUEST);
         simpMessagingTemplate.convertAndSendToUser(receiverUser.getId().toString(),"/notification", notificationResponse);
 
         return ResponseEntity.ok().body(FriendRequestResponse.generateFriendRequestResponse(newFriendRequest));
@@ -123,9 +121,15 @@ public class FriendRequestController {
         FriendRequest updatedFriendRequest = friendRequestService.updateFriendRequestStatus(friendRequestDTO.getId(), friendRequestDTO.getStatus());
 
         User currentUser = userService.findUserByEmail(email);
-        User receiverUser = updatedFriendRequest.getReceiver();
-        if(currentUser != receiverUser){
+        User friendRequestSender = updatedFriendRequest.getSender();
+        if(currentUser == friendRequestSender){
             throw new UnauthorizedRequestException(ExceptionMessage.ILLEGAL_FRIEND_REQUEST_UPDATE_STATUS_CALLER);
+        }
+
+        if(FriendRequestStatus.REJECTED == updatedFriendRequest.getStatus()){
+            //delete the receive friend request notification
+            invitationNotificationService.deleteInvitationNotification(updatedFriendRequest, InvitationNotificationType.FRIEND_REQUEST_RECEIVED);
+
         }
 
         //create friendship if the FR is accepted
@@ -134,12 +138,14 @@ public class FriendRequestController {
             //find the conversation, if it doesn't exist then create one
             conversationService.findByTwoUsers(updatedFriendRequest.getSender(), updatedFriendRequest.getReceiver());
 
-            //create & send notification via web socket
+            //delete the receive friend request notification
+//            invitationNotificationService.deleteInvitationNotification(updatedFriendRequest, InvitationNotificationType.FRIEND_REQUEST_RECEIVED);
+            //create & send accept fr notification via web socket
             InvitationNotification newInvitationNotification = invitationNotificationService
-                    .updateInvitationNotificationType(updatedFriendRequest.getInvitationNotification(), InvitationNotificationType.FRIEND_REQUEST_ACCEPTED);
+                    .createInvitationNotification(friendRequestSender, updatedFriendRequest, InvitationNotificationType.FRIEND_REQUEST_ACCEPTED);
             InvitationNotificationSocketResponse notificationResponse =
-                    InvitationNotificationSocketResponse.fromIntivationNotificationWithEvent(newInvitationNotification, NotificationSocketEvent.RECEIVER_ACCEPT_FRIEND_REQUEST);
-            simpMessagingTemplate.convertAndSendToUser(receiverUser.getId().toString(),"/notification", notificationResponse);
+                    InvitationNotificationSocketResponse.fromInvitationNotificationWithEvent(newInvitationNotification, NotificationSocketEvent.RECEIVER_ACCEPT_FRIEND_REQUEST);
+            simpMessagingTemplate.convertAndSendToUser(friendRequestSender.getId().toString(),"/notification", notificationResponse);
         }
 
         return ResponseEntity.ok().body(FriendRequestResponse.generateFriendRequestResponse(updatedFriendRequest));
@@ -163,14 +169,15 @@ public class FriendRequestController {
         }
 
         //send notification via web socket to the other user about the deleted fr
-        InvitationNotification invitationNotification = friendRequest.getInvitationNotification();
-        invitationNotificationService.deleteInvitationNotification(invitationNotification);
-        InvitationNotificationSocketResponse notificationResponse =
-                InvitationNotificationSocketResponse.fromIntivationNotificationWithEvent(invitationNotification, NotificationSocketEvent.SENDER_DELETE_FRIEND_REQUEST);
-        simpMessagingTemplate.convertAndSendToUser(invitationNotification.getReceiver().getId().toString(),"/notification", notificationResponse);
+        InvitationNotification invitationNotification = invitationNotificationService.findInvitationNotification(friendRequest, InvitationNotificationType.FRIEND_REQUEST_RECEIVED);
+        if(invitationNotification != null){
+            invitationNotificationService.deleteInvitationNotification(invitationNotification);
+            InvitationNotificationSocketResponse notificationResponse =
+                    InvitationNotificationSocketResponse.fromInvitationNotificationWithEvent(invitationNotification, NotificationSocketEvent.SENDER_DELETE_FRIEND_REQUEST);
+            simpMessagingTemplate.convertAndSendToUser(invitationNotification.getReceiver().getId().toString(),"/notification", notificationResponse);
+        }
 
         friendRequestService.deleteFriendRequest(friendRequest, currentUser);
-
         return ResponseEntity.ok().body("Deleted friend request id " + friendRequestDTO.getId());
     }
 }

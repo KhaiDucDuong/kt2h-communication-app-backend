@@ -11,7 +11,9 @@ public interface IInvitationNotificationService {
     ResultPaginationResponse findUserInvitationNotification(User currentUser, Pageable pageable);
 
     InvitationNotification createInvitationNotification(User toUser, FriendRequest friendRequest, InvitationNotificationType notificationType);
-    InvitationNotification updateInvitationNotificationType(InvitationNotification invitationNotification, InvitationNotificationType notificationType);
 
     void deleteInvitationNotification(InvitationNotification invitationNotification);
+    void deleteInvitationNotification(FriendRequest friendRequest, InvitationNotificationType type);
+
+    InvitationNotification findInvitationNotification(FriendRequest friendRequest, InvitationNotificationType type);
 }
