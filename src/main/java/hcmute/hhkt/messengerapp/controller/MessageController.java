@@ -13,13 +13,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authorization.AuthorizationDeniedException;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 @RestController
@@ -46,5 +48,21 @@ public class MessageController {
 
         ResultPaginationResponse response = messageService.getConversationMessages(conversation, pageable);
         return ResponseEntity.ok().body(response);
+    }
+    @PostMapping("/upload")
+    @PreAuthorize("hasAnyAuthority('USER')")
+    public ResponseEntity<String> uploadFile(@RequestParam("file") MultipartFile file) {
+        String imageUrl = null;
+        if (file != null && !file.isEmpty()) {
+            try {
+                imageUrl = String.valueOf(messageService.uploadImage(file));
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }// Upload file to Firebase or storage;
+        // Return the file URL in the response
+        Map<String, String> response = new HashMap<>();
+        response.put("imageUrl", imageUrl);
+        return ResponseEntity.ok(imageUrl);
     }
 }

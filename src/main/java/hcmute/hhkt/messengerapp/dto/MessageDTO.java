@@ -24,4 +24,7 @@ public class MessageDTO {
 
     @JsonProperty("message_type")
     private String messageType;
+
+    @JsonProperty("image_url")
+    private String imageUrl;
 }
