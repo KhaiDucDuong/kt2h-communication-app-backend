@@ -50,6 +50,7 @@ public class MessageController {
         return ResponseEntity.ok().body(response);
     }
     @PostMapping("/upload")
+    @PreAuthorize("hasAnyAuthority('USER')")
     public ResponseEntity<String> uploadFile(@RequestParam("file") MultipartFile file) {
         String imageUrl = null;
         if (file != null && !file.isEmpty()) {
