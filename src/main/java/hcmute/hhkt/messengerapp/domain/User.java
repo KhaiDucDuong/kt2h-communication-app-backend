@@ -2,6 +2,7 @@ package hcmute.hhkt.messengerapp.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import hcmute.hhkt.messengerapp.domain.enums.SystemRole;
+import hcmute.hhkt.messengerapp.domain.enums.UserCreationType;
 import hcmute.hhkt.messengerapp.domain.enums.UserStatus;
 import hcmute.hhkt.messengerapp.util.RegrexUtil;
 import jakarta.persistence.*;
@@ -58,28 +59,14 @@ public class User extends AbstractAuditingEntity {
     private UserStatus status = UserStatus.OFFLINE;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "role", length = 20, nullable = false)
+    @Column(name = "creation_type", length = 20, nullable = false)
+    @Builder.Default
+    private UserCreationType creationType = UserCreationType.SELF_REGISTRATION;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "role", length = 20, nullable = true)
     @Builder.Default
     private SystemRole role = SystemRole.USER;
-
-//    @JsonIgnore
-//    @NotNull
-//    @Size(min = 60, max = 60)
-//    @Column(name = "password", length = 60, nullable = false)
-//    private String password;
-//
-//    @Column(name = "is_activated")
-//    @Builder.Default
-//    private Boolean isActivated = true;
-//
-//    @Column(name = "is_banned")
-//    @Builder.Default
-//    private Boolean isBanned = false;
-
-//    @ManyToMany(fetch = FetchType.LAZY)
-//    @JoinTable(name = "user_role", joinColumns = @JoinColumn(name = "user_id", nullable = false),
-//            inverseJoinColumns = @JoinColumn(name = "role_id", nullable = false))
-//    private List<Role> roles;
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "account_id", referencedColumnName = "id")

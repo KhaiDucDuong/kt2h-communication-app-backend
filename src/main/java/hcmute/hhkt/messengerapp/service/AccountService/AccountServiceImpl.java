@@ -3,6 +3,7 @@ package hcmute.hhkt.messengerapp.service.AccountService;
 import hcmute.hhkt.messengerapp.constant.ExceptionMessage;
 import hcmute.hhkt.messengerapp.domain.Account;
 import hcmute.hhkt.messengerapp.domain.enums.AccountStatus;
+import hcmute.hhkt.messengerapp.dto.RegisterAccountDTO;
 import hcmute.hhkt.messengerapp.dto.RegisterUserDTO;
 import hcmute.hhkt.messengerapp.repository.AccountRepository;
 import hcmute.hhkt.messengerapp.util.RandomUtil;
@@ -22,8 +23,8 @@ import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
-public class AccountService implements IAccountService{
-    private final Logger log = LoggerFactory.getLogger(AccountService.class);
+public class AccountServiceImpl implements IAccountService{
+    private final Logger log = LoggerFactory.getLogger(AccountServiceImpl.class);
     private final AccountRepository accountRepository;
     private final PasswordEncoder passwordEncoder;
     @Override
@@ -33,20 +34,31 @@ public class AccountService implements IAccountService{
 
     @Override
     public Account createAccount(RegisterUserDTO registerUserDTO) {
-        if(RegrexUtil.isEmail(registerUserDTO.getUsername())){
+        RegisterAccountDTO registerAccountDTO = RegisterAccountDTO.builder()
+                .username(registerUserDTO.getUsername())
+                .password(registerUserDTO.getPassword())
+                .build();
+
+        return createAccount(registerAccountDTO, false);
+    }
+
+    @Override
+    public Account createAccount(RegisterAccountDTO registerAccountDTO, boolean isActivated) {
+        if(RegrexUtil.isEmail(registerAccountDTO.getUsername())){
             throw new IllegalArgumentException(ExceptionMessage.USERNAME_IS_EMAIL);
         }
 
-        if(accountRepository.existsAccountByUsername(registerUserDTO.getUsername())){
+        if(accountRepository.existsAccountByUsername(registerAccountDTO.getUsername())){
             throw new IllegalArgumentException(ExceptionMessage.USERNAME_IS_TAKEN);
         }
 
-        String harshPassword = passwordEncoder.encode(registerUserDTO.getPassword());
+        String harshPassword = passwordEncoder.encode(registerAccountDTO.getPassword());
 
         Account newAccount = Account.builder()
-                .username(registerUserDTO.getUsername())
+                .username(registerAccountDTO.getUsername())
                 .password(harshPassword)
-                .activationKey(RandomUtil.generateActivationKey())
+                .activationKey(!isActivated ? RandomUtil.generateActivationKey() : null)
+                .status(!isActivated ? AccountStatus.UNACTIVATED : AccountStatus.ACTIVATED)
                 .build();
         return accountRepository.save(newAccount);
     }

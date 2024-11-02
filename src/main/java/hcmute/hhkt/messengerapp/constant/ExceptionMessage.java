@@ -30,4 +30,7 @@ public class ExceptionMessage {
     public static final String CONVERSATION_IDENTICAL_CREATOR_TARGET = "Conversation cannot have the same creator and target";
     public static final String USER_CANNOT_ACCESS_THIS_CONVERSATION = "User cannot access this conversation";
     public static final String NOTIFICATION_EXIST = "Notification for this content has existed";
+    public static final String ACCOUNT_EXISTS = "Account for this user has existed";
+    public static final String INVALID_INVITATION_NOTIFICATION_TYPE = "Invitation notification's type is invalid";
+    public static final String INVITATION_NOTIFICATION_NOT_EXIST = "Invitation notification does not exist";
 }

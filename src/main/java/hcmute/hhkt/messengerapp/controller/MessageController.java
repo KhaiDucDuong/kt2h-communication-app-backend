@@ -14,6 +14,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.MessageMapping;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authorization.AuthorizationDeniedException;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -32,6 +33,7 @@ public class MessageController {
     private final IMessageService messageService;
 
     @GetMapping("/{conversationId}")
+    @PreAuthorize("hasAnyAuthority('USER')")
     @ApiMessage("Fetched messages in conversation")
     public ResponseEntity<?> getMessagesInConversation(@PathVariable String conversationId, Pageable pageable){
         String email = SecurityUtil.getCurrentUserLogin().isPresent() ? SecurityUtil.getCurrentUserLogin().get() : "";

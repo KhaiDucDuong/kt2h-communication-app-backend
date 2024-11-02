@@ -19,6 +19,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -34,6 +35,7 @@ public class FriendshipController {
     private final FriendshipServiceImpl friendshipService;
 
     @GetMapping("/me")
+    @PreAuthorize("hasAnyAuthority('USER')")
     @ApiMessage("Fetched logged in user friend list successfully")
     public ResponseEntity<?> getCurrentUserFriendships(Pageable pageable) {
         String email = SecurityUtil.getCurrentUserLogin().isPresent() ? SecurityUtil.getCurrentUserLogin().get() : "";
@@ -45,6 +47,7 @@ public class FriendshipController {
     }
 
     @DeleteMapping("/")
+    @PreAuthorize("hasAnyAuthority('USER')")
     @ApiMessage("Deleted friendship successfully")
     public ResponseEntity<?> deleteFriendship(@Valid @RequestBody FriendshipDTO friendshipDTO) {
         String email = SecurityUtil.getCurrentUserLogin().isPresent() ? SecurityUtil.getCurrentUserLogin().get() : "";
