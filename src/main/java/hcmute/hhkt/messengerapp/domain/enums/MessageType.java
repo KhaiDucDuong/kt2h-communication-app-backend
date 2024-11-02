@@ -6,5 +6,6 @@ import lombok.Setter;
 @Getter
 public enum MessageType {
     TEXT,
+    IMAGE,
     RECORDING;
 }
