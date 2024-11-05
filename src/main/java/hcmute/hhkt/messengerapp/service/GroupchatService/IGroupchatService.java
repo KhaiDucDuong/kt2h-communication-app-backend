@@ -10,4 +10,7 @@ public interface IGroupchatService {
 
     Groupchat createGroupchat(GroupchatDTO groupchatDTO);
     List<Groupchat> getAllgroupChat(String userID);
+    boolean delGroupchat(String groupID);
+
+    boolean editGroupchat (GroupchatDTO groupchatDTO);
 }
