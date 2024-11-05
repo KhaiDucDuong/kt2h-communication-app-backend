@@ -56,7 +56,7 @@ spring:
             client-id: 49619057630-ij5tirenev88rlsull9dtbr3jher6mm3.apps.googleusercontent.com
             client-secret: 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
             authorization-grant-type: authorization_code
-            scope: profile,email,openid
+            scope: profile,email,openi
 
 api:
   prefix: /api
@@ -65,6 +65,10 @@ jwt:
   access-token-expiration-in-seconds: 6000 #10 minutes (600s) = 6 * 60
   refresh-token-expiration-in-seconds: 7776000 #90 days (7776000s) = 90 * 24 * 60 * 60
   base64-secret: xqWM9YRbhgqWNY9REd4RW47o/kZRkOkQrzg1qdMBVfiXErOHpT6UTVwoUnNIZLIDaFiatwVbNgyjx/iMYbNkKQ==
+
+firebase:
+  service-account-filename: hkt-e0d9b-firebase-adminsdk-6b37m-3bbc9aeeeb.json
+  realtime-database-url: https://hkt-e0d9b-default-rtdb.firebaseio.com/
 
 logging:
   level:

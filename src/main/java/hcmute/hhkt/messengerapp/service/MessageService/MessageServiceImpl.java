@@ -18,18 +18,26 @@ import hcmute.hhkt.messengerapp.service.ConversationService.IConversationService
 import hcmute.hhkt.messengerapp.service.UserService.IUserService;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.util.ResourceUtils;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
 public class MessageServiceImpl implements IMessageService{
+    @Value("${firebase.service-account-filename}")
+    private String serviceAccountFileName;
+
     private final MessageRepository messageRepository;
     private final IConversationService conversationService;
     private final IUserService userService;
@@ -97,8 +105,11 @@ public class MessageServiceImpl implements IMessageService{
     }
 
     public String uploadImage(MultipartFile file) throws IOException {
+        File serviceAccountFile = ResourceUtils.getFile("classpath:" + serviceAccountFileName);
+        FileInputStream serviceAccount = new FileInputStream(serviceAccountFile);
+
         Storage storage = StorageOptions.newBuilder()
-                .setCredentials(GoogleCredentials.fromStream(new FileInputStream("C:/Users/Dell.MM/hoang/kt2h-communication-app-backend/src/main/resources/hkt-e0d9b-firebase-adminsdk-6b37m-3bbc9aeeeb.json")))
+                .setCredentials(GoogleCredentials.fromStream(serviceAccount))
                 .setProjectId("hkt-e0d9b") // Your project ID
                 .build()
                 .getService();

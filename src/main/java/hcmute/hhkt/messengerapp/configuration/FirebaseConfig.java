@@ -2,22 +2,31 @@ package hcmute.hhkt.messengerapp.configuration;
 import com.google.auth.oauth2.GoogleCredentials;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.FirebaseOptions;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.util.ResourceUtils;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 
 @Configuration
 public class FirebaseConfig {
+    @Value("${firebase.service-account-filename}")
+    private String serviceAccountFileName;
+    @Value("${firebase.realtime-database-url}")
+    private String firebaseUrl;
     @Bean
     public FirebaseApp firebaseInit() throws IOException {
-        FileInputStream serviceAccount =
-                new FileInputStream("C:/Users/Dell.MM/hoang/kt2h-communication-app-backend/src/main/resources/hkt-e0d9b-firebase-adminsdk-6b37m-3bbc9aeeeb.json");
+        File file = ResourceUtils.getFile("classpath:" + serviceAccountFileName);
+        FileInputStream serviceAccount = new FileInputStream(file);
 
-        FirebaseOptions options = new FirebaseOptions.Builder()
+        FirebaseOptions options = FirebaseOptions.builder()
                 .setCredentials(GoogleCredentials.fromStream(serviceAccount))
-                .setDatabaseUrl("https://hkt-e0d9b-default-rtdb.firebaseio.com/")
+                .setDatabaseUrl(firebaseUrl)
                 .build();
 
         return FirebaseApp.initializeApp(options);

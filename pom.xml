@@ -88,11 +88,13 @@
 			<artifactId>jackson-datatype-jsr310</artifactId>
 		</dependency>
 
+		<!-- https://mvnrepository.com/artifact/com.google.firebase/firebase-admin -->
 		<dependency>
 			<groupId>com.google.firebase</groupId>
 			<artifactId>firebase-admin</artifactId>
-			<version>9.0.0</version> <!-- Check for the latest version -->
+			<version>9.4.1</version>
 		</dependency>
+
 
 		<!-- https://mvnrepository.com/artifact/com.google.cloud/google-cloud-storage -->
 		<dependency>
