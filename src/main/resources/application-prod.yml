@@ -70,6 +70,12 @@ logging:
   level:
     root: INFO
     hcmute.hhkt.messengerapp: INFO
+    org:
+      springframework:
+        web:
+          socket: INFO
+        messaging: INFO
+
   file:
     name: log/dev.log
 
