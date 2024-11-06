@@ -32,7 +32,7 @@ public class Message extends AbstractDateAuditingEntity{
     @Column(name = "message_type", length = 20, nullable = false)
     private MessageType messageType;
 
-    @Column(name = "message", nullable = false, unique = false, columnDefinition = "TEXT")
+    @Column(name = "message", unique = false, columnDefinition = "TEXT")
     private String message;
 
     @Column(name = "image_url", columnDefinition = "TEXT")

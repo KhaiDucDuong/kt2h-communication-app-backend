@@ -35,25 +35,31 @@ public class StompSocketController {
     private final IMessageService messageService;
 
     @MessageMapping("/private-message")
-    public void receivePrivateMessage(@Payload MessageDTO messageDTO){
+    public void receivePrivateMessage(@Payload MessageDTO messageDTO) {
         log.debug("Stomp private message from {}", messageDTO.getSenderId());
         UUID conversationId = UUID.fromString(messageDTO.getConversationId());
         Conversation conversation = conversationService.findById(conversationId);
         User toUser;
-        if(UUID.fromString(messageDTO.getSenderId()).equals(conversation.getCreator().getId())){
+
+        // Xác định người nhận dựa trên ID của người gửi
+        if (UUID.fromString(messageDTO.getSenderId()).equals(conversation.getCreator().getId())) {
             toUser = conversation.getTarget();
         } else if (UUID.fromString(messageDTO.getSenderId()).equals(conversation.getTarget().getId())) {
             toUser = conversation.getCreator();
         } else {
             throw new IllegalArgumentException(ExceptionMessage.INVALID_MESSAGE_SENDER);
         }
+
+        // Tạo và lưu tin nhắn
         Message message = messageService.createMessage(messageDTO);
         MessageResponse response = MessageResponse.fromMessage(message);
-        simpMessagingTemplate.convertAndSendToUser(toUser.getId().toString(),"/private", response);
-        simpMessagingTemplate.convertAndSendToUser(response.getSenderId().toString(),"/private", response);
+
+        // Gửi thông điệp cho cả người nhận và người gửi
+        simpMessagingTemplate.convertAndSendToUser(toUser.getId().toString(), "/private", response);
+        simpMessagingTemplate.convertAndSendToUser(response.getSenderId().toString(), "/private", response);
         log.debug("Sending private message from {} to {} with content {}", messageDTO.getSenderId(), toUser.getId(), message.getMessage());
-//        return ResponseEntity.ok().body(MessageResponse.fromMessage(message));
     }
+
 
 
 
