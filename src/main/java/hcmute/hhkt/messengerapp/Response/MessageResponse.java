@@ -26,6 +26,8 @@ public class MessageResponse {
     private Boolean isReacted;
     @JsonProperty("sent_at")
     private Instant sentAt;
+    @JsonProperty("image_url")
+    private String image_url;
 
     public static MessageResponse fromMessage(Message message){
         return MessageResponse.builder()
@@ -35,6 +37,7 @@ public class MessageResponse {
                 .messageType(message.getMessageType().name())
                 .isReacted(message.getIsReacted())
                 .sentAt(message.getCreatedDate())
+                .image_url(message.getImageUrl())
                 .build();
     }
 

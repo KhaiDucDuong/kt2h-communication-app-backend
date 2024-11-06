@@ -51,7 +51,7 @@ public class MessageController {
     }
     @PostMapping("/upload")
     @PreAuthorize("hasAnyAuthority('USER')")
-    public ResponseEntity<String> uploadFile(@RequestParam("file") MultipartFile file) {
+    public ResponseEntity<Map<String, String>> uploadFile(@RequestParam("file") MultipartFile file) {
         String imageUrl = null;
         if (file != null && !file.isEmpty()) {
             try {
@@ -59,10 +59,11 @@ public class MessageController {
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
-        }// Upload file to Firebase or storage;
-        // Return the file URL in the response
+        }
+
+        // Trả về file URL trong response
         Map<String, String> response = new HashMap<>();
         response.put("imageUrl", imageUrl);
-        return ResponseEntity.ok(imageUrl);
+        return ResponseEntity.ok(response);
     }
 }

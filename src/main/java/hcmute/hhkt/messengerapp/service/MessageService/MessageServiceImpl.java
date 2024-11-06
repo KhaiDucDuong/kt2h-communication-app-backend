@@ -25,6 +25,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.UUID;
 
 @Service
@@ -44,13 +46,14 @@ public class MessageServiceImpl implements IMessageService{
         // Tạo đối tượng Message
         Message.MessageBuilder messageBuilder = Message.builder()
                 .messageType(messageType)
+                .message("")
                 .sender(userService.findById(UUID.fromString(messageDTO.getSenderId())));
 
         // Xử lý nội dung tin nhắn TEXT hoặc IMAGE
         if (messageType.equals(MessageType.TEXT)) {
             messageBuilder.message(messageDTO.getMessage());
         } else if (messageType.equals(MessageType.IMAGE)) {
-            messageBuilder.imageUrl(messageDTO.getImageUrl());
+            messageBuilder.imageUrl(String.valueOf(messageDTO.getImageUrl()));
         }
 
         Message message = messageBuilder.build();
@@ -62,9 +65,6 @@ public class MessageServiceImpl implements IMessageService{
 
         return messageRepository.save(message);
     }
-
-
-
     @Override
     public ResultPaginationResponse getConversationMessages(Conversation conversation, Pageable pageable) {
         Page<Message> messagePage = messageRepository.findMessagesByConversationAndIsDeletedIsFalse(conversation, pageable);
@@ -106,10 +106,13 @@ public class MessageServiceImpl implements IMessageService{
         Bucket bucket = storage.get("hkt-e0d9b.appspot.com");
 
         String fileName = "images/" + UUID.randomUUID().toString() + "_" + file.getOriginalFilename();
-
         bucket.create(fileName, file.getInputStream(), file.getContentType());
 
-        return "https://firebasestorage.googleapis.com/v0/b/hkt-e0d9b.appspot.com/o/" + fileName + "?alt=media";
+        // Mã hóa đường dẫn file
+        String encodedFileName = URLEncoder.encode(fileName, StandardCharsets.UTF_8.toString());
+
+        return "https://firebasestorage.googleapis.com/v0/b/hkt-e0d9b.appspot.com/o/" + encodedFileName + "?alt=media";
     }
+
 
 }
