@@ -52,6 +52,7 @@ public class Account extends AbstractAuditingEntity{
     private String resetKey;
 
     @Column(name = "reset_request_date")
+    @Builder.Default
     private Instant resetRequestDate = null;
 
     @OneToOne(mappedBy = "account", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)

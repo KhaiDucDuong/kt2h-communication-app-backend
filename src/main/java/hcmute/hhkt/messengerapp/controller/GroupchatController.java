@@ -57,8 +57,40 @@ public class GroupchatController {
         }
         catch (Exception e) {
             return ResponseEntity.status(404).body(e);
-
         }
         }
 
+
+    @DeleteMapping("/del")
+    @PreAuthorize("hasAnyAuthority('USER')")
+    public ResponseEntity<?> delGroupchat(@RequestParam String groupid){
+        try
+        {
+            System.out.println("Group chat ID deleted: " + groupid);
+            boolean IsDeleted = groupchatService.delGroupchat(groupid);
+            if (IsDeleted) return ResponseEntity.ok().body("deleted");
+            else  return ResponseEntity.ok().body("not deleted");
+        }
+        catch (Exception e) {
+            return ResponseEntity.status(404).body(e);
+        }
+    }
+
+    @PutMapping("/edit")
+    @PreAuthorize("hasAnyAuthority('USER')")
+    public ResponseEntity<?> editGroupchat(@Valid @RequestBody GroupchatDTO groupchat){
+        try{
+            boolean isUpdated = groupchatService.editGroupchat(groupchat);
+            if (isUpdated) {
+                System.out.println("Group chat ID updated: " + groupchat.getGroup_id());
+                return ResponseEntity.ok().body("updated");
+            }
+            else  {
+                System.out.println("Group chat ID not updated: " + groupchat.getGroup_id());
+                return ResponseEntity.ok().body("not updated");}
+        }
+        catch (Exception e) {
+            return ResponseEntity.status(404).body(e);
+        }
+    }
 }

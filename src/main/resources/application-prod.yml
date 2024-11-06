@@ -66,10 +66,20 @@ jwt:
   refresh-token-expiration-in-seconds: 7776000 #90 days (7776000s) = 90 * 24 * 60 * 60
   base64-secret: xqWM9YRbhgqWNY9REd4RW47o/kZRkOkQrzg1qdMBVfiXErOHpT6UTVwoUnNIZLIDaFiatwVbNgyjx/iMYbNkKQ==
 
+firebase:
+  service-account-filename: hkt-e0d9b-firebase-adminsdk-6b37m-3bbc9aeeeb.json
+  realtime-database-url: https://hkt-e0d9b-default-rtdb.firebaseio.com/
+
 logging:
   level:
     root: INFO
     hcmute.hhkt.messengerapp: INFO
+    org:
+      springframework:
+        web:
+          socket: INFO
+        messaging: INFO
+
   file:
     name: log/dev.log
 
