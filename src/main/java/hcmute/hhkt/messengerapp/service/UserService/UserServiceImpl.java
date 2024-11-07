@@ -129,6 +129,12 @@ public class UserServiceImpl implements IUserService {
         return userRepository.save(user);
     }
 
+    @Override
+    public void updateUserLastActivity(User user) {
+        user.setLastActivityAt(Instant.now());
+        userRepository.save(user);
+    }
+
     @Async
     @Scheduled(cron = "0 0 2 * * ?") //run at 2am every day
 //    @Scheduled(fixedRate = 30000) //every 30 seconds - for testing

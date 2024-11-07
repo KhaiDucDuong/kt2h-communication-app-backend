@@ -18,6 +18,6 @@ public interface IUserService {
     List<User> getAllUsers();
     User findById(UUID id);
     void resendActivationEmail(User user);
-
     User setUserAccount(User user, Account account);
+    void updateUserLastActivity(User user);
 }
