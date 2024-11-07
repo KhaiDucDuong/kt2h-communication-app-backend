@@ -53,8 +53,8 @@ spring:
         registration:
           google:
             provider: google
-            client-id: 49619057630-ij5tirenev88rlsull9dtbr3jher6mm3.apps.googleusercontent.com
-            client-secret: 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
+            client-id: 60975655598-7ncgl9qof8qvjgft44l541dc0i7m6o7l.apps.googleusercontent.com
+            client-secret: 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
             authorization-grant-type: authorization_code
             scope: profile,email,openid
 

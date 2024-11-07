@@ -29,6 +29,10 @@ public class FirebaseConfig {
                 .setDatabaseUrl(firebaseUrl)
                 .build();
 
-        return FirebaseApp.initializeApp(options);
+        if(FirebaseApp.getApps().isEmpty()) {
+            return FirebaseApp.initializeApp(options);
+        }
+
+        return FirebaseApp.getInstance();
     }
 }

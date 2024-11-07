@@ -1,8 +1,10 @@
 package hcmute.hhkt.messengerapp.domain;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import hcmute.hhkt.messengerapp.domain.enums.SystemRole;
 import hcmute.hhkt.messengerapp.domain.enums.UserCreationType;
+import hcmute.hhkt.messengerapp.domain.enums.UserDefaultStatus;
 import hcmute.hhkt.messengerapp.domain.enums.UserStatus;
 import hcmute.hhkt.messengerapp.util.RegrexUtil;
 import jakarta.persistence.*;
@@ -11,7 +13,9 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.*;
+import org.springframework.data.annotation.LastModifiedDate;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
@@ -57,6 +61,17 @@ public class User extends AbstractAuditingEntity {
     @Column(name = "status", length = 20, nullable = false)
     @Builder.Default
     private UserStatus status = UserStatus.OFFLINE;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "default_status", length = 20, nullable = false)
+    @Builder.Default
+    private UserDefaultStatus defaultStatus = UserDefaultStatus.ONLINE;
+
+    @LastModifiedDate
+    @Column(name = "last_activity_at")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss a", timezone = "GMT+7")
+    @Builder.Default
+    private Instant lastActivityAt = Instant.now();
 
     @Enumerated(EnumType.STRING)
     @Column(name = "creation_type", length = 20, nullable = false)
