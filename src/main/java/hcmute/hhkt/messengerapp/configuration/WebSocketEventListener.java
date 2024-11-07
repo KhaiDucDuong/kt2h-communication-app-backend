@@ -17,7 +17,6 @@ public class WebSocketEventListener {
     private void handleSessionConnect(SessionConnectEvent event) {
         StompHeaderAccessor sha = StompHeaderAccessor.wrap(event.getMessage());
 
-//        String  company = sha.getNativeHeader("company").get(0);
         log.debug("Connect event [sessionId: " + sha.getSessionId() +";" + "]");
     }
 
@@ -25,7 +24,6 @@ public class WebSocketEventListener {
     private void handleSessionConnected(SessionConnectedEvent event) {
         StompHeaderAccessor sha = StompHeaderAccessor.wrap(event.getMessage());
 
-//        String  company = sha.getNativeHeader("company").get(0);
         log.debug("Connected event [sessionId: " + sha.getSessionId() +";" + "]");
     }
 
@@ -33,7 +31,6 @@ public class WebSocketEventListener {
     private void handleSessionDisconnect(SessionDisconnectEvent event) {
         StompHeaderAccessor sha = StompHeaderAccessor.wrap(event.getMessage());
 
-//        String  company = sha.getNativeHeader("company").get(0);
         log.debug("Disconnect event [sessionId: " + sha.getSessionId() +";" + "]");
     }
 }
