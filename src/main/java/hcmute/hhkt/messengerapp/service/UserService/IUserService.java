@@ -2,6 +2,8 @@ package hcmute.hhkt.messengerapp.service.UserService;
 
 import hcmute.hhkt.messengerapp.domain.Account;
 import hcmute.hhkt.messengerapp.domain.User;
+import hcmute.hhkt.messengerapp.domain.enums.UserDefaultStatus;
+import hcmute.hhkt.messengerapp.domain.enums.UserStatus;
 import hcmute.hhkt.messengerapp.dto.RegisterUserDTO;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 
@@ -19,5 +21,6 @@ public interface IUserService {
     User findById(UUID id);
     void resendActivationEmail(User user);
     User setUserAccount(User user, Account account);
-    void updateUserLastActivity(User user);
+    void updateUserStatus(User user, UserStatus status);
+    User updateUserDefaultStatus(User user, UserDefaultStatus status);
 }

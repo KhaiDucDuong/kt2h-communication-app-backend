@@ -9,6 +9,7 @@ import hcmute.hhkt.messengerapp.domain.*;
 import hcmute.hhkt.messengerapp.domain.enums.AccountStatus;
 import hcmute.hhkt.messengerapp.domain.enums.Device;
 import hcmute.hhkt.messengerapp.domain.enums.SpecialAuthority;
+import hcmute.hhkt.messengerapp.domain.enums.UserStatus;
 import hcmute.hhkt.messengerapp.service.AccountService.IAccountService;
 import hcmute.hhkt.messengerapp.service.MailService.MailService;
 import hcmute.hhkt.messengerapp.util.RegrexUtil;
@@ -124,6 +125,8 @@ public class AuthController {
                 //.domain()
                 .build();
 
+        userService.updateUserStatus(loggedInUser, UserStatus.ONLINE);
+
         log.debug("REST request to login with username {} successfully", loginDTO.getUsername());
         return ResponseEntity.ok()
                 .header(HttpHeaders.SET_COOKIE, responseCookie.toString())
@@ -178,6 +181,8 @@ public class AuthController {
                 .maxAge(jwtRefreshTokenExpiration)
                 //.domain()
                 .build();
+
+        userService.updateUserStatus(loggedInUser, UserStatus.ONLINE);
 
         log.debug("REST request to get current account from user {} successfully", email);
         return ResponseEntity.status(HttpStatus.OK)

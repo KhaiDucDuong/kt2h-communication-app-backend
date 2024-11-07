@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import hcmute.hhkt.messengerapp.domain.enums.SystemRole;
 import hcmute.hhkt.messengerapp.domain.enums.UserCreationType;
+import hcmute.hhkt.messengerapp.domain.enums.UserDefaultStatus;
 import hcmute.hhkt.messengerapp.domain.enums.UserStatus;
 import hcmute.hhkt.messengerapp.util.RegrexUtil;
 import jakarta.persistence.*;
@@ -59,7 +60,12 @@ public class User extends AbstractAuditingEntity {
     @Enumerated(EnumType.STRING)
     @Column(name = "status", length = 20, nullable = false)
     @Builder.Default
-    private UserStatus status = UserStatus.ONLINE;
+    private UserStatus status = UserStatus.OFFLINE;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "default_status", length = 20, nullable = false)
+    @Builder.Default
+    private UserDefaultStatus defaultStatus = UserDefaultStatus.ONLINE;
 
     @LastModifiedDate
     @Column(name = "last_activity_at")

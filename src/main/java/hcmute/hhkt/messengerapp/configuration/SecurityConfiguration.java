@@ -52,7 +52,6 @@ public class SecurityConfiguration {
                                 .requestMatchers("api/accounts/activate", "/api/auth/renewActivationCode").permitAll()
                                 .requestMatchers(HttpMethod.GET, "/api/comics").permitAll()
                                 .requestMatchers("/ws").permitAll()
-                                .requestMatchers("/favicon.ico").permitAll()
                                 .anyRequest().authenticated()
                 )
                 .oauth2ResourceServer((oauth2) -> oauth2.jwt(Customizer.withDefaults())

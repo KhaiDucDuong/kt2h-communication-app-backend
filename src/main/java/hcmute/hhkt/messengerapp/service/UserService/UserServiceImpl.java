@@ -5,6 +5,8 @@ import hcmute.hhkt.messengerapp.domain.Account;
 import hcmute.hhkt.messengerapp.domain.User;
 import hcmute.hhkt.messengerapp.domain.enums.AccountStatus;
 import hcmute.hhkt.messengerapp.domain.enums.UserCreationType;
+import hcmute.hhkt.messengerapp.domain.enums.UserDefaultStatus;
+import hcmute.hhkt.messengerapp.domain.enums.UserStatus;
 import hcmute.hhkt.messengerapp.dto.RegisterUserDTO;
 import hcmute.hhkt.messengerapp.repository.UserRepository;
 import hcmute.hhkt.messengerapp.service.AccountService.AccountServiceImpl;
@@ -130,9 +132,17 @@ public class UserServiceImpl implements IUserService {
     }
 
     @Override
-    public void updateUserLastActivity(User user) {
+    @Async
+    public void updateUserStatus(User user, UserStatus status) {
         user.setLastActivityAt(Instant.now());
+        user.setStatus(status);
         userRepository.save(user);
+    }
+
+    @Override
+    public User updateUserDefaultStatus(User user, UserDefaultStatus status) {
+        user.setDefaultStatus(status);
+        return userRepository.save(user);
     }
 
     @Async
