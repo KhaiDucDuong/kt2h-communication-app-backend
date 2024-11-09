@@ -1,6 +1,8 @@
 package hcmute.hhkt.messengerapp.controller;
 
 
+import hcmute.hhkt.messengerapp.Response.ChannelResponse;
+import hcmute.hhkt.messengerapp.domain.Channel;
 import hcmute.hhkt.messengerapp.domain.User;
 import hcmute.hhkt.messengerapp.dto.ChannelDTO;
 import hcmute.hhkt.messengerapp.service.ChannelService.IChannelService;
@@ -16,6 +18,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.parameters.P;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -43,4 +46,30 @@ public class ChannelController {
         }
     }
 
+    @GetMapping("/get")
+    @PreAuthorize("hasAnyAuthority('USER')")
+    public ResponseEntity<?> getChannel(@RequestParam String groupid){
+        try
+        {
+         List<Channel> channelList = channelService.GetAllChannel(groupid);
+         List<ChannelResponse> response = ChannelResponse.generateChannelListResponse(channelList);
+         return ResponseEntity.ok().body(response);
+        }
+        catch (Exception e){
+            return  ResponseEntity.status(404).body("Error getting channel");
+        }
+    }
+
+    @DeleteMapping("/del")
+    @PreAuthorize("hasAnyAuthority('USER')")
+    public ResponseEntity<?> delChannel(@RequestParam String channelid){
+        try{
+            channelService.DeleteChannel(channelid);
+            return ResponseEntity.ok().body("Channnel have been deleted");
+    }
+        catch(Exception e) {
+            return ResponseEntity.status(404).body("Channnel have not been deleted");
+
+        }
+}
 }
