@@ -25,6 +25,10 @@ public class Message extends AbstractDateAuditingEntity{
     private Conversation conversation;
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "channel_id", referencedColumnName = "channelid")
+    private Channel channel;
+
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "sender_id", referencedColumnName = "id")
     private User sender;
 

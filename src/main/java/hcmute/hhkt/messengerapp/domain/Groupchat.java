@@ -3,6 +3,7 @@ package hcmute.hhkt.messengerapp.domain;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.Set;
 import java.util.UUID;
 
 @Getter
@@ -31,5 +32,7 @@ public class Groupchat extends AbstractDateAuditingEntity{
     @Column(name = "QRCode", nullable = false, unique = false, columnDefinition = "TEXT")
     private String QRcode;
 
+    @ManyToMany(mappedBy = "groups")
+    private Set<User> users;
 
 }

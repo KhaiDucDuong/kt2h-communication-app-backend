@@ -13,6 +13,7 @@ import jakarta.validation.constraints.Size;
 import lombok.*;
 
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 @Getter
@@ -74,4 +75,12 @@ public class User extends AbstractAuditingEntity {
 
     @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "receiver", orphanRemoval = true)
     private List<InvitationNotification> invitationNotifications;
+
+    @ManyToMany
+    @JoinTable(
+            name = "groupchat_members",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "group_id")
+    )
+    private Set<Groupchat> groups;
 }
