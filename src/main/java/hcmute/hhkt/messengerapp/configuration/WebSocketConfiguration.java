@@ -20,6 +20,8 @@ import org.springframework.messaging.simp.stomp.StompCommand;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.messaging.support.ChannelInterceptor;
 import org.springframework.messaging.support.MessageHeaderAccessor;
+import org.springframework.scheduling.concurrent.DefaultManagedTaskScheduler;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import org.springframework.security.authorization.AuthenticatedAuthorizationManager;
 import org.springframework.security.authorization.AuthorizationEventPublisher;
 import org.springframework.security.authorization.AuthorizationManager;
@@ -96,8 +98,15 @@ public class WebSocketConfiguration implements WebSocketMessageBrokerConfigurer 
 
     @Override
     public void configureMessageBroker(MessageBrokerRegistry registry) {
+        ThreadPoolTaskScheduler te = new ThreadPoolTaskScheduler();
+        te.setPoolSize(1);
+        te.setThreadNamePrefix("wss-heartbeat-thread-");
+        te.initialize();
+
         registry.setApplicationDestinationPrefixes("/app");
-        registry.enableSimpleBroker("/chatroom","/user","/admin");
+        registry.enableSimpleBroker("/chatroom","/user","/admin")
+                .setTaskScheduler(te)
+                .setHeartbeatValue(new long[] {10000, 10000}); // Heartbeat every 10 seconds
         registry.setUserDestinationPrefix("/user");
     }
 

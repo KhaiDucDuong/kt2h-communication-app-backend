@@ -2,6 +2,7 @@ package hcmute.hhkt.messengerapp.Response;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import hcmute.hhkt.messengerapp.domain.User;
+import hcmute.hhkt.messengerapp.domain.enums.UserStatus;
 import lombok.*;
 
 @Getter
@@ -43,6 +44,12 @@ public class LoginResponse {
         @JsonProperty("role")
         private String role;
 
+        @JsonProperty("status")
+        private String status;
+
+        @JsonProperty("default_status")
+        private String defaultStatus;
+
         public static UserLogin fromUser(User user){
             return UserLogin.builder()
                     .userId(String.valueOf(user.getId()))
@@ -52,6 +59,8 @@ public class LoginResponse {
                     .phone(user.getPhone())
                     .image(user.getImage())
                     .role(user.getRole().name())
+                    .status(UserStatus.ONLINE.name())
+                    .defaultStatus(user.getDefaultStatus().name())
                     .build();
         }
     }
