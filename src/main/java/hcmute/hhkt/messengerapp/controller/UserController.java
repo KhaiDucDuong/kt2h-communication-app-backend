@@ -10,6 +10,8 @@ import hcmute.hhkt.messengerapp.domain.enums.UserDefaultStatus;
 import hcmute.hhkt.messengerapp.domain.enums.UserStatus;
 import hcmute.hhkt.messengerapp.dto.MessageDTO;
 import hcmute.hhkt.messengerapp.dto.UpdateStatusDTO;
+import hcmute.hhkt.messengerapp.service.FirebaseService.FirebaseServiceImpl;
+import hcmute.hhkt.messengerapp.service.FirebaseService.IFirebaseService;
 import hcmute.hhkt.messengerapp.util.SecurityUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,7 +27,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import hcmute.hhkt.messengerapp.util.annotation.ApiMessage;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.time.Instant;
 import java.util.*;
 
@@ -35,6 +39,8 @@ import java.util.*;
 public class UserController {
     private final Logger log = LoggerFactory.getLogger(UserController.class);
     private final IUserService userService;
+    private final IFirebaseService firebaseService;
+    private final String USER_PROFILE_IMG_FOLDER = "user_profiles/";
 
     @GetMapping("")
     @ApiMessage("Fetched all users")
@@ -81,5 +87,22 @@ public class UserController {
         response.setLastActivityAt(null);
 
         return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
+    @PutMapping("/image")
+    @PreAuthorize("hasAnyAuthority('USER')")
+    @ApiMessage("Fetched user successfully")
+    public ResponseEntity<?> updateUserProfilePic(@RequestParam("image") MultipartFile image) throws IOException {
+        String email = SecurityUtil.getCurrentUserLogin().isPresent() ? SecurityUtil.getCurrentUserLogin().get() : "";
+        log.debug("Api request to update user profile image from {}", email);
+        User user = userService.findUserByEmail(email);
+        if(user == null){
+            throw new IllegalArgumentException(ExceptionMessage.USER_NOT_EXIST);
+        }
+
+        final String fileName = user.getId().toString();
+        String imgPath = firebaseService.resizeAndUploadImage(image, fileName, USER_PROFILE_IMG_FOLDER);
+        user = userService.updateUserImg(user, imgPath);
+        return ResponseEntity.status(HttpStatus.OK).body(UserResponse.fromUser(user));
     }
 }
