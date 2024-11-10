@@ -11,4 +11,7 @@ import java.util.UUID;
 public interface GroupchatRepository extends JpaRepository<Groupchat, UUID>
 {
         List<Groupchat> getGroupchatByOwnerId(UUID uuid);
+
+        Groupchat getGroupchatByGroupid(UUID uuid);
+
 }

@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.time.Instant;
 import java.util.UUID;
 import java.util.List;
 
@@ -31,6 +32,9 @@ public class UserResponse {
     @JsonProperty("status")
     private String status;
 
+    @JsonProperty("last_activity_at")
+    private Instant lastActivityAt;
+
     public static UserResponse fromUser(User user){
         return UserResponse.builder()
                 .id(user.getId())
@@ -39,6 +43,7 @@ public class UserResponse {
                 .image(user.getImage())
                 .email(user.getEmail())
                 .status(user.getStatus().name())
+                .lastActivityAt(user.getLastActivityAt())
                 .build();
     }
 

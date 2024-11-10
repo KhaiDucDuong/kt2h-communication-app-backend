@@ -7,6 +7,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -48,6 +49,9 @@ public class ConversationResponse {
         @JsonProperty("to_user_status")
         private String status;
 
+        @JsonProperty("to_user_last_activity_at")
+        private Instant toUserLastActivityAt;
+
         public static ToUser fromUser(User user, String nickname){
             return ToUser.builder()
                     .id(user.getId())
@@ -56,6 +60,7 @@ public class ConversationResponse {
                     .nickname(nickname)
                     .image(user.getImage())
                     .status(user.getStatus().name())
+                    .toUserLastActivityAt((user.getLastActivityAt()))
                     .build();
         }
     }
