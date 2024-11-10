@@ -38,6 +38,9 @@ public class Message extends AbstractDateAuditingEntity{
     @Column(name = "image_url", columnDefinition = "TEXT")
     private String imageUrl;
 
+    @Column(name = "message_types", columnDefinition = "TEXT")
+    private String messageTypes;
+
     @Column(name = "is_deleted")
     @Builder.Default
     private Boolean isDeleted = false;
