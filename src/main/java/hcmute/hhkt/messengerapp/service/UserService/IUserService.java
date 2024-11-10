@@ -23,4 +23,6 @@ public interface IUserService {
     User setUserAccount(User user, Account account);
     void updateUserStatus(User user, UserStatus status);
     User updateUserDefaultStatus(User user, UserDefaultStatus status);
+
+    User updateUserImg(User user, String imgPath);
 }

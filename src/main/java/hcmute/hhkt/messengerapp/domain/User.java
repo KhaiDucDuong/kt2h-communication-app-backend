@@ -33,7 +33,7 @@ public class User extends AbstractAuditingEntity {
     @Column(name="id")
     private UUID id;
 
-    @Size(max = 100)
+    @Size(max = 254)
     @Column(name="image")
     private String image;
 

@@ -33,4 +33,8 @@ public class ExceptionMessage {
     public static final String ACCOUNT_EXISTS = "Account for this user has existed";
     public static final String INVALID_INVITATION_NOTIFICATION_TYPE = "Invitation notification's type is invalid";
     public static final String INVITATION_NOTIFICATION_NOT_EXIST = "Invitation notification does not exist";
+    public static final String FIREBASE_FILE_PATH_INVALID = "Firebase file path is invalid";
+    public static final String FILE_NAME_BLANK = "File name is blank";
+    public static final String IMAGE_INVALID = "Error processing image file";
+    public static final String RESIZE_IMAGE_ERROR = "Error trying to resize image file";
 }

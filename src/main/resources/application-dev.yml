@@ -69,6 +69,9 @@ jwt:
 firebase:
   service-account-filename: hkt-e0d9b-firebase-adminsdk-6b37m-3bbc9aeeeb.json
   realtime-database-url: https://hkt-e0d9b-default-rtdb.firebaseio.com/
+  project-id: hkt-e0d9b
+  bucket-url: hkt-e0d9b.appspot.com
+  file-starter-url: "https://firebasestorage.googleapis.com/v0/b/hkt-e0d9b.appspot.com/o/"
 
 logging:
   level:
