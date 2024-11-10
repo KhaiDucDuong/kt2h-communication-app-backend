@@ -10,6 +10,7 @@ import hcmute.hhkt.messengerapp.domain.enums.UserDefaultStatus;
 import hcmute.hhkt.messengerapp.domain.enums.UserStatus;
 import hcmute.hhkt.messengerapp.dto.MessageDTO;
 import hcmute.hhkt.messengerapp.dto.UpdateStatusDTO;
+import hcmute.hhkt.messengerapp.util.SecurityUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.messaging.handler.annotation.MessageMapping;
@@ -25,9 +26,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import hcmute.hhkt.messengerapp.util.annotation.ApiMessage;
 
-import java.util.List;
-import java.util.Objects;
-import java.util.UUID;
+import java.time.Instant;
+import java.util.*;
 
 @RestController
 @RequestMapping("/api/users")
@@ -56,5 +56,30 @@ public class UserController {
             throw new IllegalArgumentException(ExceptionMessage.USER_NOT_EXIST);
         }
         return ResponseEntity.status(HttpStatus.OK).body(UserResponse.fromUser(queryUser));
+    }
+
+    @GetMapping("/activityStatus/{id}")
+    @PreAuthorize("hasAnyAuthority('USER')")
+    @ApiMessage("Fetched user activity status successfully")
+    public ResponseEntity<?> getUserActivityStatusById(@PathVariable String id){
+        String email = SecurityUtil.getCurrentUserLogin().isPresent() ? SecurityUtil.getCurrentUserLogin().get() : "";
+        log.debug("Api request to find user activity status with id {} from {}", id, email);
+        UUID userId = UUID.fromString(id);
+        User user = userService.findById(userId);
+        if(user == null){
+            throw new IllegalArgumentException(ExceptionMessage.USER_NOT_EXIST);
+        }
+
+        UserStatusResponse response;
+        if(user.getDefaultStatus() == UserDefaultStatus.ONLINE){ //if user's default status is online, use the current status
+            response = UserStatusResponse.fromUser(user, user.getStatus());
+        } else if(user.getDefaultStatus() == UserDefaultStatus.INVISIBLE){ //if user's default status is invisible, use the offline status
+            response = UserStatusResponse.fromUser(user, UserStatus.OFFLINE);
+        } else { //if user's default status is others (idle, DND), use the default status
+            response = UserStatusResponse.fromUser(user, user.getDefaultStatus());
+        }
+        response.setLastActivityAt(null);
+
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 }
