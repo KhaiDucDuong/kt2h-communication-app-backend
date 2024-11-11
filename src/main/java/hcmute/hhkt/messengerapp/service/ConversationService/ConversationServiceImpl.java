@@ -50,9 +50,9 @@ public class ConversationServiceImpl implements IConversationService{
 
         Conversation conversation = Conversation.builder()
                 .creator(creator)
-                .creatorNickname(creator.getLastName() + " " + creator.getFirstName())
+                .creatorNickname(null)
                 .target(target)
-                .targetNickname(target.getLastName() + " " + target.getFirstName())
+                .targetNickname(null)
                 .build();
 
         return conversationRepository.save(conversation);
