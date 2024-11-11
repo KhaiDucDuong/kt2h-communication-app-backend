@@ -10,6 +10,7 @@ import hcmute.hhkt.messengerapp.domain.enums.UserDefaultStatus;
 import hcmute.hhkt.messengerapp.domain.enums.UserStatus;
 import hcmute.hhkt.messengerapp.dto.MessageDTO;
 import hcmute.hhkt.messengerapp.dto.UpdateStatusDTO;
+import hcmute.hhkt.messengerapp.dto.UserProfileDTO;
 import hcmute.hhkt.messengerapp.service.FirebaseService.FirebaseServiceImpl;
 import hcmute.hhkt.messengerapp.service.FirebaseService.IFirebaseService;
 import hcmute.hhkt.messengerapp.util.SecurityUtil;
@@ -91,7 +92,7 @@ public class UserController {
 
     @PutMapping("/image")
     @PreAuthorize("hasAnyAuthority('USER')")
-    @ApiMessage("Fetched user successfully")
+    @ApiMessage("Update user's profile picture successfully")
     public ResponseEntity<?> updateUserProfilePic(@RequestParam("image") MultipartFile image) throws IOException {
         String email = SecurityUtil.getCurrentUserLogin().isPresent() ? SecurityUtil.getCurrentUserLogin().get() : "";
         log.debug("Api request to update user profile image from {}", email);
@@ -103,6 +104,21 @@ public class UserController {
         final String fileName = user.getId().toString();
         String imgPath = firebaseService.resizeAndUploadImage(image, fileName, USER_PROFILE_IMG_FOLDER);
         user = userService.updateUserImg(user, imgPath);
+        return ResponseEntity.status(HttpStatus.OK).body(UserResponse.fromUser(user));
+    }
+
+    @PutMapping("/profile")
+    @PreAuthorize("hasAnyAuthority('USER')")
+    @ApiMessage("Update user's profile successfully")
+    public ResponseEntity<?> updateUserProfile(@RequestBody UserProfileDTO userProfileDTO) {
+        String email = SecurityUtil.getCurrentUserLogin().isPresent() ? SecurityUtil.getCurrentUserLogin().get() : "";
+        log.debug("Api request to update user profile from {}", email);
+        User user = userService.findUserByEmail(email);
+        if(user == null){
+            throw new IllegalArgumentException(ExceptionMessage.USER_NOT_EXIST);
+        }
+
+        user = userService.updateUser(user, userProfileDTO);
         return ResponseEntity.status(HttpStatus.OK).body(UserResponse.fromUser(user));
     }
 }

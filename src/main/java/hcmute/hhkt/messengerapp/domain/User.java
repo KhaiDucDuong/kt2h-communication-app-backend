@@ -54,10 +54,6 @@ public class User extends AbstractAuditingEntity {
     @Column(length = 10, unique = true)
     private String phone;
 
-    @Column(name = "is_active")
-    @Builder.Default
-    private Boolean isActive = true;
-
     @Enumerated(EnumType.STRING)
     @Column(name = "status", length = 20, nullable = false)
     @Builder.Default
