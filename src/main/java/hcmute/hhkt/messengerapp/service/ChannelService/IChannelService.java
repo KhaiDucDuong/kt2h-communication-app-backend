@@ -11,4 +11,6 @@ public interface IChannelService {
 
     boolean DeleteChannel(String channelID);
 
+    boolean EditChannel(ChannelDTO channel);
+
 }

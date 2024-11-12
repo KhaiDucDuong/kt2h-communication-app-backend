@@ -51,7 +51,8 @@ public class ChannelController {
     public ResponseEntity<?> getChannel(@RequestParam String groupid){
         try
         {
-         List<Channel> channelList = channelService.GetAllChannel(groupid);
+            System.out.println("get channel for Group chat ID: " + groupid);
+            List<Channel> channelList = channelService.GetAllChannel(groupid);
          List<ChannelResponse> response = ChannelResponse.generateChannelListResponse(channelList);
          return ResponseEntity.ok().body(response);
         }
@@ -72,4 +73,17 @@ public class ChannelController {
 
         }
 }
+    @PutMapping("/edit")
+    @PreAuthorize("hasAnyAuthority('USER')")
+    public ResponseEntity<?> editChannel(@RequestBody ChannelDTO channel){
+        try {
+            channelService.EditChannel(channel);
+            return ResponseEntity.ok().body("Channel have been edited");
+        }
+        catch(Exception e){
+            return ResponseEntity.status(404).body("Channel have not been edited");
+        }
+    }
+
 }
+

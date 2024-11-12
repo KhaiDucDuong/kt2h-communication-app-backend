@@ -4,6 +4,7 @@ import hcmute.hhkt.messengerapp.domain.Channel;
 import hcmute.hhkt.messengerapp.domain.Groupchat;
 import hcmute.hhkt.messengerapp.domain.enums.ChannelType;
 import hcmute.hhkt.messengerapp.dto.ChannelDTO;
+import hcmute.hhkt.messengerapp.dto.GroupchatDTO;
 import hcmute.hhkt.messengerapp.repository.ChannelRepository;
 import hcmute.hhkt.messengerapp.repository.GroupchatRepository;
 import lombok.RequiredArgsConstructor;
@@ -39,6 +40,24 @@ public class ChannelServiceImpl implements  IChannelService{
             return false;
         }
 
+    }
+
+    @Override
+    public boolean EditChannel(ChannelDTO channel){
+        try{
+            Channel editchannel = channelRepository.findById(UUID.fromString(channel.getChannel_id())).orElse(null);
+            if (editchannel != null){
+                editchannel.setChannelname(channel.getChannel_name());
+                editchannel.setIsPrivate(channel.getIs_private());
+                channelRepository.save(editchannel);
+                return true;
+            }
+            return false;
+
+        }
+        catch(Exception e){
+            return false;
+        }
     }
 
     @Override
