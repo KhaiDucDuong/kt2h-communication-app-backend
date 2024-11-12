@@ -21,7 +21,7 @@ public class Conversation extends AbstractDateAuditingEntity{
     private UUID id;
 
     @Size(min = 1, max = 50)
-    @Column(name="creator_nickname", nullable = false)
+    @Column(name="creator_nickname")
     private String creatorNickname;
 
     @ManyToOne(fetch = FetchType.LAZY)

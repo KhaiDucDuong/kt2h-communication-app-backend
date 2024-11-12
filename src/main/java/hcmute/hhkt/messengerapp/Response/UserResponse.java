@@ -14,8 +14,8 @@ import java.util.List;
 @Setter
 @Builder
 public class UserResponse {
-    @JsonProperty("id")
-    private UUID id;
+    @JsonProperty("user_id")
+    private UUID userId;
 
     @JsonProperty("image")
     private String image;
@@ -37,7 +37,7 @@ public class UserResponse {
 
     public static UserResponse fromUser(User user){
         return UserResponse.builder()
-                .id(user.getId())
+                .userId(user.getId())
                 .firstName(user.getFirstName())
                 .lastName(user.getLastName())
                 .image(user.getImage())

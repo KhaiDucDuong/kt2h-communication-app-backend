@@ -8,6 +8,7 @@ import hcmute.hhkt.messengerapp.domain.enums.UserCreationType;
 import hcmute.hhkt.messengerapp.domain.enums.UserDefaultStatus;
 import hcmute.hhkt.messengerapp.domain.enums.UserStatus;
 import hcmute.hhkt.messengerapp.dto.RegisterUserDTO;
+import hcmute.hhkt.messengerapp.dto.UserProfileDTO;
 import hcmute.hhkt.messengerapp.repository.UserRepository;
 import hcmute.hhkt.messengerapp.service.AccountService.AccountServiceImpl;
 import hcmute.hhkt.messengerapp.service.AccountService.IAccountService;
@@ -142,6 +143,21 @@ public class UserServiceImpl implements IUserService {
     @Override
     public User updateUserDefaultStatus(User user, UserDefaultStatus status) {
         user.setDefaultStatus(status);
+        return userRepository.save(user);
+    }
+
+    @Override
+    public User updateUserImg(User user, String imgPath) {
+        user.setImage(imgPath);
+        user.setLastActivityAt(Instant.now());
+        return userRepository.save(user);
+    }
+
+    @Override
+    public User updateUser(User user, UserProfileDTO userProfileDTO) {
+        user.setFirstName(userProfileDTO.getFirstName());
+        user.setLastName(userProfileDTO.getLastName());
+        user.setLastActivityAt(Instant.now());
         return userRepository.save(user);
     }
 

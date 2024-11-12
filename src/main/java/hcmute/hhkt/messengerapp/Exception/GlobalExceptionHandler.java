@@ -22,6 +22,7 @@ import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import java.io.IOException;
 import java.util.List;
 
 @RestControllerAdvice
@@ -56,6 +57,8 @@ public class GlobalExceptionHandler {
             return handleUnauthorizedRequestException(ex);
         } else if (ex instanceof DisabledException){
             return handleDisabledException(ex);
+        } else if (ex instanceof IOException){
+            return handleIOException(ex);
         }
 
         RestResponse<Object> res = new RestResponse<Object>();
@@ -174,5 +177,14 @@ public class GlobalExceptionHandler {
         res.setMessage("Unactivated Account");
         res.setData(new UnactivatedAccountLoginResponse(ex.getUnactivatedEmail()));
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body(res);
+    }
+
+    private ResponseEntity<Object> handleIOException(Exception ex){
+        RestResponse<Object> res = new RestResponse<Object>();
+        res.setStatusCode(HttpStatus.BAD_REQUEST.value());
+        res.setError(ex.getMessage());
+        res.setMessage("Error processing files");
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(res);
     }
 }

@@ -33,7 +33,7 @@ public class User extends AbstractAuditingEntity {
     @Column(name="id")
     private UUID id;
 
-    @Size(max = 100)
+    @Size(max = 254)
     @Column(name="image")
     private String image;
 
@@ -53,10 +53,6 @@ public class User extends AbstractAuditingEntity {
     @Pattern(regexp="(^$|[0-9]{10})") //phone number length must be 10 and contains digits only
     @Column(length = 10, unique = true)
     private String phone;
-
-    @Column(name = "is_active")
-    @Builder.Default
-    private Boolean isActive = true;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "status", length = 20, nullable = false)
