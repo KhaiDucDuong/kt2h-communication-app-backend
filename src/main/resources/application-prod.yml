@@ -3,9 +3,9 @@ server:
 spring:
   datasource:
     driver-class-name: org.postgresql.Driver
-    url: jdbc:postgresql://pg-2e29d2d0-messaging-platform-kht-messaging-platform.c.aivencloud.com:28690/defaultdb
-    username: avnadmin
-    password: AVNS_f6-iad_WNH5i3sjxqrM
+    url: jdbc:postgresql://db:5432/kt2h_db
+    username: postgres
+    password: ~bis9gXOOoNU9x'
     hikari:
       maximum-pool-size: 10
 
