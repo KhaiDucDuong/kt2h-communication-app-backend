@@ -20,9 +20,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 @RestController
 @RequestMapping("/api/messages")
@@ -51,19 +49,21 @@ public class MessageController {
     }
     @PostMapping("/upload")
     @PreAuthorize("hasAnyAuthority('USER')")
-    public ResponseEntity<Map<String, String>> uploadFile(@RequestParam("file") MultipartFile file) {
-        String imageUrl = null;
-        if (file != null && !file.isEmpty()) {
-            try {
-                imageUrl = String.valueOf(messageService.uploadImage(file));
-            } catch (IOException e) {
-                throw new RuntimeException(e);
+    public ResponseEntity<?> uploadFile(@RequestParam("file") List<MultipartFile> files) {
+        List<String> imageUrls = new ArrayList<>();
+        for (MultipartFile file : files){
+            if (file != null && !file.isEmpty()) {
+                try {
+                    String imageUrl = String.valueOf(messageService.uploadImage(file));  // Assuming this returns the URL of the uploaded image
+                    imageUrls.add(imageUrl);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
             }
         }
-
         // Trả về file URL trong response
-        Map<String, String> response = new HashMap<>();
-        response.put("imageUrl", imageUrl);
+        Map<String, List<String>> response = new HashMap<>();
+        response.put("imageUrls", imageUrls);  // Updated to return a list of URLs
         return ResponseEntity.ok(response);
     }
 }

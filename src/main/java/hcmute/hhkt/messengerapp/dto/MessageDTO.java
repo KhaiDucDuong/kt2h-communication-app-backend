@@ -24,9 +24,9 @@ public class MessageDTO {
     @JsonProperty("message")
     private String message;
 
-    @JsonProperty("message_types")  // Thay đổi tên trường thành message_types
-    private List<String> messageTypes;  // Sử dụng List để lưu nhiều loại tin nhắn
+    @JsonProperty("message_type")  // Thay đổi tên trường thành message_types
+    private String messageType;  // Sử dụng List để lưu nhiều loại tin nhắn
 
-    @JsonProperty("image_url")
-    private String imageUrl;
+    @JsonProperty("image_urls")
+    private List<String> imageUrls;
 }

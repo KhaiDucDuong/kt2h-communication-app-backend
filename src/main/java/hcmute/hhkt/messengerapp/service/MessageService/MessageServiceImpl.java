@@ -31,6 +31,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.util.Collections;
 import java.util.UUID;
 
 @Service
@@ -44,39 +45,47 @@ public class MessageServiceImpl implements IMessageService{
     private final IUserService userService;
     @Override
     public Message createMessage(MessageDTO messageDTO) {
-        // Kiểm tra và xác định kiểu tin nhắn
-        if (messageDTO.getMessageTypes() == null || messageDTO.getMessageTypes().isEmpty()) {
-            throw new IllegalArgumentException("Message types must not be empty");
+        MessageType messageType = MessageType.valueOf(messageDTO.getMessageType());
+
+        if (messageType.equals(MessageType.TEXT) && StringUtils.isBlank(messageDTO.getMessage())) {
+            throw new IllegalArgumentException(ExceptionMessage.MESSAGE_IS_BLANK);
         }
 
-        Message message = new Message();
-        message.setSender(userService.findById(UUID.fromString(messageDTO.getSenderId())));
-        message.setConversation(conversationService.findById(UUID.fromString(messageDTO.getConversationId())));
+        // Tạo đối tượng Message
+        Message.MessageBuilder messageBuilder = Message.builder()
+                .messageType(messageType)
+                .message("")  // Default empty message for non-TEXT types
+                .sender(userService.findById(UUID.fromString(messageDTO.getSenderId())));
 
-        // Kiểm tra các loại tin nhắn và xử lý
-        for (String messageTypeString : messageDTO.getMessageTypes()) {
-            MessageType messageType = MessageType.valueOf(messageTypeString.toUpperCase());
-
-            // Nếu là văn bản
-            if (messageType == MessageType.TEXT) {
-                if (messageDTO.getMessage() == null || messageDTO.getMessage().isEmpty()) {
-                    throw new IllegalArgumentException("Message content cannot be empty for TEXT message");
-                }
-                message.setMessage(messageDTO.getMessage());
+        // Xử lý nội dung tin nhắn TEXT hoặc IMAGE
+        if (messageType.equals(MessageType.TEXT)) {
+            messageBuilder.message(messageDTO.getMessage());
+        } else if (messageType.equals(MessageType.IMAGE)) {
+            // If multiple image URLs are provided, assign them as a list
+            if (messageDTO.getImageUrls() == null || messageDTO.getImageUrls().isEmpty()) {
+                throw new IllegalArgumentException("Image URL(s) must be provided for image messages.");
             }
-
-            // Nếu là hình ảnh
-            if (messageType == MessageType.IMAGE) {
-                if (messageDTO.getImageUrl() == null || messageDTO.getImageUrl().isEmpty()) {
-                    throw new IllegalArgumentException("Image URL cannot be empty for IMAGE message");
-                }
-                message.setImageUrl(messageDTO.getImageUrl());
+            messageBuilder.imageUrls(messageDTO.getImageUrls());
+        } else if (messageType.equals(MessageType.IMAGE_AND_TEXT)) {
+            messageBuilder.message(messageDTO.getMessage());
+            // If multiple image URLs are provided, assign them as a list
+            if (messageDTO.getImageUrls() == null || messageDTO.getImageUrls().isEmpty()) {
+                throw new IllegalArgumentException("Image URL(s) must be provided for image and text messages.");
             }
+            messageBuilder.imageUrls(messageDTO.getImageUrls());
+        }
+
+        Message message = messageBuilder.build();
+
+        // Liên kết với cuộc trò chuyện nếu có
+        if (!StringUtils.isBlank(messageDTO.getConversationId())) {
+            message.setConversation(conversationService.findById(UUID.fromString(messageDTO.getConversationId())));
         }
 
         // Lưu tin nhắn vào cơ sở dữ liệu
         return messageRepository.save(message);
     }
+
 
     @Override
     public ResultPaginationResponse getConversationMessages(Conversation conversation, Pageable pageable) {

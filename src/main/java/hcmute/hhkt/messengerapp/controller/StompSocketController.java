@@ -41,7 +41,7 @@ public class StompSocketController {
     private final IConversationService conversationService;
     private final IMessageService messageService;
     private final IUserService userService;
-
+    @MessageMapping("/private-message")
     public void receivePrivateMessage(@Payload MessageDTO messageDTO) {
         log.debug("Stomp private message from {}", messageDTO.getSenderId());
         UUID conversationId = UUID.fromString(messageDTO.getConversationId());
