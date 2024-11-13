@@ -88,4 +88,4 @@ logging:
 
 front-end:
   website:
-    url: http://localhost:3000
+    url: http://14.225.212.169:3000/
