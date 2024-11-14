@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.time.Instant;
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
@@ -26,8 +27,8 @@ public class MessageResponse {
     private Boolean isReacted;
     @JsonProperty("sent_at")
     private Instant sentAt;
-    @JsonProperty("image_url")
-    private String image_url;
+    @JsonProperty("image_urls")
+    private List<String> imageUrls;
 
     public static MessageResponse fromMessage(Message message){
         return MessageResponse.builder()
@@ -37,7 +38,7 @@ public class MessageResponse {
                 .messageType(message.getMessageType().name())
                 .isReacted(message.getIsReacted())
                 .sentAt(message.getCreatedDate())
-                .image_url(message.getImageUrl())
+                .imageUrls(message.getImageUrls())
                 .build();
     }
 

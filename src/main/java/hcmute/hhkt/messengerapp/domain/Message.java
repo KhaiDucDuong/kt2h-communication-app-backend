@@ -5,6 +5,7 @@ import hcmute.hhkt.messengerapp.domain.enums.SystemRole;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.List;
 import java.util.UUID;
 
 @Getter
@@ -39,8 +40,9 @@ public class Message extends AbstractDateAuditingEntity{
     @Column(name = "message", unique = false, columnDefinition = "TEXT")
     private String message;
 
-    @Column(name = "image_url", columnDefinition = "TEXT")
-    private String imageUrl;
+    @ElementCollection
+    @Column(name = "image_urls", columnDefinition = "TEXT")
+    private List<String> imageUrls;
 
     @Column(name = "is_deleted")
     @Builder.Default

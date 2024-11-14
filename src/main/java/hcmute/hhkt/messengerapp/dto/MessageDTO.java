@@ -4,6 +4,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.List;
+
 @Getter
 @Setter
 public class MessageDTO {
@@ -22,9 +24,9 @@ public class MessageDTO {
     @JsonProperty("message")
     private String message;
 
-    @JsonProperty("message_type")
-    private String messageType;
+    @JsonProperty("message_type")  // Thay đổi tên trường thành message_types
+    private String messageType;  // Sử dụng List để lưu nhiều loại tin nhắn
 
-    @JsonProperty("image_url")
-    private String imageUrl;
+    @JsonProperty("image_urls")
+    private List<String> imageUrls;
 }

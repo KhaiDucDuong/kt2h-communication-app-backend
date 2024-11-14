@@ -31,6 +31,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.util.Collections;
 import java.util.UUID;
 
 @Service
@@ -53,14 +54,25 @@ public class MessageServiceImpl implements IMessageService{
         // Tạo đối tượng Message
         Message.MessageBuilder messageBuilder = Message.builder()
                 .messageType(messageType)
-                .message("")
+                .message("")  // Default empty message for non-TEXT types
                 .sender(userService.findById(UUID.fromString(messageDTO.getSenderId())));
 
         // Xử lý nội dung tin nhắn TEXT hoặc IMAGE
         if (messageType.equals(MessageType.TEXT)) {
             messageBuilder.message(messageDTO.getMessage());
         } else if (messageType.equals(MessageType.IMAGE)) {
-            messageBuilder.imageUrl(String.valueOf(messageDTO.getImageUrl()));
+            // If multiple image URLs are provided, assign them as a list
+            if (messageDTO.getImageUrls() == null || messageDTO.getImageUrls().isEmpty()) {
+                throw new IllegalArgumentException("Image URL(s) must be provided for image messages.");
+            }
+            messageBuilder.imageUrls(messageDTO.getImageUrls());
+        } else if (messageType.equals(MessageType.IMAGE_AND_TEXT)) {
+            messageBuilder.message(messageDTO.getMessage());
+            // If multiple image URLs are provided, assign them as a list
+            if (messageDTO.getImageUrls() == null || messageDTO.getImageUrls().isEmpty()) {
+                throw new IllegalArgumentException("Image URL(s) must be provided for image and text messages.");
+            }
+            messageBuilder.imageUrls(messageDTO.getImageUrls());
         }
 
         Message message = messageBuilder.build();
@@ -70,8 +82,11 @@ public class MessageServiceImpl implements IMessageService{
             message.setConversation(conversationService.findById(UUID.fromString(messageDTO.getConversationId())));
         }
 
+        // Lưu tin nhắn vào cơ sở dữ liệu
         return messageRepository.save(message);
     }
+
+
     @Override
     public ResultPaginationResponse getConversationMessages(Conversation conversation, Pageable pageable) {
         Page<Message> messagePage = messageRepository.findMessagesByConversationAndIsDeletedIsFalse(conversation, pageable);
