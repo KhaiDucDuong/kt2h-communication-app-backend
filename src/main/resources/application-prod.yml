@@ -88,4 +88,4 @@ logging:
 
 front-end:
   website:
-    url: http://localhost:3000
+    url: https://kt2h-communication-web-front-end.vercel.app/
