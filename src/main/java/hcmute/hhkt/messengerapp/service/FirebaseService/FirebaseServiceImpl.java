@@ -9,6 +9,7 @@ import hcmute.hhkt.messengerapp.util.ImageUtil;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ResourceUtils;
 import org.springframework.web.multipart.MultipartFile;
@@ -140,8 +141,10 @@ public class FirebaseServiceImpl implements IFirebaseService{
     }
 
     private Storage getStorage() throws IOException {
-        File serviceAccountFile = ResourceUtils.getFile("classpath:" + serviceAccountFileName);
-        FileInputStream serviceAccount = new FileInputStream(serviceAccountFile);
+        InputStream serviceAccount = new ClassPathResource(serviceAccountFileName).getInputStream();
+
+//        File serviceAccountFile = ResourceUtils.getFile("classpath:" + serviceAccountFileName);
+//        FileInputStream serviceAccount = new FileInputStream(serviceAccountFile);
 
         return StorageOptions.newBuilder()
                 .setCredentials(GoogleCredentials.fromStream(serviceAccount))
