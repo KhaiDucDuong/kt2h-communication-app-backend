@@ -1,9 +1,11 @@
 package hcmute.hhkt.messengerapp.domain;
 
+import hcmute.hhkt.messengerapp.domain.enums.Device;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.Instant;
+import java.util.UUID;
 
 @Getter
 @Setter
@@ -14,20 +16,21 @@ import java.time.Instant;
 @Table(name ="refresh_tokens")
 public class RefreshToken {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name="id")
-    private long id;
+    private UUID id;
 
-    @Column(name = "token", nullable = false, unique = true, columnDefinition = "MEDIUMTEXT")
+    @Column(name = "token", nullable = false, unique = true, columnDefinition = "TEXT")
     private String token;
 
     @Column(name = "expiry_date", nullable = false)
     private Instant expiryDate;
 
-    @Column(name = "is_mobile")
-    private boolean isMobile;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "device", length = 20, nullable = false)
+    private Device device;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", referencedColumnName = "id")
-    private User user;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "account_id", referencedColumnName = "id")
+    private Account account;
 }

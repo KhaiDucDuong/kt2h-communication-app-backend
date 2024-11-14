@@ -24,7 +24,7 @@ public abstract class AbstractAuditingEntity {
     private String createdBy;
 
     @CreatedDate
-    @Column(name = "created_date", updatable = false)
+    @Column(name = "created_at", updatable = false)
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss a", timezone = "GMT+7")
     private Instant createdDate = Instant.now();
 
@@ -33,7 +33,7 @@ public abstract class AbstractAuditingEntity {
     private String lastModifiedBy;
 
     @LastModifiedDate
-    @Column(name = "last_modified_date")
+    @Column(name = "last_modified_at")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss a", timezone = "GMT+7")
     private Instant lastModifiedDate = Instant.now();
 }

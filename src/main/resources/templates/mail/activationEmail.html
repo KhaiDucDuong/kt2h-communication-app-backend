@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>KT2H Activation mail</title>
+    <style>
+        .text {
+            color: #737f8d;
+            font-size: 16px;
+            font-family: Helvetica Neue, Helvetica, Arial, Lucida Grande, sans-serif;
+        }
+
+        .greeting-text {
+            font-family: Helvetica Neue, Helvetica, Arial, Lucida Grande, sans-serif;
+            font-weight: 500;
+            font-size: 20px;
+            color: #4f545c
+        }
+
+        .text-bold {
+            font-weight: bold;
+        }
+
+        .container {
+            display: flex !important;
+            flex-direction: column !important;
+            margin: auto !important;
+            background: white;
+            width: fit-content;
+            padding: 40px 50px;
+        }
+
+        .confirm-btn {
+            background: #5764F0;
+            padding: 15px 20px;
+            border-radius: 5px;
+        }
+
+        .confirm-text {
+            color: white !important;
+            text-decoration: none !important;
+            font-family: Ubuntu, Helvetica, Arial, sans-serif;
+            font-size: 15px;
+            font-weight: normal;
+        }
+
+        .background-container {
+            background: #f9f9f9;
+            align-items: center;
+        }
+    </style>
+</head>
+<body>
+    <section class="background-container">
+        <div style="vertical-align:top;direction:ltr;padding:40px 50px">
+            <p th:text="#{email.activation.greeting(${user.firstName})}" class="greeting-text">Dear</p>
+            <p th:text="#{email.activation.text1}" class="text"></p>
+            <div class="confirm-btn" style="width: fit-content">
+                <a th:with="url=@{|${webUrl}/activate?key=${activationCode}|}" th:href="${url}" class="confirm-text"
+                style="line-height: 100%">Activation link</a>
+            </div>
+            <p class="text">
+                <span th:text="#{email.activation.text2}">Regards, </span>
+                <br/>
+                <em th:text="#{email.signature}" class="text-bold">KT2H.</em>
+            </p>
+        </div>
+    </section>
+</body>
+</html>

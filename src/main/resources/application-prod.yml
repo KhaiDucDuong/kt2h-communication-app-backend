@@ -1,0 +1,91 @@
+server:
+  port: 8080
+spring:
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://pg-2e29d2d0-messaging-platform-kht-messaging-platform.c.aivencloud.com:28690/defaultdb
+    username: avnadmin
+    password: AVNS_f6-iad_WNH5i3sjxqrM
+    hikari:
+      maximum-pool-size: 10
+
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+
+  data:
+    redis:
+      host: redis-13005.c252.ap-southeast-1-1.ec2.redns.redis-cloud.com
+      port: 13005
+      password: YUGlni8un2dWM5NgFoEITHD5g0w1uuUg
+      username: default
+    web:
+      pageable:
+        default-page-size: 20
+        one-indexed-parameters: true
+        max-page-size: 50
+
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: greenjohnny531@gmail.com
+    password: jqdsxhbbdqwizqqx
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+
+  messages:
+    basename: i18n/messages
+
+  thymeleaf:
+    mode: HTML
+
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            provider: google
+            client-id: 60975655598-7ncgl9qof8qvjgft44l541dc0i7m6o7l.apps.googleusercontent.com
+            client-secret: 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
+            authorization-grant-type: authorization_code
+            scope: profile,email,openid
+
+api:
+  prefix: /api
+
+jwt:
+  access-token-expiration-in-seconds: 6000 #10 minutes (600s) = 6 * 60
+  refresh-token-expiration-in-seconds: 7776000 #90 days (7776000s) = 90 * 24 * 60 * 60
+  base64-secret: xqWM9YRbhgqWNY9REd4RW47o/kZRkOkQrzg1qdMBVfiXErOHpT6UTVwoUnNIZLIDaFiatwVbNgyjx/iMYbNkKQ==
+
+firebase:
+  service-account-filename: hkt-e0d9b-firebase-adminsdk-6b37m-3bbc9aeeeb.json
+  realtime-database-url: https://hkt-e0d9b-default-rtdb.firebaseio.com/
+  project-id: hkt-e0d9b
+  bucket-url: hkt-e0d9b.appspot.com
+  file-starter-url: "https://firebasestorage.googleapis.com/v0/b/hkt-e0d9b.appspot.com/o/"
+
+logging:
+  level:
+    root: INFO
+    hcmute.hhkt.messengerapp: INFO
+    org:
+      springframework:
+        web:
+          socket: INFO
+        messaging: INFO
+
+  file:
+    name: log/dev.log
+
+front-end:
+  website:
+    url: http://localhost:3000

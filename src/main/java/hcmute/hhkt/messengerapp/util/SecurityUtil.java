@@ -10,7 +10,6 @@ import org.springframework.security.oauth2.jose.jws.MacAlgorithm;
 import org.springframework.security.oauth2.jwt.*;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.stereotype.Service;
-import hcmute.hhkt.messengerapp.domain.Authority;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
@@ -31,17 +30,17 @@ public final class SecurityUtil {
 
     private final JwtEncoder jwtEncoder;
 
-    public String createAccessToken(Authentication authentication, List<Authority> authorities) {
+    public String createAccessToken(Authentication authentication, String email) {
         Instant now = Instant.now();
         Instant validity;
 
-        List<String> authorityNameList = authorities.stream().map(Authority::getName).toList();
+        List<String> authorityNameList = authentication.getAuthorities().stream().map(Object::toString).toList();
 
         validity = now.plus(this.jwtAccessTokenExpiration, ChronoUnit.SECONDS);
         JwtClaimsSet claims = JwtClaimsSet.builder()
                 .issuedAt(now)
                 .expiresAt(validity)
-                .subject(authentication.getName())
+                .subject(email)
                 .claim("authorities", authorityNameList)
                 .build();
 
@@ -49,7 +48,23 @@ public final class SecurityUtil {
         return this.jwtEncoder.encode(JwtEncoderParameters.from(jwsHeader, claims)).getTokenValue();
     }
 
-    public String createRefreshToken(String email) {
+    public String createAccessToken(List<String> authorities, String email) {
+        Instant now = Instant.now();
+        Instant validity;
+
+        validity = now.plus(this.jwtAccessTokenExpiration, ChronoUnit.SECONDS);
+        JwtClaimsSet claims = JwtClaimsSet.builder()
+                .issuedAt(now)
+                .expiresAt(validity)
+                .subject(email)
+                .claim("authorities", authorities)
+                .build();
+
+        JwsHeader jwsHeader = JwsHeader.with(JWT_ALGORITHM).build();
+        return this.jwtEncoder.encode(JwtEncoderParameters.from(jwsHeader, claims)).getTokenValue();
+    }
+
+    public String createRefreshToken(String subject) {
         Instant now = Instant.now();
         Instant validity;
 
@@ -57,7 +72,7 @@ public final class SecurityUtil {
         JwtClaimsSet claims = JwtClaimsSet.builder()
                 .issuedAt(now)
                 .expiresAt(validity)
-                .subject(email)
+                .subject(subject)
                 .build();
 
         JwsHeader jwsHeader = JwsHeader.with(JWT_ALGORITHM).build();

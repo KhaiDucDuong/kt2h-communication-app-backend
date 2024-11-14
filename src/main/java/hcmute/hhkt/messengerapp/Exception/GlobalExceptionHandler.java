@@ -1,8 +1,10 @@
 package hcmute.hhkt.messengerapp.Exception;
 
+import hcmute.hhkt.messengerapp.Response.UnactivatedAccountLoginResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.mapping.PropertyReferenceException;
+import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authorization.AuthorizationDeniedException;
 import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -20,6 +22,7 @@ import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import java.io.IOException;
 import java.util.List;
 
 @RestControllerAdvice
@@ -38,6 +41,8 @@ public class GlobalExceptionHandler {
             return handleMethodArgumentNotValidException((MethodArgumentNotValidException) ex, request);
         } else if (ex instanceof UsernameNotFoundException || ex instanceof BadCredentialsException){
             return handleFailedAuthenticationException(ex);
+        } else if (ex instanceof UnactivatedAccountException) {
+            return handleUnactivatedAccountException((UnactivatedAccountException) ex);
         } else if (ex instanceof HttpRequestMethodNotSupportedException){
             return handleHttpRequestMethodNotSupportedException(ex);
         } else if (ex instanceof PropertyReferenceException){
@@ -48,6 +53,12 @@ public class GlobalExceptionHandler {
             return handleMissingRequestCookieException(ex);
         } else if (ex instanceof AuthorizationDeniedException){
             return handleAuthorizationDeniedException(ex);
+        } else if (ex instanceof UnauthorizedRequestException){
+            return handleUnauthorizedRequestException(ex);
+        } else if (ex instanceof DisabledException){
+            return handleDisabledException(ex);
+        } else if (ex instanceof IOException){
+            return handleIOException(ex);
         }
 
         RestResponse<Object> res = new RestResponse<Object>();
@@ -139,5 +150,41 @@ public class GlobalExceptionHandler {
         res.setMessage("Authorization Denied Exception");
 
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body(res);
+    }
+
+    private ResponseEntity<Object> handleUnauthorizedRequestException(Exception ex){
+        RestResponse<Object> res = new RestResponse<Object>();
+        res.setStatusCode(HttpStatus.FORBIDDEN.value());
+        res.setError(ex.getMessage());
+        res.setMessage("Unauthorized Request Exception");
+
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(res);
+    }
+
+    private ResponseEntity<Object> handleDisabledException(Exception ex){
+        RestResponse<Object> res = new RestResponse<Object>();
+        res.setStatusCode(HttpStatus.FORBIDDEN.value());
+        res.setError(ex.getMessage());
+        res.setMessage("Account is disabled");
+
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(res);
+    }
+
+    private ResponseEntity<Object> handleUnactivatedAccountException(UnactivatedAccountException ex){
+        RestResponse<Object> res = new RestResponse<Object>();
+        res.setStatusCode(HttpStatus.FORBIDDEN.value());
+        res.setError(ex.getMessage());
+        res.setMessage("Unactivated Account");
+        res.setData(new UnactivatedAccountLoginResponse(ex.getUnactivatedEmail()));
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(res);
+    }
+
+    private ResponseEntity<Object> handleIOException(Exception ex){
+        RestResponse<Object> res = new RestResponse<Object>();
+        res.setStatusCode(HttpStatus.BAD_REQUEST.value());
+        res.setError(ex.getMessage());
+        res.setMessage("Error processing files");
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(res);
     }
 }

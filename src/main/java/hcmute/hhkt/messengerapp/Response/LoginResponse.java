@@ -1,6 +1,8 @@
 package hcmute.hhkt.messengerapp.Response;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import hcmute.hhkt.messengerapp.domain.User;
+import hcmute.hhkt.messengerapp.domain.enums.UserStatus;
 import lombok.*;
 
 @Getter
@@ -24,10 +26,42 @@ public class LoginResponse {
         @JsonProperty("email")
         private String email;
 
-        @JsonProperty("full_name")
-        private String fullName;
+        @JsonProperty("first_name")
+        private String firstName;
+
+        @JsonProperty("last_name")
+        private String lastName;
 
         @JsonProperty("user_id")
         private String userId;
+
+        @JsonProperty("image")
+        private String image;
+
+        @JsonProperty("phone")
+        private String phone;
+
+        @JsonProperty("role")
+        private String role;
+
+        @JsonProperty("status")
+        private String status;
+
+        @JsonProperty("default_status")
+        private String defaultStatus;
+
+        public static UserLogin fromUser(User user){
+            return UserLogin.builder()
+                    .userId(String.valueOf(user.getId()))
+                    .email(user.getEmail())
+                    .firstName(user.getFirstName())
+                    .lastName(user.getLastName())
+                    .phone(user.getPhone())
+                    .image(user.getImage())
+                    .role(user.getRole().name())
+                    .status(UserStatus.ONLINE.name())
+                    .defaultStatus(user.getDefaultStatus().name())
+                    .build();
+        }
     }
 }
