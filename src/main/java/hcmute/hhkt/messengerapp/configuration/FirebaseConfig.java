@@ -21,8 +21,9 @@ public class FirebaseConfig {
     private String firebaseUrl;
     @Bean
     public FirebaseApp firebaseInit() throws IOException {
-        File file = ResourceUtils.getFile("classpath:" + serviceAccountFileName);
-        FileInputStream serviceAccount = new FileInputStream(file);
+        InputStream serviceAccount = new ClassPathResource(serviceAccountFileName).getInputStream();
+//        File file = ResourceUtils.getFile("classpath:" + serviceAccountFileName);
+//        FileInputStream serviceAccount = new FileInputStream(file);
 
         FirebaseOptions options = FirebaseOptions.builder()
                 .setCredentials(GoogleCredentials.fromStream(serviceAccount))

@@ -29,6 +29,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Collections;
@@ -119,8 +120,10 @@ public class MessageServiceImpl implements IMessageService{
     }
 
     public String uploadImage(MultipartFile file) throws IOException {
-        File serviceAccountFile = ResourceUtils.getFile("classpath:" + serviceAccountFileName);
-        FileInputStream serviceAccount = new FileInputStream(serviceAccountFile);
+        InputStream serviceAccount = new ClassPathResource(serviceAccountFileName).getInputStream();
+
+//        File serviceAccountFile = ResourceUtils.getFile("classpath:" + serviceAccountFileName);
+//        FileInputStream serviceAccount = new FileInputStream(serviceAccountFile);
 
         Storage storage = StorageOptions.newBuilder()
                 .setCredentials(GoogleCredentials.fromStream(serviceAccount))
