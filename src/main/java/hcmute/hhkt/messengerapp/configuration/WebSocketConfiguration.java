@@ -106,7 +106,7 @@ public class WebSocketConfiguration implements WebSocketMessageBrokerConfigurer 
         registry.setApplicationDestinationPrefixes("/app");
         registry.enableSimpleBroker("/chatroom","/user","/admin")
                 .setTaskScheduler(te)
-                .setHeartbeatValue(new long[] {10000, 10000}); // Heartbeat every 10 seconds
+                .setHeartbeatValue(new long[] {60000, 60000}); // Heartbeat every 60 seconds
         registry.setUserDestinationPrefix("/user");
     }
 
