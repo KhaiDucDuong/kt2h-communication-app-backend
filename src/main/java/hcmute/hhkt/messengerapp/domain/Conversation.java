@@ -29,7 +29,7 @@ public class Conversation extends AbstractDateAuditingEntity{
     private User creator;
 
     @Size(min = 1, max = 50)
-    @Column(name="target_nickname", nullable = false)
+    @Column(name="target_nickname")
     private String targetNickname;
 
     @ManyToOne(fetch = FetchType.LAZY)

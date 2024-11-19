@@ -3,9 +3,9 @@ server:
 spring:
   datasource:
     driver-class-name: org.postgresql.Driver
-    url: jdbc:postgresql://pg-2e29d2d0-messaging-platform-kht-messaging-platform.c.aivencloud.com:28690/defaultdb
+    url: jdbc:postgresql://pg-23e027d9-kt2h-communication-platform-prod.h.aivencloud.com:25565/defaultdb
     username: avnadmin
-    password: AVNS_f6-iad_WNH5i3sjxqrM
+    password: AVNS_7KugJXTFJ1GaPyYti4N
     hikari:
       maximum-pool-size: 10
 
@@ -88,4 +88,4 @@ logging:
 
 front-end:
   website:
-    url: https://kt2h-communication-web-front-end.vercel.app/
+    url: https://kt2h.io.vn/
