@@ -8,6 +8,7 @@ import hcmute.hhkt.messengerapp.domain.enums.UserCreationType;
 import hcmute.hhkt.messengerapp.domain.enums.UserDefaultStatus;
 import hcmute.hhkt.messengerapp.domain.enums.UserStatus;
 import hcmute.hhkt.messengerapp.dto.RegisterUserDTO;
+import hcmute.hhkt.messengerapp.dto.SearchUserDTO;
 import hcmute.hhkt.messengerapp.dto.UserProfileDTO;
 import hcmute.hhkt.messengerapp.repository.UserRepository;
 import hcmute.hhkt.messengerapp.service.AccountService.AccountServiceImpl;
@@ -159,6 +160,11 @@ public class UserServiceImpl implements IUserService {
         user.setLastName(userProfileDTO.getLastName());
         user.setLastActivityAt(Instant.now());
         return userRepository.save(user);
+    }
+
+    @Override
+    public List<SearchUserDTO> findUserbyUsername (String username, String currentuserid) {
+        return userRepository.findUserWithFriendStatusByUsername(username, UUID.fromString(currentuserid));
     }
 
     @Async

@@ -5,6 +5,7 @@ import hcmute.hhkt.messengerapp.domain.User;
 import hcmute.hhkt.messengerapp.domain.enums.UserDefaultStatus;
 import hcmute.hhkt.messengerapp.domain.enums.UserStatus;
 import hcmute.hhkt.messengerapp.dto.RegisterUserDTO;
+import hcmute.hhkt.messengerapp.dto.SearchUserDTO;
 import hcmute.hhkt.messengerapp.dto.UserProfileDTO;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 
@@ -28,4 +29,6 @@ public interface IUserService {
     User updateUserImg(User user, String imgPath);
 
     User updateUser(User user, UserProfileDTO userProfileDTO);
+
+    List<SearchUserDTO> findUserbyUsername(String username, String currentId);
 }

@@ -14,6 +14,7 @@ import hcmute.hhkt.messengerapp.dto.UserProfileDTO;
 import hcmute.hhkt.messengerapp.service.FirebaseService.FirebaseServiceImpl;
 import hcmute.hhkt.messengerapp.service.FirebaseService.IFirebaseService;
 import hcmute.hhkt.messengerapp.util.SecurityUtil;
+import io.lettuce.core.dynamic.annotation.Param;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.messaging.handler.annotation.MessageMapping;
@@ -33,6 +34,8 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.time.Instant;
 import java.util.*;
+
+import static hcmute.hhkt.messengerapp.Response.UserResponse.fromUserList;
 
 @RestController
 @RequestMapping("/api/users")

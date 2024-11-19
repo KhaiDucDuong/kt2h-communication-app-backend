@@ -14,4 +14,6 @@ public interface GroupchatRepository extends JpaRepository<Groupchat, UUID>
 
         Groupchat getGroupchatByGroupid(UUID uuid);
 
+        List<Groupchat> getGroupchatByGroupname(String Groupname);
+
 }

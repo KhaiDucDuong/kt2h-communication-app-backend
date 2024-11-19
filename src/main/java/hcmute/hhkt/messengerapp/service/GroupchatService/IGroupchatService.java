@@ -12,4 +12,5 @@ public interface IGroupchatService {
     boolean delGroupchat(String groupID);
 
     boolean editGroupchat (GroupchatDTO groupchatDTO);
+
 }
